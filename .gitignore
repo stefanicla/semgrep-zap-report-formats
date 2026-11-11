@@ -1,0 +1,25 @@
+# Scan output: one formats-<UTC> folder per run (samples/ holds the published copy)
+reports/
+
+# Semgrep ruleset snapshot: Semgrep Rules License v1.0, downloaded by scripts/Update-SemgrepRules.ps1
+rules/*.yaml
+rules/*.download
+
+# Infographic build output
+docs/infographic/out/
+/*.pdf
+
+# OS and editor files
+Thumbs.db
+desktop.ini
+.DS_Store
+.vscode/*
+!.vscode/settings.json
+!.vscode/extensions.json
+.idea/
+*.swp
+
+# Python
+__pycache__/
+*.py[cod]
+.venv/

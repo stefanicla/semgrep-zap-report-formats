@@ -1,0 +1,2197 @@
+{
+   "runs": [
+      {
+         "results": [ 
+            {
+               "level": "error",
+               "locations": [
+                  {
+                     "physicalLocation": {
+                        "artifactLocation": {
+                           "uri": "http:\/\/demo-app:5000\/hello?name=%3C%2Fh1%3E%3CscrIpt%3Ealert%281%29%3B%3C%2FscRipt%3E%3Ch1%3E"
+                        },
+                        
+                        "region": {
+                           "startLine": 1,
+                           
+                           "snippet": {
+                               "text": "<\/h1><scrIpt>alert(1);<\/scRipt><h1>"
+                           }
+                        }
+                     },
+                     "properties": {
+                         "attack": "<\/h1><scrIpt>alert(1);<\/scRipt><h1>"
+                     }
+                  }
+               ],
+               "message": {
+                  "text": "Cross-site Scripting (XSS) is an attack technique that involves echoing attacker-supplied code into a user's browser instance. A browser instance can be a standard web browser client, or a browser object embedded in a software product such as the browser within WinAmp, an RSS reader, or an email client. The code itself is usually written in HTML\/JavaScript, but may also extend to VBScript, ActiveX, Java, Flash, or any other browser-supported technology.\nWhen an attacker gets a user's browser to execute his\/her code, the code will run within the security context (or zone) of the hosting web site. With this level of privilege, the code has the ability to read, modify and transmit any sensitive data accessible by the browser. A Cross-site Scripted user could have his\/her account hijacked (cookie theft), their browser redirected to another location, or possibly shown fraudulent content delivered by the web site they are visiting. Cross-site Scripting attacks essentially compromise the trust relationship between a user and the web site. Applications utilizing browser object instances which load content from the file system may execute code under the local machine zone allowing for system compromise.\n\nThere are three types of Cross-site Scripting attacks: non-persistent, persistent and DOM-based.\nNon-persistent attacks and DOM-based attacks require a user to either visit a specially crafted link laced with malicious code, or visit a malicious web page containing a web form, which when posted to the vulnerable site, will mount the attack. Using a malicious form will oftentimes take place when the vulnerable resource only accepts HTTP POST requests. In such a case, the form can be submitted automatically, without the victim's knowledge (e.g. by using JavaScript). Upon clicking on the malicious link or submitting the malicious form, the XSS payload will get echoed back and will get interpreted by the user's browser and execute. Another technique to send almost arbitrary requests (GET and POST) is by using an embedded client, such as Adobe Flash.\nPersistent attacks occur when the malicious code is submitted to a web site where it's stored for a period of time. Examples of an attacker's favorite targets often include message board posts, web mail messages, and web chat software. The unsuspecting user is not required to interact with any additional site\/link (e.g. an attacker site or a malicious link sent via email), just simply view the web page containing the code."
+               },
+               "ruleId": "40012",
+               "webRequest": {
+                   "protocol": "HTTP",
+                   "version": "1.1",
+                   "target": "http:\/\/demo-app:5000\/hello?name=%3C%2Fh1%3E%3CscrIpt%3Ealert%281%29%3B%3C%2FscRipt%3E%3Ch1%3E",
+                   "method": "GET",
+                   "headers": {
+                       "cache-control" : "no-cache",
+                       "host" : "demo-app:5000",
+                       "pragma" : "no-cache",
+                       "referer" : "http:\/\/demo-app:5000",
+                       "user-agent" : ""
+                   },
+                   "body": {
+                       
+                   }
+               },
+               "webResponse": {
+                   "statusCode": 200,
+                   "reasonPhrase": "OK",
+                   "protocol": "HTTP",
+                   "version": "1.1",
+                   "headers": {
+                       "Connection" : "close",
+                       "Content-Length" : "50",
+                       "Content-Type" : "text\/html; charset=utf-8",
+                       "Date" : "Fri, 06 Nov 2026 07:08:37 GMT",
+                       "Server" : "Werkzeug\/3.1.9 Python\/3.13.18"
+                   },
+                   "body": {
+                       "text": "<h1>Hello <\/h1><scrIpt>alert(1);<\/scRipt><h1><\/h1>"
+                   },
+                   "noResponseReceived": true
+               }
+            },
+            {
+               "level": "error",
+               "locations": [
+                  {
+                     "physicalLocation": {
+                        "artifactLocation": {
+                           "uri": "http:\/\/demo-app:5000\/search?q=%27"
+                        },
+                        
+                        "region": {
+                           "startLine": 1,
+                           
+                           "properties" : { 
+                               "startLineFailure" : "Resolved invalid start line: 0 - used fallback value instead."
+                            }, 
+                           "snippet": {
+                               "text": "HTTP\/1.1 500 INTERNAL SERVER ERROR"
+                           }
+                        }
+                     },
+                     "properties": {
+                         "attack": "'"
+                     }
+                  }
+               ],
+               "message": {
+                  "text": "SQL injection may be possible."
+               },
+               "ruleId": "40018",
+               "webRequest": {
+                   "protocol": "HTTP",
+                   "version": "1.1",
+                   "target": "http:\/\/demo-app:5000\/search?q=%27",
+                   "method": "GET",
+                   "headers": {
+                       "Cookie" : "session_id=demo-session",
+                       "cache-control" : "no-cache",
+                       "host" : "demo-app:5000",
+                       "pragma" : "no-cache",
+                       "referer" : "http:\/\/demo-app:5000",
+                       "user-agent" : ""
+                   },
+                   "body": {
+                       
+                   }
+               },
+               "webResponse": {
+                   "statusCode": 500,
+                   "reasonPhrase": "INTERNAL SERVER ERROR",
+                   "protocol": "HTTP",
+                   "version": "1.1",
+                   "headers": {
+                       "Connection" : "close",
+                       "Content-Length" : "14210",
+                       "Content-Type" : "text\/html; charset=utf-8",
+                       "Date" : "Fri, 06 Nov 2026 07:08:37 GMT",
+                       "Server" : "Werkzeug\/3.1.9 Python\/3.13.18"
+                   },
+                   "body": {
+                       "text": "<!doctype html>\n<html lang=en>\n  <head>\n    <title>sqlite3.OperationalError: unrecognized token: \u0026#34;\u0026#39;\u0026#39;\u0026#39;\u0026#34;\n \/\/ Werkzeug Debugger<\/title>\n    <link rel=\"stylesheet\" href=\"?__debugger__=yes\u0026amp;cmd=resource\u0026amp;f=style.css\">\n    <link rel=\"shortcut icon\"\n        href=\"?__debugger__=yes\u0026amp;cmd=resource\u0026amp;f=console.png\">\n    <script src=\"?__debugger__=yes\u0026amp;cmd=resource\u0026amp;f=debugger.js\"><\/script>\n    <script>\n      var CONSOLE_MODE = false,\n          EVALEX = false,\n          EVALEX_TRUSTED = false,\n          SECRET = \"Sj6xrmaHlyHIugcKhgjO\";\n    <\/script>\n  <\/head>\n  <body style=\"background-color: #fff\">\n    <div class=\"debugger\">\n<h1>sqlite3.OperationalError<\/h1>\n<div class=\"detail\">\n  <p class=\"errormsg\">sqlite3.OperationalError: unrecognized token: \u0026#34;\u0026#39;\u0026#39;\u0026#39;\u0026#34;\n<\/p>\n<\/div>\n<h2 class=\"traceback\">Traceback <em>(most recent call last)<\/em><\/h2>\n<div class=\"traceback\">\n  <h3><\/h3>\n  <ul><li><div class=\"frame\" id=\"frame-139725869462720\">\n  <h4>File <cite class=\"filename\">\"\/usr\/local\/lib\/python3.13\/site-packages\/flask\/app.py\"<\/cite>,\n      line <em class=\"line\">1536<\/em>,\n      in <code class=\"function\">__call__<\/code><\/h4>\n  <div class=\"source library\"><pre class=\"line before\"><span class=\"ws\">    <\/span>) -\u0026gt; cabc.Iterable[bytes]:<\/pre>\n<pre class=\"line before\"><span class=\"ws\">        <\/span>\u0026#34;\u0026#34;\u0026#34;The WSGI server calls the Flask application object as the<\/pre>\n<pre class=\"line before\"><span class=\"ws\">        <\/span>WSGI application. This calls :meth:`wsgi_app`, which can be<\/pre>\n<pre class=\"line before\"><span class=\"ws\">        <\/span>wrapped to apply middleware.<\/pre>\n<pre class=\"line before\"><span class=\"ws\">        <\/span>\u0026#34;\u0026#34;\u0026#34;<\/pre>\n<pre class=\"line current\"><span class=\"ws\">        <\/span>return self.wsgi_app(environ, start_response)\n<span class=\"ws\">        <\/span>       ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^<\/pre><\/div>\n<\/div>\n\n<li><div class=\"frame\" id=\"frame-139725869464960\">\n  <h4>File <cite class=\"filename\">\"\/usr\/local\/lib\/python3.13\/site-packages\/flask\/app.py\"<\/cite>,\n      line <em class=\"line\">1514<\/em>,\n      in <code class=\"function\">wsgi_app<\/code><\/h4>\n  <div class=\"source library\"><pre class=\"line before\"><span class=\"ws\">            <\/span>try:<\/pre>\n<pre class=\"line before\"><span class=\"ws\">                <\/span>ctx.push()<\/pre>\n<pre class=\"line before\"><span class=\"ws\">                <\/span>response = self.full_dispatch_request()<\/pre>\n<pre class=\"line before\"><span class=\"ws\">            <\/span>except Exception as e:<\/pre>\n<pre class=\"line before\"><span class=\"ws\">                <\/span>error = e<\/pre>\n<pre class=\"line current\"><span class=\"ws\">                <\/span>response = self.handle_exception(e)\n<span class=\"ws\">                <\/span>           ^^^^^^^^^^^^^^^^^^^^^^^^<\/pre>\n<pre class=\"line after\"><span class=\"ws\">            <\/span>except:<\/pre>\n<pre class=\"line after\"><span class=\"ws\">                <\/span>error = sys.exc_info()[1]<\/pre>\n<pre class=\"line after\"><span class=\"ws\">                <\/span>raise<\/pre>\n<pre class=\"line after\"><span class=\"ws\">            <\/span>return response(environ, start_response)<\/pre>\n<pre class=\"line after\"><span class=\"ws\">        <\/span>finally:<\/pre><\/div>\n<\/div>\n\n<li><div class=\"frame\" id=\"frame-139725869464800\">\n  <h4>File <cite class=\"filename\">\"\/usr\/local\/lib\/python3.13\/site-packages\/flask\/app.py\"<\/cite>,\n      line <em class=\"line\">1511<\/em>,\n      in <code class=\"function\">wsgi_app<\/code><\/h4>\n  <div class=\"source library\"><pre class=\"line before\"><span class=\"ws\">        <\/span>ctx = self.request_context(environ)<\/pre>\n<pre class=\"line before\"><span class=\"ws\">        <\/span>error: BaseException | None = None<\/pre>\n<pre class=\"line before\"><span class=\"ws\">        <\/span>try:<\/pre>\n<pre class=\"line before\"><span class=\"ws\">            <\/span>try:<\/pre>\n<pre class=\"line before\"><span class=\"ws\">                <\/span>ctx.push()<\/pre>\n<pre class=\"line current\"><span class=\"ws\">                <\/span>response = self.full_dispatch_request()\n<span class=\"ws\">                <\/span>           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^<\/pre>\n<pre class=\"line after\"><span class=\"ws\">            <\/span>except Exception as e:<\/pre>\n<pre class=\"line after\"><span class=\"ws\">                <\/span>error = e<\/pre>\n<pre class=\"line after\"><span class=\"ws\">                <\/span>response = self.handle_exception(e)<\/pre>\n<pre class=\"line after\"><span class=\"ws\">            <\/span>except:<\/pre>\n<pre class=\"line after\"><span class=\"ws\">                <\/span>error = sys.exc_info()[1]<\/pre><\/div>\n<\/div>\n\n<li><div class=\"frame\" id=\"frame-139725869465280\">\n  <h4>File <cite class=\"filename\">\"\/usr\/local\/lib\/python3.13\/site-packages\/flask\/app.py\"<\/cite>,\n      line <em class=\"line\">919<\/em>,\n      in <code class=\"function\">full_dispatch_request<\/code><\/h4>\n  <div class=\"source library\"><pre class=\"line before\"><span class=\"ws\">            <\/span>request_started.send(self, _async_wrapper=self.ensure_sync)<\/pre>\n<pre class=\"line before\"><span class=\"ws\">            <\/span>rv = self.preprocess_request()<\/pre>\n<pre class=\"line before\"><span class=\"ws\">            <\/span>if rv is None:<\/pre>\n<pre class=\"line before\"><span class=\"ws\">                <\/span>rv = self.dispatch_request()<\/pre>\n<pre class=\"line before\"><span class=\"ws\">        <\/span>except Exception as e:<\/pre>\n<pre class=\"line current\"><span class=\"ws\">            <\/span>rv = self.handle_user_exception(e)\n<span class=\"ws\">            <\/span>     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^<\/pre>\n<pre class=\"line after\"><span class=\"ws\">        <\/span>return self.finalize_request(rv)<\/pre>\n<pre class=\"line after\"><span class=\"ws\"><\/span> <\/pre>\n<pre class=\"line after\"><span class=\"ws\">    <\/span>def finalize_request(<\/pre>\n<pre class=\"line after\"><span class=\"ws\">        <\/span>self,<\/pre>\n<pre class=\"line after\"><span class=\"ws\">        <\/span>rv: ft.ResponseReturnValue | HTTPException,<\/pre><\/div>\n<\/div>\n\n<li><div class=\"frame\" id=\"frame-139725869676192\">\n  <h4>File <cite class=\"filename\">\"\/usr\/local\/lib\/python3.13\/site-packages\/flask\/app.py\"<\/cite>,\n      line <em class=\"line\">917<\/em>,\n      in <code class=\"function\">full_dispatch_request<\/code><\/h4>\n  <div class=\"source library\"><pre class=\"line before\"><span class=\"ws\"><\/span> <\/pre>\n<pre class=\"line before\"><span class=\"ws\">        <\/span>try:<\/pre>\n<pre class=\"line before\"><span class=\"ws\">            <\/span>request_started.send(self, _async_wrapper=self.ensure_sync)<\/pre>\n<pre class=\"line before\"><span class=\"ws\">            <\/span>rv = self.preprocess_request()<\/pre>\n<pre class=\"line before\"><span class=\"ws\">            <\/span>if rv is None:<\/pre>\n<pre class=\"line current\"><span class=\"ws\">                <\/span>rv = self.dispatch_request()\n<span class=\"ws\">                <\/span>     ^^^^^^^^^^^^^^^^^^^^^^^<\/pre>\n<pre class=\"line after\"><span class=\"ws\">        <\/span>except Exception as e:<\/pre>\n<pre class=\"line after\"><span class=\"ws\">            <\/span>rv = self.handle_user_exception(e)<\/pre>\n<pre class=\"line after\"><span class=\"ws\">        <\/span>return self.finalize_request(rv)<\/pre>\n<pre class=\"line after\"><span class=\"ws\"><\/span> <\/pre>\n<pre class=\"line after\"><span class=\"ws\">    <\/span>def finalize_request(<\/pre><\/div>\n<\/div>\n\n<li><div class=\"frame\" id=\"frame-139725869666752\">\n  <h4>File <cite class=\"filename\">\"\/usr\/local\/lib\/python3.13\/site-packages\/flask\/app.py\"<\/cite>,\n      line <em class=\"line\">902<\/em>,\n      in <code class=\"function\">dispatch_request<\/code><\/h4>\n  <div class=\"source library\"><pre class=\"line before\"><span class=\"ws\">            <\/span>and req.method == \u0026#34;OPTIONS\u0026#34;<\/pre>\n<pre class=\"line before\"><span class=\"ws\">        <\/span>):<\/pre>\n<pre class=\"line before\"><span class=\"ws\">            <\/span>return self.make_default_options_response()<\/pre>\n<pre class=\"line before\"><span class=\"ws\">        <\/span># otherwise dispatch to the handler for that endpoint<\/pre>\n<pre class=\"line before\"><span class=\"ws\">        <\/span>view_args: dict[str, t.Any] = req.view_args  # type: ignore[assignment]<\/pre>\n<pre class=\"line current\"><span class=\"ws\">        <\/span>return self.ensure_sync(self.view_functions[rule.end[...]"
+                   },
+                   "noResponseReceived": true
+               }
+            },
+            {
+               "level": "error",
+               "locations": [
+                  {
+                     "physicalLocation": {
+                        "artifactLocation": {
+                           "uri": "http:\/\/demo-app:5000\/hello?name=%3Cscript%3Ealert(5397)%3C\/script%3E"
+                        },
+                        
+                        "region": {
+                           "startLine": 1,
+                           
+                           "snippet": {
+                               "text": ""
+                           }
+                        }
+                     },
+                     "properties": {
+                         "attack": "<script>alert(5397)<\/script>"
+                     }
+                  }
+               ],
+               "message": {
+                  "text": "The following steps were done to trigger the DOM XSS:\nWith <PAYLOAD_1> as: %3Cscript%3Ealert(5397)%3C\/script%3E\nAccess: http:\/\/demo-app:5000\/hello?name=<PAYLOAD_1>\n"
+               },
+               "ruleId": "40026",
+               "webRequest": {
+                   "protocol": "HTTP",
+                   "version": "1.1",
+                   "target": "http:\/\/demo-app:5000\/hello?name=guest",
+                   "method": "GET",
+                   "headers": {
+                       "cache-control" : "no-cache",
+                       "host" : "demo-app:5000",
+                       "pragma" : "no-cache",
+                       "referer" : "http:\/\/demo-app:5000",
+                       "user-agent" : ""
+                   },
+                   "body": {
+                       
+                   }
+               },
+               "webResponse": {
+                   "statusCode": 200,
+                   "reasonPhrase": "OK",
+                   "protocol": "HTTP",
+                   "version": "1.1",
+                   "headers": {
+                       "Connection" : "close",
+                       "Content-Length" : "20",
+                       "Content-Type" : "text\/html; charset=utf-8",
+                       "Date" : "Fri, 06 Nov 2026 07:08:36 GMT",
+                       "Server" : "Werkzeug\/3.1.9 Python\/3.13.18"
+                   },
+                   "body": {
+                       "text": "<h1>Hello guest<\/h1>"
+                   },
+                   "noResponseReceived": true
+               }
+            },
+            {
+               "level": "error",
+               "locations": [
+                  {
+                     "physicalLocation": {
+                        "artifactLocation": {
+                           "uri": "http:\/\/demo-app:5000\/lookup?host=localhost%26cat+%2Fetc%2Fpasswd%26"
+                        },
+                        
+                        "region": {
+                           "startLine": 2,
+                           
+                           "snippet": {
+                               "text": "root:x:0:0"
+                           }
+                        }
+                     },
+                     "properties": {
+                         "attack": "localhost\u0026cat \/etc\/passwd\u0026"
+                     }
+                  }
+               ],
+               "message": {
+                  "text": "The scan rule was able to retrieve the content of a file or command by sending [localhost\u0026cat \/etc\/passwd\u0026] to the operating system running this application."
+               },
+               "ruleId": "90020",
+               "webRequest": {
+                   "protocol": "HTTP",
+                   "version": "1.1",
+                   "target": "http:\/\/demo-app:5000\/lookup?host=localhost%26cat+%2Fetc%2Fpasswd%26",
+                   "method": "GET",
+                   "headers": {
+                       "cache-control" : "no-cache",
+                       "host" : "demo-app:5000",
+                       "pragma" : "no-cache",
+                       "referer" : "http:\/\/demo-app:5000",
+                       "user-agent" : ""
+                   },
+                   "body": {
+                       
+                   }
+               },
+               "webResponse": {
+                   "statusCode": 200,
+                   "reasonPhrase": "OK",
+                   "protocol": "HTTP",
+                   "version": "1.1",
+                   "headers": {
+                       "Connection" : "close",
+                       "Content-Length" : "903",
+                       "Content-Type" : "text\/html; charset=utf-8",
+                       "Date" : "Fri, 06 Nov 2026 07:10:08 GMT",
+                       "Server" : "Werkzeug\/3.1.9 Python\/3.13.18"
+                   },
+                   "body": {
+                       "text": "<pre>::1             localhost ip6-localhost ip6-loopback\nroot:x:0:0:root:\/root:\/bin\/bash\ndaemon:x:1:1:daemon:\/usr\/sbin:\/usr\/sbin\/nologin\nbin:x:2:2:bin:\/bin:\/usr\/sbin\/nologin\nsys:x:3:3:sys:\/dev:\/usr\/sbin\/nologin\nsync:x:4:65534:sync:\/bin:\/bin\/sync\ngames:x:5:60:games:\/usr\/games:\/usr\/sbin\/nologin\nman:x:6:12:man:\/var\/cache\/man:\/usr\/sbin\/nologin\nlp:x:7:7:lp:\/var\/spool\/lpd:\/usr\/sbin\/nologin\nmail:x:8:8:mail:\/var\/mail:\/usr\/sbin\/nologin\nnews:x:9:9:news:\/var\/spool\/news:\/usr\/sbin\/nologin\nuucp:x:10:10:uucp:\/var\/spool\/uucp:\/usr\/sbin\/nologin\nproxy:x:13:13:proxy:\/bin:\/usr\/sbin\/nologin\nwww-data:x:33:33:www-data:\/var\/www:\/usr\/sbin\/nologin\nbackup:x:34:34:backup:\/var\/backups:\/usr\/sbin\/nologin\nlist:x:38:38:Mailing List Manager:\/var\/list:\/usr\/sbin\/nologin\nirc:x:39:39:ircd:\/run\/ircd:\/usr\/sbin\/nologin\n_apt:x:42:65534::\/nonexistent:\/usr\/sbin\/nologin\nnobody:x:65534:65534:nobody:\/nonexistent:\/usr\/sbin\/nologin\n<\/pre>"
+                   },
+                   "noResponseReceived": true
+               }
+            },
+            {
+               "level": "error",
+               "locations": [
+                  {
+                     "physicalLocation": {
+                        "artifactLocation": {
+                           "uri": "http:\/\/demo-app:5000\/lookup?host=localhost%26sleep+1.0%26"
+                        },
+                        
+                        "region": {
+                           "startLine": 1,
+                           
+                           "snippet": {
+                               "text": ""
+                           }
+                        }
+                     },
+                     "properties": {
+                         "attack": "localhost\u0026sleep 15\u0026"
+                     }
+                  }
+               ],
+               "message": {
+                  "text": "The scan rule was able to control the timing of the application response by sending [localhost\u0026sleep 15\u0026] to the operating system running this application."
+               },
+               "ruleId": "90037",
+               "webRequest": {
+                   "protocol": "HTTP",
+                   "version": "1.1",
+                   "target": "http:\/\/demo-app:5000\/lookup?host=localhost%26sleep+1.0%26",
+                   "method": "GET",
+                   "headers": {
+                       "cache-control" : "no-cache",
+                       "host" : "demo-app:5000",
+                       "pragma" : "no-cache",
+                       "referer" : "http:\/\/demo-app:5000",
+                       "user-agent" : ""
+                   },
+                   "body": {
+                       
+                   }
+               },
+               "webResponse": {
+                   "statusCode": 200,
+                   "reasonPhrase": "OK",
+                   "protocol": "HTTP",
+                   "version": "1.1",
+                   "headers": {
+                       "Connection" : "close",
+                       "Content-Length" : "64",
+                       "Content-Type" : "text\/html; charset=utf-8",
+                       "Date" : "Fri, 06 Nov 2026 07:10:41 GMT",
+                       "Server" : "Werkzeug\/3.1.9 Python\/3.13.18"
+                   },
+                   "body": {
+                       "text": "<pre>::1             localhost ip6-localhost ip6-loopback\n<\/pre>"
+                   },
+                   "noResponseReceived": true
+               }
+            },
+            {
+               "level": "warning",
+               "locations": [
+                  {
+                     "physicalLocation": {
+                        "artifactLocation": {
+                           "uri": "http:\/\/demo-app:5000\/"
+                        },
+                        
+                        "region": {
+                           "startLine": 1,
+                           
+                           "snippet": {
+                               "text": ""
+                           }
+                        }
+                     },
+                     "properties": {
+                         "attack": ""
+                     }
+                  }
+               ],
+               "message": {
+                  "text": "The response does not protect against 'ClickJacking' attacks. It should include either Content-Security-Policy with 'frame-ancestors' directive or X-Frame-Options."
+               },
+               "ruleId": "10020",
+               "webRequest": {
+                   "protocol": "HTTP",
+                   "version": "1.1",
+                   "target": "http:\/\/demo-app:5000\/",
+                   "method": "GET",
+                   "headers": {
+                       "cache-control" : "no-cache",
+                       "host" : "demo-app:5000",
+                       "pragma" : "no-cache",
+                       "user-agent" : ""
+                   },
+                   "body": {
+                       
+                   }
+               },
+               "webResponse": {
+                   "statusCode": 200,
+                   "reasonPhrase": "OK",
+                   "protocol": "HTTP",
+                   "version": "1.1",
+                   "headers": {
+                       "Connection" : "close",
+                       "Content-Length" : "389",
+                       "Content-Type" : "text\/html; charset=utf-8",
+                       "Date" : "Fri, 06 Nov 2026 07:08:36 GMT",
+                       "Server" : "Werkzeug\/3.1.9 Python\/3.13.18"
+                   },
+                   "body": {
+                       "text": "<html><head><title>Demo shop<\/title><\/head><body>\n<h1>Demo shop<\/h1>\n<ul>\n  <li><a href=\"\/hello?name=guest\">Say hello<\/a><\/li>\n  <li><a href=\"\/search?q=apple\">Search products<\/a><\/li>\n  <li><a href=\"\/lookup?host=localhost\">Look up a host<\/a><\/li>\n  <li><a href=\"\/login\">Log in<\/a><\/li>\n<\/ul>\n<form action=\"\/search\" method=\"get\"><input name=\"q\"><button>Search<\/button><\/form>\n<\/body><\/html>"
+                   },
+                   "noResponseReceived": true
+               }
+            },
+            {
+               "level": "warning",
+               "locations": [
+                  {
+                     "physicalLocation": {
+                        "artifactLocation": {
+                           "uri": "http:\/\/demo-app:5000\/hello?name=guest"
+                        },
+                        
+                        "region": {
+                           "startLine": 1,
+                           
+                           "snippet": {
+                               "text": ""
+                           }
+                        }
+                     },
+                     "properties": {
+                         "attack": ""
+                     }
+                  }
+               ],
+               "message": {
+                  "text": "The response does not protect against 'ClickJacking' attacks. It should include either Content-Security-Policy with 'frame-ancestors' directive or X-Frame-Options."
+               },
+               "ruleId": "10020",
+               "webRequest": {
+                   "protocol": "HTTP",
+                   "version": "1.1",
+                   "target": "http:\/\/demo-app:5000\/hello?name=guest",
+                   "method": "GET",
+                   "headers": {
+                       "cache-control" : "no-cache",
+                       "host" : "demo-app:5000",
+                       "pragma" : "no-cache",
+                       "referer" : "http:\/\/demo-app:5000",
+                       "user-agent" : ""
+                   },
+                   "body": {
+                       
+                   }
+               },
+               "webResponse": {
+                   "statusCode": 200,
+                   "reasonPhrase": "OK",
+                   "protocol": "HTTP",
+                   "version": "1.1",
+                   "headers": {
+                       "Connection" : "close",
+                       "Content-Length" : "20",
+                       "Content-Type" : "text\/html; charset=utf-8",
+                       "Date" : "Fri, 06 Nov 2026 07:08:36 GMT",
+                       "Server" : "Werkzeug\/3.1.9 Python\/3.13.18"
+                   },
+                   "body": {
+                       "text": "<h1>Hello guest<\/h1>"
+                   },
+                   "noResponseReceived": true
+               }
+            },
+            {
+               "level": "warning",
+               "locations": [
+                  {
+                     "physicalLocation": {
+                        "artifactLocation": {
+                           "uri": "http:\/\/demo-app:5000\/login"
+                        },
+                        
+                        "region": {
+                           "startLine": 1,
+                           
+                           "snippet": {
+                               "text": ""
+                           }
+                        }
+                     },
+                     "properties": {
+                         "attack": ""
+                     }
+                  }
+               ],
+               "message": {
+                  "text": "The response does not protect against 'ClickJacking' attacks. It should include either Content-Security-Policy with 'frame-ancestors' directive or X-Frame-Options."
+               },
+               "ruleId": "10020",
+               "webRequest": {
+                   "protocol": "HTTP",
+                   "version": "1.1",
+                   "target": "http:\/\/demo-app:5000\/login",
+                   "method": "GET",
+                   "headers": {
+                       "cache-control" : "no-cache",
+                       "host" : "demo-app:5000",
+                       "pragma" : "no-cache",
+                       "referer" : "http:\/\/demo-app:5000\/",
+                       "user-agent" : ""
+                   },
+                   "body": {
+                       
+                   }
+               },
+               "webResponse": {
+                   "statusCode": 200,
+                   "reasonPhrase": "OK",
+                   "protocol": "HTTP",
+                   "version": "1.1",
+                   "headers": {
+                       "Connection" : "close",
+                       "Content-Length" : "25",
+                       "Content-Type" : "text\/html; charset=utf-8",
+                       "Date" : "Fri, 06 Nov 2026 07:08:36 GMT",
+                       "Server" : "Werkzeug\/3.1.9 Python\/3.13.18",
+                       "Set-Cookie" : "session_id=demo-session; Path=\/"
+                   },
+                   "body": {
+                       "text": "<p>Logged in as demo.<\/p>"
+                   },
+                   "noResponseReceived": true
+               }
+            },
+            {
+               "level": "warning",
+               "locations": [
+                  {
+                     "physicalLocation": {
+                        "artifactLocation": {
+                           "uri": "http:\/\/demo-app:5000\/lookup?host=localhost"
+                        },
+                        
+                        "region": {
+                           "startLine": 1,
+                           
+                           "snippet": {
+                               "text": ""
+                           }
+                        }
+                     },
+                     "properties": {
+                         "attack": ""
+                     }
+                  }
+               ],
+               "message": {
+                  "text": "The response does not protect against 'ClickJacking' attacks. It should include either Content-Security-Policy with 'frame-ancestors' directive or X-Frame-Options."
+               },
+               "ruleId": "10020",
+               "webRequest": {
+                   "protocol": "HTTP",
+                   "version": "1.1",
+                   "target": "http:\/\/demo-app:5000\/lookup?host=localhost",
+                   "method": "GET",
+                   "headers": {
+                       "cache-control" : "no-cache",
+                       "host" : "demo-app:5000",
+                       "pragma" : "no-cache",
+                       "referer" : "http:\/\/demo-app:5000",
+                       "user-agent" : ""
+                   },
+                   "body": {
+                       
+                   }
+               },
+               "webResponse": {
+                   "statusCode": 200,
+                   "reasonPhrase": "OK",
+                   "protocol": "HTTP",
+                   "version": "1.1",
+                   "headers": {
+                       "Connection" : "close",
+                       "Content-Length" : "64",
+                       "Content-Type" : "text\/html; charset=utf-8",
+                       "Date" : "Fri, 06 Nov 2026 07:08:36 GMT",
+                       "Server" : "Werkzeug\/3.1.9 Python\/3.13.18"
+                   },
+                   "body": {
+                       "text": "<pre>::1             localhost ip6-localhost ip6-loopback\n<\/pre>"
+                   },
+                   "noResponseReceived": true
+               }
+            },
+            {
+               "level": "warning",
+               "locations": [
+                  {
+                     "physicalLocation": {
+                        "artifactLocation": {
+                           "uri": "http:\/\/demo-app:5000"
+                        },
+                        
+                        "region": {
+                           "startLine": 1,
+                           
+                           "snippet": {
+                               "text": ""
+                           }
+                        }
+                     },
+                     "properties": {
+                         "attack": ""
+                     }
+                  }
+               ],
+               "message": {
+                  "text": "Content Security Policy (CSP) is an added layer of security that helps to detect and mitigate certain types of attacks, including Cross Site Scripting (XSS) and data injection attacks. These attacks are used for everything from data theft to site defacement or distribution of malware. CSP provides a set of standard HTTP headers that allow website owners to declare approved sources of content that browsers should be allowed to load on that page \u2014 covered types are JavaScript, CSS, HTML frames, fonts, images and embeddable objects such as Java applets, ActiveX, audio and video files."
+               },
+               "ruleId": "10038",
+               "webRequest": {
+                   "protocol": "HTTP",
+                   "version": "1.1",
+                   "target": "http:\/\/demo-app:5000",
+                   "method": "GET",
+                   "headers": {
+                       "cache-control" : "no-cache",
+                       "host" : "demo-app:5000",
+                       "pragma" : "no-cache",
+                       "user-agent" : ""
+                   },
+                   "body": {
+                       
+                   }
+               },
+               "webResponse": {
+                   "statusCode": 200,
+                   "reasonPhrase": "OK",
+                   "protocol": "HTTP",
+                   "version": "1.1",
+                   "headers": {
+                       "Connection" : "close",
+                       "Content-Length" : "389",
+                       "Content-Type" : "text\/html; charset=utf-8",
+                       "Date" : "Fri, 06 Nov 2026 07:08:36 GMT",
+                       "Server" : "Werkzeug\/3.1.9 Python\/3.13.18"
+                   },
+                   "body": {
+                       "text": "<html><head><title>Demo shop<\/title><\/head><body>\n<h1>Demo shop<\/h1>\n<ul>\n  <li><a href=\"\/hello?name=guest\">Say hello<\/a><\/li>\n  <li><a href=\"\/search?q=apple\">Search products<\/a><\/li>\n  <li><a href=\"\/lookup?host=localhost\">Look up a host<\/a><\/li>\n  <li><a href=\"\/login\">Log in<\/a><\/li>\n<\/ul>\n<form action=\"\/search\" method=\"get\"><input name=\"q\"><button>Search<\/button><\/form>\n<\/body><\/html>"
+                   },
+                   "noResponseReceived": true
+               }
+            },
+            {
+               "level": "warning",
+               "locations": [
+                  {
+                     "physicalLocation": {
+                        "artifactLocation": {
+                           "uri": "http:\/\/demo-app:5000\/"
+                        },
+                        
+                        "region": {
+                           "startLine": 1,
+                           
+                           "snippet": {
+                               "text": ""
+                           }
+                        }
+                     },
+                     "properties": {
+                         "attack": ""
+                     }
+                  }
+               ],
+               "message": {
+                  "text": "Content Security Policy (CSP) is an added layer of security that helps to detect and mitigate certain types of attacks, including Cross Site Scripting (XSS) and data injection attacks. These attacks are used for everything from data theft to site defacement or distribution of malware. CSP provides a set of standard HTTP headers that allow website owners to declare approved sources of content that browsers should be allowed to load on that page \u2014 covered types are JavaScript, CSS, HTML frames, fonts, images and embeddable objects such as Java applets, ActiveX, audio and video files."
+               },
+               "ruleId": "10038",
+               "webRequest": {
+                   "protocol": "HTTP",
+                   "version": "1.1",
+                   "target": "http:\/\/demo-app:5000\/",
+                   "method": "GET",
+                   "headers": {
+                       "cache-control" : "no-cache",
+                       "host" : "demo-app:5000",
+                       "pragma" : "no-cache",
+                       "user-agent" : "Mozilla\/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit\/537.36 (KHTML, like Gecko) Chrome\/141.0.0.0 Safari\/537.36"
+                   },
+                   "body": {
+                       
+                   }
+               },
+               "webResponse": {
+                   "statusCode": 200,
+                   "reasonPhrase": "OK",
+                   "protocol": "HTTP",
+                   "version": "1.1",
+                   "headers": {
+                       "Connection" : "close",
+                       "Content-Length" : "389",
+                       "Content-Type" : "text\/html; charset=utf-8",
+                       "Date" : "Fri, 06 Nov 2026 07:08:36 GMT",
+                       "Server" : "Werkzeug\/3.1.9 Python\/3.13.18"
+                   },
+                   "body": {
+                       "text": "<html><head><title>Demo shop<\/title><\/head><body>\n<h1>Demo shop<\/h1>\n<ul>\n  <li><a href=\"\/hello?name=guest\">Say hello<\/a><\/li>\n  <li><a href=\"\/search?q=apple\">Search products<\/a><\/li>\n  <li><a href=\"\/lookup?host=localhost\">Look up a host<\/a><\/li>\n  <li><a href=\"\/login\">Log in<\/a><\/li>\n<\/ul>\n<form action=\"\/search\" method=\"get\"><input name=\"q\"><button>Search<\/button><\/form>\n<\/body><\/html>"
+                   },
+                   "noResponseReceived": true
+               }
+            },
+            {
+               "level": "warning",
+               "locations": [
+                  {
+                     "physicalLocation": {
+                        "artifactLocation": {
+                           "uri": "http:\/\/demo-app:5000\/login"
+                        },
+                        
+                        "region": {
+                           "startLine": 1,
+                           
+                           "snippet": {
+                               "text": ""
+                           }
+                        }
+                     },
+                     "properties": {
+                         "attack": ""
+                     }
+                  }
+               ],
+               "message": {
+                  "text": "Content Security Policy (CSP) is an added layer of security that helps to detect and mitigate certain types of attacks, including Cross Site Scripting (XSS) and data injection attacks. These attacks are used for everything from data theft to site defacement or distribution of malware. CSP provides a set of standard HTTP headers that allow website owners to declare approved sources of content that browsers should be allowed to load on that page \u2014 covered types are JavaScript, CSS, HTML frames, fonts, images and embeddable objects such as Java applets, ActiveX, audio and video files."
+               },
+               "ruleId": "10038",
+               "webRequest": {
+                   "protocol": "HTTP",
+                   "version": "1.1",
+                   "target": "http:\/\/demo-app:5000\/login",
+                   "method": "GET",
+                   "headers": {
+                       "cache-control" : "no-cache",
+                       "host" : "demo-app:5000",
+                       "pragma" : "no-cache",
+                       "referer" : "http:\/\/demo-app:5000\/",
+                       "user-agent" : ""
+                   },
+                   "body": {
+                       
+                   }
+               },
+               "webResponse": {
+                   "statusCode": 200,
+                   "reasonPhrase": "OK",
+                   "protocol": "HTTP",
+                   "version": "1.1",
+                   "headers": {
+                       "Connection" : "close",
+                       "Content-Length" : "25",
+                       "Content-Type" : "text\/html; charset=utf-8",
+                       "Date" : "Fri, 06 Nov 2026 07:08:36 GMT",
+                       "Server" : "Werkzeug\/3.1.9 Python\/3.13.18",
+                       "Set-Cookie" : "session_id=demo-session; Path=\/"
+                   },
+                   "body": {
+                       "text": "<p>Logged in as demo.<\/p>"
+                   },
+                   "noResponseReceived": true
+               }
+            },
+            {
+               "level": "warning",
+               "locations": [
+                  {
+                     "physicalLocation": {
+                        "artifactLocation": {
+                           "uri": "http:\/\/demo-app:5000\/robots.txt"
+                        },
+                        
+                        "region": {
+                           "startLine": 1,
+                           
+                           "snippet": {
+                               "text": ""
+                           }
+                        }
+                     },
+                     "properties": {
+                         "attack": ""
+                     }
+                  }
+               ],
+               "message": {
+                  "text": "Content Security Policy (CSP) is an added layer of security that helps to detect and mitigate certain types of attacks, including Cross Site Scripting (XSS) and data injection attacks. These attacks are used for everything from data theft to site defacement or distribution of malware. CSP provides a set of standard HTTP headers that allow website owners to declare approved sources of content that browsers should be allowed to load on that page \u2014 covered types are JavaScript, CSS, HTML frames, fonts, images and embeddable objects such as Java applets, ActiveX, audio and video files."
+               },
+               "ruleId": "10038",
+               "webRequest": {
+                   "protocol": "HTTP",
+                   "version": "1.1",
+                   "target": "http:\/\/demo-app:5000\/robots.txt",
+                   "method": "GET",
+                   "headers": {
+                       "cache-control" : "no-cache",
+                       "host" : "demo-app:5000",
+                       "pragma" : "no-cache",
+                       "user-agent" : ""
+                   },
+                   "body": {
+                       
+                   }
+               },
+               "webResponse": {
+                   "statusCode": 404,
+                   "reasonPhrase": "NOT FOUND",
+                   "protocol": "HTTP",
+                   "version": "1.1",
+                   "headers": {
+                       "Connection" : "close",
+                       "Content-Length" : "207",
+                       "Content-Type" : "text\/html; charset=utf-8",
+                       "Date" : "Fri, 06 Nov 2026 07:08:36 GMT",
+                       "Server" : "Werkzeug\/3.1.9 Python\/3.13.18"
+                   },
+                   "body": {
+                       "text": "<!doctype html>\n<html lang=en>\n<title>404 Not Found<\/title>\n<h1>Not Found<\/h1>\n<p>The requested URL was not found on the server. If you entered the URL manually please check your spelling and try again.<\/p>\n"
+                   },
+                   "noResponseReceived": true
+               }
+            },
+            {
+               "level": "note",
+               "locations": [
+                  {
+                     "physicalLocation": {
+                        "artifactLocation": {
+                           "uri": "http:\/\/demo-app:5000\/login"
+                        },
+                        
+                        "region": {
+                           "startLine": 1,
+                           
+                           "properties" : { 
+                               "startLineFailure" : "Resolved invalid start line: 0 - used fallback value instead."
+                            }, 
+                           "snippet": {
+                               "text": "Set-Cookie: session_id"
+                           }
+                        }
+                     },
+                     "properties": {
+                         "attack": ""
+                     }
+                  }
+               ],
+               "message": {
+                  "text": "A cookie has been set without the HttpOnly flag, which means that the cookie can be accessed by JavaScript. If a malicious script can be run on this page then the cookie will be accessible and can be transmitted to another site. If this is a session cookie then session hijacking may be possible."
+               },
+               "ruleId": "10010",
+               "webRequest": {
+                   "protocol": "HTTP",
+                   "version": "1.1",
+                   "target": "http:\/\/demo-app:5000\/login",
+                   "method": "GET",
+                   "headers": {
+                       "cache-control" : "no-cache",
+                       "host" : "demo-app:5000",
+                       "pragma" : "no-cache",
+                       "referer" : "http:\/\/demo-app:5000\/",
+                       "user-agent" : ""
+                   },
+                   "body": {
+                       
+                   }
+               },
+               "webResponse": {
+                   "statusCode": 200,
+                   "reasonPhrase": "OK",
+                   "protocol": "HTTP",
+                   "version": "1.1",
+                   "headers": {
+                       "Connection" : "close",
+                       "Content-Length" : "25",
+                       "Content-Type" : "text\/html; charset=utf-8",
+                       "Date" : "Fri, 06 Nov 2026 07:08:36 GMT",
+                       "Server" : "Werkzeug\/3.1.9 Python\/3.13.18",
+                       "Set-Cookie" : "session_id=demo-session; Path=\/"
+                   },
+                   "body": {
+                       "text": "<p>Logged in as demo.<\/p>"
+                   },
+                   "noResponseReceived": true
+               }
+            },
+            {
+               "level": "note",
+               "locations": [
+                  {
+                     "physicalLocation": {
+                        "artifactLocation": {
+                           "uri": "http:\/\/demo-app:5000"
+                        },
+                        
+                        "region": {
+                           "startLine": 1,
+                           
+                           "snippet": {
+                               "text": ""
+                           }
+                        }
+                     },
+                     "properties": {
+                         "attack": ""
+                     }
+                  }
+               ],
+               "message": {
+                  "text": "This issue still applies to error type pages (401, 403, 500, etc.) as those pages are often still affected by injection issues, in which case there is still concern for browsers sniffing pages away from their actual content type.\nAt \"High\" threshold this scan rule will not alert on client or server error responses."
+               },
+               "ruleId": "10021",
+               "webRequest": {
+                   "protocol": "HTTP",
+                   "version": "1.1",
+                   "target": "http:\/\/demo-app:5000",
+                   "method": "GET",
+                   "headers": {
+                       "cache-control" : "no-cache",
+                       "host" : "demo-app:5000",
+                       "pragma" : "no-cache",
+                       "user-agent" : ""
+                   },
+                   "body": {
+                       
+                   }
+               },
+               "webResponse": {
+                   "statusCode": 200,
+                   "reasonPhrase": "OK",
+                   "protocol": "HTTP",
+                   "version": "1.1",
+                   "headers": {
+                       "Connection" : "close",
+                       "Content-Length" : "389",
+                       "Content-Type" : "text\/html; charset=utf-8",
+                       "Date" : "Fri, 06 Nov 2026 07:08:36 GMT",
+                       "Server" : "Werkzeug\/3.1.9 Python\/3.13.18"
+                   },
+                   "body": {
+                       "text": "<html><head><title>Demo shop<\/title><\/head><body>\n<h1>Demo shop<\/h1>\n<ul>\n  <li><a href=\"\/hello?name=guest\">Say hello<\/a><\/li>\n  <li><a href=\"\/search?q=apple\">Search products<\/a><\/li>\n  <li><a href=\"\/lookup?host=localhost\">Look up a host<\/a><\/li>\n  <li><a href=\"\/login\">Log in<\/a><\/li>\n<\/ul>\n<form action=\"\/search\" method=\"get\"><input name=\"q\"><button>Search<\/button><\/form>\n<\/body><\/html>"
+                   },
+                   "noResponseReceived": true
+               }
+            },
+            {
+               "level": "note",
+               "locations": [
+                  {
+                     "physicalLocation": {
+                        "artifactLocation": {
+                           "uri": "http:\/\/demo-app:5000\/"
+                        },
+                        
+                        "region": {
+                           "startLine": 1,
+                           
+                           "snippet": {
+                               "text": ""
+                           }
+                        }
+                     },
+                     "properties": {
+                         "attack": ""
+                     }
+                  }
+               ],
+               "message": {
+                  "text": "This issue still applies to error type pages (401, 403, 500, etc.) as those pages are often still affected by injection issues, in which case there is still concern for browsers sniffing pages away from their actual content type.\nAt \"High\" threshold this scan rule will not alert on client or server error responses."
+               },
+               "ruleId": "10021",
+               "webRequest": {
+                   "protocol": "HTTP",
+                   "version": "1.1",
+                   "target": "http:\/\/demo-app:5000\/",
+                   "method": "GET",
+                   "headers": {
+                       "cache-control" : "no-cache",
+                       "host" : "demo-app:5000",
+                       "pragma" : "no-cache",
+                       "user-agent" : "Mozilla\/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit\/537.36 (KHTML, like Gecko) Chrome\/141.0.0.0 Safari\/537.36"
+                   },
+                   "body": {
+                       
+                   }
+               },
+               "webResponse": {
+                   "statusCode": 200,
+                   "reasonPhrase": "OK",
+                   "protocol": "HTTP",
+                   "version": "1.1",
+                   "headers": {
+                       "Connection" : "close",
+                       "Content-Length" : "389",
+                       "Content-Type" : "text\/html; charset=utf-8",
+                       "Date" : "Fri, 06 Nov 2026 07:08:36 GMT",
+                       "Server" : "Werkzeug\/3.1.9 Python\/3.13.18"
+                   },
+                   "body": {
+                       "text": "<html><head><title>Demo shop<\/title><\/head><body>\n<h1>Demo shop<\/h1>\n<ul>\n  <li><a href=\"\/hello?name=guest\">Say hello<\/a><\/li>\n  <li><a href=\"\/search?q=apple\">Search products<\/a><\/li>\n  <li><a href=\"\/lookup?host=localhost\">Look up a host<\/a><\/li>\n  <li><a href=\"\/login\">Log in<\/a><\/li>\n<\/ul>\n<form action=\"\/search\" method=\"get\"><input name=\"q\"><button>Search<\/button><\/form>\n<\/body><\/html>"
+                   },
+                   "noResponseReceived": true
+               }
+            },
+            {
+               "level": "note",
+               "locations": [
+                  {
+                     "physicalLocation": {
+                        "artifactLocation": {
+                           "uri": "http:\/\/demo-app:5000\/login"
+                        },
+                        
+                        "region": {
+                           "startLine": 1,
+                           
+                           "snippet": {
+                               "text": ""
+                           }
+                        }
+                     },
+                     "properties": {
+                         "attack": ""
+                     }
+                  }
+               ],
+               "message": {
+                  "text": "This issue still applies to error type pages (401, 403, 500, etc.) as those pages are often still affected by injection issues, in which case there is still concern for browsers sniffing pages away from their actual content type.\nAt \"High\" threshold this scan rule will not alert on client or server error responses."
+               },
+               "ruleId": "10021",
+               "webRequest": {
+                   "protocol": "HTTP",
+                   "version": "1.1",
+                   "target": "http:\/\/demo-app:5000\/login",
+                   "method": "GET",
+                   "headers": {
+                       "cache-control" : "no-cache",
+                       "host" : "demo-app:5000",
+                       "pragma" : "no-cache",
+                       "referer" : "http:\/\/demo-app:5000\/",
+                       "user-agent" : ""
+                   },
+                   "body": {
+                       
+                   }
+               },
+               "webResponse": {
+                   "statusCode": 200,
+                   "reasonPhrase": "OK",
+                   "protocol": "HTTP",
+                   "version": "1.1",
+                   "headers": {
+                       "Connection" : "close",
+                       "Content-Length" : "25",
+                       "Content-Type" : "text\/html; charset=utf-8",
+                       "Date" : "Fri, 06 Nov 2026 07:08:36 GMT",
+                       "Server" : "Werkzeug\/3.1.9 Python\/3.13.18",
+                       "Set-Cookie" : "session_id=demo-session; Path=\/"
+                   },
+                   "body": {
+                       "text": "<p>Logged in as demo.<\/p>"
+                   },
+                   "noResponseReceived": true
+               }
+            },
+            {
+               "level": "note",
+               "locations": [
+                  {
+                     "physicalLocation": {
+                        "artifactLocation": {
+                           "uri": "http:\/\/demo-app:5000\/lookup?host=localhost"
+                        },
+                        
+                        "region": {
+                           "startLine": 1,
+                           
+                           "snippet": {
+                               "text": ""
+                           }
+                        }
+                     },
+                     "properties": {
+                         "attack": ""
+                     }
+                  }
+               ],
+               "message": {
+                  "text": "This issue still applies to error type pages (401, 403, 500, etc.) as those pages are often still affected by injection issues, in which case there is still concern for browsers sniffing pages away from their actual content type.\nAt \"High\" threshold this scan rule will not alert on client or server error responses."
+               },
+               "ruleId": "10021",
+               "webRequest": {
+                   "protocol": "HTTP",
+                   "version": "1.1",
+                   "target": "http:\/\/demo-app:5000\/lookup?host=localhost",
+                   "method": "GET",
+                   "headers": {
+                       "cache-control" : "no-cache",
+                       "host" : "demo-app:5000",
+                       "pragma" : "no-cache",
+                       "referer" : "http:\/\/demo-app:5000",
+                       "user-agent" : ""
+                   },
+                   "body": {
+                       
+                   }
+               },
+               "webResponse": {
+                   "statusCode": 200,
+                   "reasonPhrase": "OK",
+                   "protocol": "HTTP",
+                   "version": "1.1",
+                   "headers": {
+                       "Connection" : "close",
+                       "Content-Length" : "64",
+                       "Content-Type" : "text\/html; charset=utf-8",
+                       "Date" : "Fri, 06 Nov 2026 07:08:36 GMT",
+                       "Server" : "Werkzeug\/3.1.9 Python\/3.13.18"
+                   },
+                   "body": {
+                       "text": "<pre>::1             localhost ip6-localhost ip6-loopback\n<\/pre>"
+                   },
+                   "noResponseReceived": true
+               }
+            },
+            {
+               "level": "note",
+               "locations": [
+                  {
+                     "physicalLocation": {
+                        "artifactLocation": {
+                           "uri": "http:\/\/demo-app:5000\/search?q=apple"
+                        },
+                        
+                        "region": {
+                           "startLine": 1,
+                           
+                           "snippet": {
+                               "text": ""
+                           }
+                        }
+                     },
+                     "properties": {
+                         "attack": ""
+                     }
+                  }
+               ],
+               "message": {
+                  "text": "This issue still applies to error type pages (401, 403, 500, etc.) as those pages are often still affected by injection issues, in which case there is still concern for browsers sniffing pages away from their actual content type.\nAt \"High\" threshold this scan rule will not alert on client or server error responses."
+               },
+               "ruleId": "10021",
+               "webRequest": {
+                   "protocol": "HTTP",
+                   "version": "1.1",
+                   "target": "http:\/\/demo-app:5000\/search?q=apple",
+                   "method": "GET",
+                   "headers": {
+                       "cache-control" : "no-cache",
+                       "host" : "demo-app:5000",
+                       "pragma" : "no-cache",
+                       "referer" : "http:\/\/demo-app:5000\/",
+                       "user-agent" : ""
+                   },
+                   "body": {
+                       
+                   }
+               },
+               "webResponse": {
+                   "statusCode": 200,
+                   "reasonPhrase": "OK",
+                   "protocol": "HTTP",
+                   "version": "1.1",
+                   "headers": {
+                       "Connection" : "close",
+                       "Content-Length" : "60",
+                       "Content-Type" : "application\/json",
+                       "Date" : "Fri, 06 Nov 2026 07:08:36 GMT",
+                       "Server" : "Werkzeug\/3.1.9 Python\/3.13.18"
+                   },
+                   "body": {
+                       "text": "{\n  \"results\": [\n    [\n      \"apple\",\n      1.0\n    ]\n  ]\n}\n"
+                   },
+                   "noResponseReceived": true
+               }
+            },
+            {
+               "level": "note",
+               "locations": [
+                  {
+                     "physicalLocation": {
+                        "artifactLocation": {
+                           "uri": "http:\/\/demo-app:5000"
+                        },
+                        
+                        "region": {
+                           "startLine": 1,
+                           
+                           "properties" : { 
+                               "startLineFailure" : "Resolved invalid start line: 0 - used fallback value instead."
+                            }, 
+                           "snippet": {
+                               "text": "Werkzeug\/3.1.9 Python\/3.13.18"
+                           }
+                        }
+                     },
+                     "properties": {
+                         "attack": ""
+                     }
+                  }
+               ],
+               "message": {
+                  "text": "The web\/application server is leaking version information via the \"Server\" HTTP response header. Access to such information may facilitate attackers identifying other vulnerabilities your web\/application server is subject to."
+               },
+               "ruleId": "10036",
+               "webRequest": {
+                   "protocol": "HTTP",
+                   "version": "1.1",
+                   "target": "http:\/\/demo-app:5000",
+                   "method": "GET",
+                   "headers": {
+                       "cache-control" : "no-cache",
+                       "host" : "demo-app:5000",
+                       "pragma" : "no-cache",
+                       "user-agent" : ""
+                   },
+                   "body": {
+                       
+                   }
+               },
+               "webResponse": {
+                   "statusCode": 200,
+                   "reasonPhrase": "OK",
+                   "protocol": "HTTP",
+                   "version": "1.1",
+                   "headers": {
+                       "Connection" : "close",
+                       "Content-Length" : "389",
+                       "Content-Type" : "text\/html; charset=utf-8",
+                       "Date" : "Fri, 06 Nov 2026 07:08:36 GMT",
+                       "Server" : "Werkzeug\/3.1.9 Python\/3.13.18"
+                   },
+                   "body": {
+                       "text": "<html><head><title>Demo shop<\/title><\/head><body>\n<h1>Demo shop<\/h1>\n<ul>\n  <li><a href=\"\/hello?name=guest\">Say hello<\/a><\/li>\n  <li><a href=\"\/search?q=apple\">Search products<\/a><\/li>\n  <li><a href=\"\/lookup?host=localhost\">Look up a host<\/a><\/li>\n  <li><a href=\"\/login\">Log in<\/a><\/li>\n<\/ul>\n<form action=\"\/search\" method=\"get\"><input name=\"q\"><button>Search<\/button><\/form>\n<\/body><\/html>"
+                   },
+                   "noResponseReceived": true
+               }
+            },
+            {
+               "level": "note",
+               "locations": [
+                  {
+                     "physicalLocation": {
+                        "artifactLocation": {
+                           "uri": "http:\/\/demo-app:5000\/"
+                        },
+                        
+                        "region": {
+                           "startLine": 1,
+                           
+                           "properties" : { 
+                               "startLineFailure" : "Resolved invalid start line: 0 - used fallback value instead."
+                            }, 
+                           "snippet": {
+                               "text": "Werkzeug\/3.1.9 Python\/3.13.18"
+                           }
+                        }
+                     },
+                     "properties": {
+                         "attack": ""
+                     }
+                  }
+               ],
+               "message": {
+                  "text": "The web\/application server is leaking version information via the \"Server\" HTTP response header. Access to such information may facilitate attackers identifying other vulnerabilities your web\/application server is subject to."
+               },
+               "ruleId": "10036",
+               "webRequest": {
+                   "protocol": "HTTP",
+                   "version": "1.1",
+                   "target": "http:\/\/demo-app:5000\/",
+                   "method": "GET",
+                   "headers": {
+                       "cache-control" : "no-cache",
+                       "host" : "demo-app:5000",
+                       "pragma" : "no-cache",
+                       "user-agent" : "Mozilla\/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit\/537.36 (KHTML, like Gecko) Chrome\/141.0.0.0 Safari\/537.36"
+                   },
+                   "body": {
+                       
+                   }
+               },
+               "webResponse": {
+                   "statusCode": 200,
+                   "reasonPhrase": "OK",
+                   "protocol": "HTTP",
+                   "version": "1.1",
+                   "headers": {
+                       "Connection" : "close",
+                       "Content-Length" : "389",
+                       "Content-Type" : "text\/html; charset=utf-8",
+                       "Date" : "Fri, 06 Nov 2026 07:08:36 GMT",
+                       "Server" : "Werkzeug\/3.1.9 Python\/3.13.18"
+                   },
+                   "body": {
+                       "text": "<html><head><title>Demo shop<\/title><\/head><body>\n<h1>Demo shop<\/h1>\n<ul>\n  <li><a href=\"\/hello?name=guest\">Say hello<\/a><\/li>\n  <li><a href=\"\/search?q=apple\">Search products<\/a><\/li>\n  <li><a href=\"\/lookup?host=localhost\">Look up a host<\/a><\/li>\n  <li><a href=\"\/login\">Log in<\/a><\/li>\n<\/ul>\n<form action=\"\/search\" method=\"get\"><input name=\"q\"><button>Search<\/button><\/form>\n<\/body><\/html>"
+                   },
+                   "noResponseReceived": true
+               }
+            },
+            {
+               "level": "note",
+               "locations": [
+                  {
+                     "physicalLocation": {
+                        "artifactLocation": {
+                           "uri": "http:\/\/demo-app:5000\/lookup?host=localhost"
+                        },
+                        
+                        "region": {
+                           "startLine": 1,
+                           
+                           "properties" : { 
+                               "startLineFailure" : "Resolved invalid start line: 0 - used fallback value instead."
+                            }, 
+                           "snippet": {
+                               "text": "Werkzeug\/3.1.9 Python\/3.13.18"
+                           }
+                        }
+                     },
+                     "properties": {
+                         "attack": ""
+                     }
+                  }
+               ],
+               "message": {
+                  "text": "The web\/application server is leaking version information via the \"Server\" HTTP response header. Access to such information may facilitate attackers identifying other vulnerabilities your web\/application server is subject to."
+               },
+               "ruleId": "10036",
+               "webRequest": {
+                   "protocol": "HTTP",
+                   "version": "1.1",
+                   "target": "http:\/\/demo-app:5000\/lookup?host=localhost",
+                   "method": "GET",
+                   "headers": {
+                       "cache-control" : "no-cache",
+                       "host" : "demo-app:5000",
+                       "pragma" : "no-cache",
+                       "referer" : "http:\/\/demo-app:5000",
+                       "user-agent" : ""
+                   },
+                   "body": {
+                       
+                   }
+               },
+               "webResponse": {
+                   "statusCode": 200,
+                   "reasonPhrase": "OK",
+                   "protocol": "HTTP",
+                   "version": "1.1",
+                   "headers": {
+                       "Connection" : "close",
+                       "Content-Length" : "64",
+                       "Content-Type" : "text\/html; charset=utf-8",
+                       "Date" : "Fri, 06 Nov 2026 07:08:36 GMT",
+                       "Server" : "Werkzeug\/3.1.9 Python\/3.13.18"
+                   },
+                   "body": {
+                       "text": "<pre>::1             localhost ip6-localhost ip6-loopback\n<\/pre>"
+                   },
+                   "noResponseReceived": true
+               }
+            },
+            {
+               "level": "note",
+               "locations": [
+                  {
+                     "physicalLocation": {
+                        "artifactLocation": {
+                           "uri": "http:\/\/demo-app:5000\/robots.txt"
+                        },
+                        
+                        "region": {
+                           "startLine": 1,
+                           
+                           "properties" : { 
+                               "startLineFailure" : "Resolved invalid start line: 0 - used fallback value instead."
+                            }, 
+                           "snippet": {
+                               "text": "Werkzeug\/3.1.9 Python\/3.13.18"
+                           }
+                        }
+                     },
+                     "properties": {
+                         "attack": ""
+                     }
+                  }
+               ],
+               "message": {
+                  "text": "The web\/application server is leaking version information via the \"Server\" HTTP response header. Access to such information may facilitate attackers identifying other vulnerabilities your web\/application server is subject to."
+               },
+               "ruleId": "10036",
+               "webRequest": {
+                   "protocol": "HTTP",
+                   "version": "1.1",
+                   "target": "http:\/\/demo-app:5000\/robots.txt",
+                   "method": "GET",
+                   "headers": {
+                       "cache-control" : "no-cache",
+                       "host" : "demo-app:5000",
+                       "pragma" : "no-cache",
+                       "user-agent" : ""
+                   },
+                   "body": {
+                       
+                   }
+               },
+               "webResponse": {
+                   "statusCode": 404,
+                   "reasonPhrase": "NOT FOUND",
+                   "protocol": "HTTP",
+                   "version": "1.1",
+                   "headers": {
+                       "Connection" : "close",
+                       "Content-Length" : "207",
+                       "Content-Type" : "text\/html; charset=utf-8",
+                       "Date" : "Fri, 06 Nov 2026 07:08:36 GMT",
+                       "Server" : "Werkzeug\/3.1.9 Python\/3.13.18"
+                   },
+                   "body": {
+                       "text": "<!doctype html>\n<html lang=en>\n<title>404 Not Found<\/title>\n<h1>Not Found<\/h1>\n<p>The requested URL was not found on the server. If you entered the URL manually please check your spelling and try again.<\/p>\n"
+                   },
+                   "noResponseReceived": true
+               }
+            },
+            {
+               "level": "note",
+               "locations": [
+                  {
+                     "physicalLocation": {
+                        "artifactLocation": {
+                           "uri": "http:\/\/demo-app:5000\/search?q=ZAP"
+                        },
+                        
+                        "region": {
+                           "startLine": 1,
+                           
+                           "properties" : { 
+                               "startLineFailure" : "Resolved invalid start line: 0 - used fallback value instead."
+                            }, 
+                           "snippet": {
+                               "text": "Werkzeug\/3.1.9 Python\/3.13.18"
+                           }
+                        }
+                     },
+                     "properties": {
+                         "attack": ""
+                     }
+                  }
+               ],
+               "message": {
+                  "text": "The web\/application server is leaking version information via the \"Server\" HTTP response header. Access to such information may facilitate attackers identifying other vulnerabilities your web\/application server is subject to."
+               },
+               "ruleId": "10036",
+               "webRequest": {
+                   "protocol": "HTTP",
+                   "version": "1.1",
+                   "target": "http:\/\/demo-app:5000\/search?q=ZAP",
+                   "method": "GET",
+                   "headers": {
+                       "Cookie" : "session_id=demo-session",
+                       "cache-control" : "no-cache",
+                       "host" : "demo-app:5000",
+                       "pragma" : "no-cache",
+                       "referer" : "http:\/\/demo-app:5000",
+                       "user-agent" : ""
+                   },
+                   "body": {
+                       
+                   }
+               },
+               "webResponse": {
+                   "statusCode": 200,
+                   "reasonPhrase": "OK",
+                   "protocol": "HTTP",
+                   "version": "1.1",
+                   "headers": {
+                       "Connection" : "close",
+                       "Content-Length" : "20",
+                       "Content-Type" : "application\/json",
+                       "Date" : "Fri, 06 Nov 2026 07:08:36 GMT",
+                       "Server" : "Werkzeug\/3.1.9 Python\/3.13.18"
+                   },
+                   "body": {
+                       "text": "{\n  \"results\": []\n}\n"
+                   },
+                   "noResponseReceived": true
+               }
+            },
+            {
+               "level": "note",
+               "locations": [
+                  {
+                     "physicalLocation": {
+                        "artifactLocation": {
+                           "uri": "http:\/\/demo-app:5000\/login"
+                        },
+                        
+                        "region": {
+                           "startLine": 1,
+                           
+                           "properties" : { 
+                               "startLineFailure" : "Resolved invalid start line: 0 - used fallback value instead."
+                            }, 
+                           "snippet": {
+                               "text": "Set-Cookie: session_id"
+                           }
+                        }
+                     },
+                     "properties": {
+                         "attack": ""
+                     }
+                  }
+               ],
+               "message": {
+                  "text": "A cookie has been set without the SameSite attribute, which means that the cookie can be sent as a result of a 'cross-site' request. The SameSite attribute is an effective counter measure to cross-site request forgery, cross-site script inclusion, and timing attacks."
+               },
+               "ruleId": "10054",
+               "webRequest": {
+                   "protocol": "HTTP",
+                   "version": "1.1",
+                   "target": "http:\/\/demo-app:5000\/login",
+                   "method": "GET",
+                   "headers": {
+                       "cache-control" : "no-cache",
+                       "host" : "demo-app:5000",
+                       "pragma" : "no-cache",
+                       "referer" : "http:\/\/demo-app:5000\/",
+                       "user-agent" : ""
+                   },
+                   "body": {
+                       
+                   }
+               },
+               "webResponse": {
+                   "statusCode": 200,
+                   "reasonPhrase": "OK",
+                   "protocol": "HTTP",
+                   "version": "1.1",
+                   "headers": {
+                       "Connection" : "close",
+                       "Content-Length" : "25",
+                       "Content-Type" : "text\/html; charset=utf-8",
+                       "Date" : "Fri, 06 Nov 2026 07:08:36 GMT",
+                       "Server" : "Werkzeug\/3.1.9 Python\/3.13.18",
+                       "Set-Cookie" : "session_id=demo-session; Path=\/"
+                   },
+                   "body": {
+                       "text": "<p>Logged in as demo.<\/p>"
+                   },
+                   "noResponseReceived": true
+               }
+            },
+            {
+               "level": "none",
+               "locations": [
+                  {
+                     "physicalLocation": {
+                        "artifactLocation": {
+                           "uri": "http:\/\/demo-app:5000\/login"
+                        },
+                        
+                        "region": {
+                           "startLine": 1,
+                           
+                           "properties" : { 
+                               "startLineFailure" : "Resolved invalid start line: 0 - used fallback value instead."
+                            }, 
+                           "snippet": {
+                               "text": "session_id"
+                           }
+                        }
+                     },
+                     "properties": {
+                         "attack": ""
+                     }
+                  }
+               ],
+               "message": {
+                  "text": "cookie:session_id"
+               },
+               "ruleId": "10112",
+               "webRequest": {
+                   "protocol": "HTTP",
+                   "version": "1.1",
+                   "target": "http:\/\/demo-app:5000\/login",
+                   "method": "GET",
+                   "headers": {
+                       "cache-control" : "no-cache",
+                       "host" : "demo-app:5000",
+                       "pragma" : "no-cache",
+                       "referer" : "http:\/\/demo-app:5000\/",
+                       "user-agent" : ""
+                   },
+                   "body": {
+                       
+                   }
+               },
+               "webResponse": {
+                   "statusCode": 200,
+                   "reasonPhrase": "OK",
+                   "protocol": "HTTP",
+                   "version": "1.1",
+                   "headers": {
+                       "Connection" : "close",
+                       "Content-Length" : "25",
+                       "Content-Type" : "text\/html; charset=utf-8",
+                       "Date" : "Fri, 06 Nov 2026 07:08:36 GMT",
+                       "Server" : "Werkzeug\/3.1.9 Python\/3.13.18",
+                       "Set-Cookie" : "session_id=demo-session; Path=\/"
+                   },
+                   "body": {
+                       "text": "<p>Logged in as demo.<\/p>"
+                   },
+                   "noResponseReceived": true
+               }
+            },
+            {
+               "level": "none",
+               "locations": [
+                  {
+                     "physicalLocation": {
+                        "artifactLocation": {
+                           "uri": "http:\/\/demo-app:5000\/login"
+                        },
+                        
+                        "region": {
+                           "startLine": 1,
+                           
+                           "properties" : { 
+                               "startLineFailure" : "Resolved invalid start line: 0 - used fallback value instead."
+                            }, 
+                           "snippet": {
+                               "text": "session_id"
+                           }
+                        }
+                     },
+                     "properties": {
+                         "attack": ""
+                     }
+                  }
+               ],
+               "message": {
+                  "text": "cookie:session_id"
+               },
+               "ruleId": "10112",
+               "webRequest": {
+                   "protocol": "HTTP",
+                   "version": "1.1",
+                   "target": "http:\/\/demo-app:5000\/login",
+                   "method": "GET",
+                   "headers": {
+                       "cache-control" : "no-cache",
+                       "host" : "demo-app:5000",
+                       "pragma" : "no-cache",
+                       "referer" : "http:\/\/demo-app:5000\/",
+                       "user-agent" : ""
+                   },
+                   "body": {
+                       
+                   }
+               },
+               "webResponse": {
+                   "statusCode": 200,
+                   "reasonPhrase": "OK",
+                   "protocol": "HTTP",
+                   "version": "1.1",
+                   "headers": {
+                       "Connection" : "close",
+                       "Content-Length" : "25",
+                       "Content-Type" : "text\/html; charset=utf-8",
+                       "Date" : "Fri, 06 Nov 2026 07:08:36 GMT",
+                       "Server" : "Werkzeug\/3.1.9 Python\/3.13.18",
+                       "Set-Cookie" : "session_id=demo-session; Path=\/"
+                   },
+                   "body": {
+                       "text": "<p>Logged in as demo.<\/p>"
+                   },
+                   "noResponseReceived": true
+               }
+            }
+         ],
+         "taxonomies": [
+            {
+               "downloadUri": "https:\/\/cwe.mitre.org\/data\/xml\/cwec_v4.8.xml.zip",
+               "guid":  "b000a760-3e52-3565-a35c-f61369da53b7",
+               "informationUri": "https:\/\/cwe.mitre.org\/data\/published\/cwe_v4.8.pdf",
+               "isComprehensive": true,
+               "language": "en",
+               "minimumRequiredLocalizedDataSemanticVersion": "4.8",
+               "name":  "CWE",
+               "organization": "MITRE",
+               "releaseDateUtc": "2022-06-28",
+               "shortDescription": {
+                  "text": "The MITRE Common Weakness Enumeration"
+               },
+               "taxa": [
+                  {
+                     "guid": "098ecca7-f059-3e81-a2ff-a54023da4848",
+                     "helpUri": "https:\/\/cwe.mitre.org\/data\/definitions\/-1.html",
+                     "id": "-1"
+                  },
+                  {
+                     "guid": "deb1d258-acdc-37fc-8ba9-037d4256f85e",
+                     "helpUri": "https:\/\/cwe.mitre.org\/data\/definitions\/78.html",
+                     "id": "78"
+                  },
+                  {
+                     "guid": "5dd429c8-e5e3-37a8-bf40-f7b2d72a9085",
+                     "helpUri": "https:\/\/cwe.mitre.org\/data\/definitions\/79.html",
+                     "id": "79"
+                  },
+                  {
+                     "guid": "ff0466a9-1201-3bed-930e-db9d31099304",
+                     "helpUri": "https:\/\/cwe.mitre.org\/data\/definitions\/89.html",
+                     "id": "89"
+                  },
+                  {
+                     "guid": "b70a7030-c124-3e5f-a628-a76f82820eed",
+                     "helpUri": "https:\/\/cwe.mitre.org\/data\/definitions\/497.html",
+                     "id": "497"
+                  },
+                  {
+                     "guid": "c60fb1e0-6538-36e7-9dfd-7702d6cf8b1f",
+                     "helpUri": "https:\/\/cwe.mitre.org\/data\/definitions\/693.html",
+                     "id": "693"
+                  },
+                  {
+                     "guid": "3b219658-b060-3ce2-9009-97890c7cea66",
+                     "helpUri": "https:\/\/cwe.mitre.org\/data\/definitions\/1004.html",
+                     "id": "1004"
+                  },
+                  {
+                     "guid": "d8d0ef05-721c-3cbc-8dff-5209722467f8",
+                     "helpUri": "https:\/\/cwe.mitre.org\/data\/definitions\/1021.html",
+                     "id": "1021"
+                  },
+                  {
+                     "guid": "4ef91eff-12a3-3611-9fa7-b36884d2a991",
+                     "helpUri": "https:\/\/cwe.mitre.org\/data\/definitions\/1275.html",
+                     "id": "1275"
+                  }
+               ],
+               "version": "4.8"
+            }
+         ],
+         "tool": {
+            "driver": {
+               "guid": "3716e880-7ee2-34d2-9cf1-0f88c0dc613a",
+               "informationUri": "https:\/\/www.zaproxy.org\/",
+               "name": "ZAP",
+               "rules": [ 
+                  {
+                     "id": "10010",
+                     "defaultConfiguration": {
+                        "level": "note"
+                     },
+                     "fullDescription": {
+                        "text": "A cookie has been set without the HttpOnly flag, which means that the cookie can be accessed by JavaScript. If a malicious script can be run on this page then the cookie will be accessible and can be transmitted to another site. If this is a session cookie then session hijacking may be possible."
+                     },
+                     "name": "Cookie No HttpOnly Flag",
+                     "properties": {
+                            "references": [
+                                "https:\/\/owasp.org\/www-community\/HttpOnly"
+                            ],
+                            "solution": {
+                                "text": "Ensure that the HttpOnly flag is set for all cookies."
+                            },
+                            "confidence": "medium"
+                     },
+                     "relationships": [ 
+                        {
+                           "kinds": [
+                              "superset"
+                           ],
+                           "target": {
+                              "guid":"3b219658-b060-3ce2-9009-97890c7cea66",
+                              "id": "1004",
+                              "toolComponent": {
+                                 "guid": "b000a760-3e52-3565-a35c-f61369da53b7",
+                                 "name": "CWE"
+                              }
+                           }
+                        }
+                        
+                     ],
+                     "shortDescription": {
+                        "text": "Cookie No HttpOnly Flag"
+                     }
+                  },
+                  {
+                     "id": "10020",
+                     "defaultConfiguration": {
+                        "level": "warning"
+                     },
+                     "fullDescription": {
+                        "text": "The response does not protect against 'ClickJacking' attacks. It should include either Content-Security-Policy with 'frame-ancestors' directive or X-Frame-Options."
+                     },
+                     "name": "Missing Anti-clickjacking Header",
+                     "properties": {
+                            "references": [
+                                "https:\/\/developer.mozilla.org\/en-US\/docs\/Web\/HTTP\/Reference\/Headers\/X-Frame-Options"
+                            ],
+                            "solution": {
+                                "text": "Modern Web browsers support the Content-Security-Policy and X-Frame-Options HTTP headers. Ensure one of them is set on all web pages returned by your site\/app.\nIf you expect the page to be framed only by pages on your server (e.g. it's part of a FRAMESET) then you'll want to use SAMEORIGIN, otherwise if you never expect the page to be framed, you should use DENY. Alternatively consider implementing Content Security Policy's \"frame-ancestors\" directive."
+                            },
+                            "confidence": "medium"
+                     },
+                     "relationships": [ 
+                        {
+                           "kinds": [
+                              "superset"
+                           ],
+                           "target": {
+                              "guid":"d8d0ef05-721c-3cbc-8dff-5209722467f8",
+                              "id": "1021",
+                              "toolComponent": {
+                                 "guid": "b000a760-3e52-3565-a35c-f61369da53b7",
+                                 "name": "CWE"
+                              }
+                           }
+                        }
+                        
+                     ],
+                     "shortDescription": {
+                        "text": "Missing Anti-clickjacking Header"
+                     }
+                  },
+                  {
+                     "id": "10021",
+                     "defaultConfiguration": {
+                        "level": "note"
+                     },
+                     "fullDescription": {
+                        "text": "The Anti-MIME-Sniffing header X-Content-Type-Options was not set to 'nosniff'. This allows older versions of Internet Explorer and Chrome to perform MIME-sniffing on the response body, potentially causing the response body to be interpreted and displayed as a content type other than the declared content type. Current (early 2014) and legacy versions of Firefox will use the declared content type (if one is set), rather than performing MIME-sniffing."
+                     },
+                     "name": "X-Content-Type-Options Header Missing",
+                     "properties": {
+                            "references": [
+                                "https:\/\/learn.microsoft.com\/en-us\/previous-versions\/windows\/internet-explorer\/ie-developer\/compatibility\/gg622941(v=vs.85)",
+                                "https:\/\/owasp.org\/www-community\/Security_Headers"
+                            ],
+                            "solution": {
+                                "text": "Ensure that the application\/web server sets the Content-Type header appropriately, and that it sets the X-Content-Type-Options header to 'nosniff' for all web pages.\nIf possible, ensure that the end user uses a standards-compliant and modern web browser that does not perform MIME-sniffing at all, or that can be directed by the web application\/web server to not perform MIME-sniffing."
+                            },
+                            "confidence": "medium"
+                     },
+                     "relationships": [ 
+                        {
+                           "kinds": [
+                              "superset"
+                           ],
+                           "target": {
+                              "guid":"c60fb1e0-6538-36e7-9dfd-7702d6cf8b1f",
+                              "id": "693",
+                              "toolComponent": {
+                                 "guid": "b000a760-3e52-3565-a35c-f61369da53b7",
+                                 "name": "CWE"
+                              }
+                           }
+                        }
+                        
+                     ],
+                     "shortDescription": {
+                        "text": "X-Content-Type-Options Header Missing"
+                     }
+                  },
+                  {
+                     "id": "10036",
+                     "defaultConfiguration": {
+                        "level": "note"
+                     },
+                     "fullDescription": {
+                        "text": "The web\/application server is leaking version information via the \"Server\" HTTP response header. Access to such information may facilitate attackers identifying other vulnerabilities your web\/application server is subject to."
+                     },
+                     "name": "Server Leaks Version Information via \"Server\" HTTP Response Header Field",
+                     "properties": {
+                            "references": [
+                                "https:\/\/httpd.apache.org\/docs\/current\/mod\/core.html#servertokens",
+                                "https:\/\/learn.microsoft.com\/en-us\/previous-versions\/msp-n-p\/ff648552(v=pandp.10)",
+                                "https:\/\/www.troyhunt.com\/shhh-dont-let-your-response-headers\/"
+                            ],
+                            "solution": {
+                                "text": "Ensure that your web server, application server, load balancer, etc. is configured to suppress the \"Server\" header or provide generic details."
+                            },
+                            "confidence": "high"
+                     },
+                     "relationships": [ 
+                        {
+                           "kinds": [
+                              "superset"
+                           ],
+                           "target": {
+                              "guid":"b70a7030-c124-3e5f-a628-a76f82820eed",
+                              "id": "497",
+                              "toolComponent": {
+                                 "guid": "b000a760-3e52-3565-a35c-f61369da53b7",
+                                 "name": "CWE"
+                              }
+                           }
+                        }
+                        
+                     ],
+                     "shortDescription": {
+                        "text": "Server Leaks Version Information via \"Server\" HTTP Response Header Field"
+                     }
+                  },
+                  {
+                     "id": "10038",
+                     "defaultConfiguration": {
+                        "level": "warning"
+                     },
+                     "fullDescription": {
+                        "text": "Content Security Policy (CSP) is an added layer of security that helps to detect and mitigate certain types of attacks, including Cross Site Scripting (XSS) and data injection attacks. These attacks are used for everything from data theft to site defacement or distribution of malware. CSP provides a set of standard HTTP headers that allow website owners to declare approved sources of content that browsers should be allowed to load on that page \u2014 covered types are JavaScript, CSS, HTML frames, fonts, images and embeddable objects such as Java applets, ActiveX, audio and video files."
+                     },
+                     "name": "Content Security Policy (CSP) Header Not Set",
+                     "properties": {
+                            "references": [
+                                "https:\/\/developer.mozilla.org\/en-US\/docs\/Web\/HTTP\/Guides\/CSP",
+                                "https:\/\/cheatsheetseries.owasp.org\/cheatsheets\/Content_Security_Policy_Cheat_Sheet.html",
+                                "https:\/\/www.w3.org\/TR\/CSP\/",
+                                "https:\/\/w3c.github.io\/webappsec-csp\/",
+                                "https:\/\/web.dev\/articles\/csp",
+                                "https:\/\/caniuse.com\/#feat=contentsecuritypolicy",
+                                "https:\/\/content-security-policy.com\/"
+                            ],
+                            "solution": {
+                                "text": "Ensure that your web server, application server, load balancer, etc. is configured to set the Content-Security-Policy header."
+                            },
+                            "confidence": "high"
+                     },
+                     "relationships": [ 
+                        {
+                           "kinds": [
+                              "superset"
+                           ],
+                           "target": {
+                              "guid":"c60fb1e0-6538-36e7-9dfd-7702d6cf8b1f",
+                              "id": "693",
+                              "toolComponent": {
+                                 "guid": "b000a760-3e52-3565-a35c-f61369da53b7",
+                                 "name": "CWE"
+                              }
+                           }
+                        }
+                        
+                     ],
+                     "shortDescription": {
+                        "text": "Content Security Policy (CSP) Header Not Set"
+                     }
+                  },
+                  {
+                     "id": "10054",
+                     "defaultConfiguration": {
+                        "level": "note"
+                     },
+                     "fullDescription": {
+                        "text": "A cookie has been set without the SameSite attribute, which means that the cookie can be sent as a result of a 'cross-site' request. The SameSite attribute is an effective counter measure to cross-site request forgery, cross-site script inclusion, and timing attacks."
+                     },
+                     "name": "Cookie without SameSite Attribute",
+                     "properties": {
+                            "references": [
+                                "https:\/\/datatracker.ietf.org\/doc\/html\/draft-ietf-httpbis-cookie-same-site"
+                            ],
+                            "solution": {
+                                "text": "Ensure that the SameSite attribute is set to either 'lax' or ideally 'strict' for all cookies."
+                            },
+                            "confidence": "medium"
+                     },
+                     "relationships": [ 
+                        {
+                           "kinds": [
+                              "superset"
+                           ],
+                           "target": {
+                              "guid":"4ef91eff-12a3-3611-9fa7-b36884d2a991",
+                              "id": "1275",
+                              "toolComponent": {
+                                 "guid": "b000a760-3e52-3565-a35c-f61369da53b7",
+                                 "name": "CWE"
+                              }
+                           }
+                        }
+                        
+                     ],
+                     "shortDescription": {
+                        "text": "Cookie without SameSite Attribute"
+                     }
+                  },
+                  {
+                     "id": "10112",
+                     "defaultConfiguration": {
+                        "level": "none"
+                     },
+                     "fullDescription": {
+                        "text": "The given response has been identified as containing a session management token. The 'Other Info' field contains a set of header tokens that can be used in the Header Based Session Management Method. If the request is in a context which has a Session Management Method set to \"Auto-Detect\" then this rule will change the session management to use the tokens identified."
+                     },
+                     "name": "Session Management Response Identified",
+                     "properties": {
+                            "references": [
+                                "https:\/\/www.zaproxy.org\/docs\/desktop\/addons\/authentication-helper\/session-mgmt-id\/"
+                            ],
+                            "solution": {
+                                "text": "This is an informational alert rather than a vulnerability and so there is nothing to fix."
+                            },
+                            "confidence": "medium"
+                     },
+                     "relationships": [ 
+                     ],
+                     "shortDescription": {
+                        "text": "Session Management Response Identified"
+                     }
+                  },
+                  {
+                     "id": "40012",
+                     "defaultConfiguration": {
+                        "level": "error"
+                     },
+                     "fullDescription": {
+                        "text": "Cross-site Scripting (XSS) is an attack technique that involves echoing attacker-supplied code into a user's browser instance. A browser instance can be a standard web browser client, or a browser object embedded in a software product such as the browser within WinAmp, an RSS reader, or an email client. The code itself is usually written in HTML\/JavaScript, but may also extend to VBScript, ActiveX, Java, Flash, or any other browser-supported technology.\nWhen an attacker gets a user's browser to execute his\/her code, the code will run within the security context (or zone) of the hosting web site. With this level of privilege, the code has the ability to read, modify and transmit any sensitive data accessible by the browser. A Cross-site Scripted user could have his\/her account hijacked (cookie theft), their browser redirected to another location, or possibly shown fraudulent content delivered by the web site they are visiting. Cross-site Scripting attacks essentially compromise the trust relationship between a user and the web site. Applications utilizing browser object instances which load content from the file system may execute code under the local machine zone allowing for system compromise.\n\nThere are three types of Cross-site Scripting attacks: non-persistent, persistent and DOM-based.\nNon-persistent attacks and DOM-based attacks require a user to either visit a specially crafted link laced with malicious code, or visit a malicious web page containing a web form, which when posted to the vulnerable site, will mount the attack. Using a malicious form will oftentimes take place when the vulnerable resource only accepts HTTP POST requests. In such a case, the form can be submitted automatically, without the victim's knowledge (e.g. by using JavaScript). Upon clicking on the malicious link or submitting the malicious form, the XSS payload will get echoed back and will get interpreted by the user's browser and execute. Another technique to send almost arbitrary requests (GET and POST) is by using an embedded client, such as Adobe Flash.\nPersistent attacks occur when the malicious code is submitted to a web site where it's stored for a period of time. Examples of an attacker's favorite targets often include message board posts, web mail messages, and web chat software. The unsuspecting user is not required to interact with any additional site\/link (e.g. an attacker site or a malicious link sent via email), just simply view the web page containing the code."
+                     },
+                     "name": "Cross Site Scripting (Reflected)",
+                     "properties": {
+                            "references": [
+                                "https:\/\/owasp.org\/www-community\/attacks\/xss\/",
+                                "https:\/\/cwe.mitre.org\/data\/definitions\/79.html"
+                            ],
+                            "solution": {
+                                "text": "Phase: Architecture and Design\nUse a vetted library or framework that does not allow this weakness to occur or provides constructs that make this weakness easier to avoid.\nExamples of libraries and frameworks that make it easier to generate properly encoded output include Microsoft's Anti-XSS library, the OWASP ESAPI Encoding module, and Apache Wicket.\n\nPhases: Implementation; Architecture and Design\nUnderstand the context in which your data will be used and the encoding that will be expected. This is especially important when transmitting data between different components, or when generating outputs that can contain multiple encodings at the same time, such as web pages or multi-part mail messages. Study all expected communication protocols and data representations to determine the required encoding strategies.\nFor any data that will be output to another web page, especially any data that was received from external inputs, use the appropriate encoding on all non-alphanumeric characters.\nConsult the XSS Prevention Cheat Sheet for more details on the types of encoding and escaping that are needed.\n\nPhase: Architecture and Design\nFor any security checks that are performed on the client side, ensure that these checks are duplicated on the server side, in order to avoid CWE-602. Attackers can bypass the client-side checks by modifying values after the checks have been performed, or by changing the client to remove the client-side checks entirely. Then, these modified values would be submitted to the server.\n\nIf available, use structured mechanisms that automatically enforce the separation between data and code. These mechanisms may be able to provide the relevant quoting, encoding, and validation automatically, instead of relying on the developer to provide this capability at every point where output is generated.\n\nPhase: Implementation\nFor every web page that is generated, use and specify a character encoding such as ISO-8859-1 or UTF-8. When an encoding is not specified, the web browser may choose a different encoding by guessing which encoding is actually being used by the web page. This can cause the web browser to treat certain sequences as special, opening up the client to subtle XSS attacks. See CWE-116 for more mitigations related to encoding\/escaping.\n\nTo help mitigate XSS attacks against the user's session cookie, set the session cookie to be HttpOnly. In browsers that support the HttpOnly feature (such as more recent versions of Internet Explorer and Firefox), this attribute can prevent the user's session cookie from being accessible to malicious client-side scripts that use document.cookie. This is not a complete solution, since HttpOnly is not supported by all browsers. More importantly, XMLHTTPRequest and other powerful browser technologies provide read access to HTTP headers, including the Set-Cookie header in which the HttpOnly flag is set.\n\nAssume all input is malicious. Use an \"accept known good\" input validation strategy, i.e., use an allow list of acceptable inputs that strictly conform to specifications. Reject any input that does not strictly conform to specifications, or transform it into something that does. Do not rely exclusively on looking for malicious or malformed inputs (i.e., do not rely on a deny list). However, deny lists can be useful for detecting potential attacks or determining which inputs are so malformed that they should be rejected outright.\n\nWhen performing input validation, consider all potentially relevant properties, including length, type of input, the full range of acceptable values, missing or extra inputs, syntax, consistency across related fields, and conformance to business rules. As an example of business rule logic, \"boat\" may be syntactically valid because it only contains alphanumeric characters, but it is not valid if you are expecting colors such as \"red\" or \"blue.\"\n\nEnsure that you perform input validation at well-defined interfaces within the application. This will help protect the application even if a component is reused or moved elsewhere.\n\t"
+                            },
+                            "confidence": "medium"
+                     },
+                     "relationships": [ 
+                        {
+                           "kinds": [
+                              "superset"
+                           ],
+                           "target": {
+                              "guid":"5dd429c8-e5e3-37a8-bf40-f7b2d72a9085",
+                              "id": "79",
+                              "toolComponent": {
+                                 "guid": "b000a760-3e52-3565-a35c-f61369da53b7",
+                                 "name": "CWE"
+                              }
+                           }
+                        }
+                        
+                     ],
+                     "shortDescription": {
+                        "text": "Cross Site Scripting (Reflected)"
+                     }
+                  },
+                  {
+                     "id": "40018",
+                     "defaultConfiguration": {
+                        "level": "error"
+                     },
+                     "fullDescription": {
+                        "text": "SQL injection may be possible."
+                     },
+                     "name": "SQL Injection",
+                     "properties": {
+                            "references": [
+                                "https:\/\/cheatsheetseries.owasp.org\/cheatsheets\/SQL_Injection_Prevention_Cheat_Sheet.html"
+                            ],
+                            "solution": {
+                                "text": "Do not trust client side input, even if there is client side validation in place.\nIn general, type check all data on the server side.\nIf the application uses JDBC, use PreparedStatement or CallableStatement, with parameters passed by '?'\nIf the application uses ASP, use ADO Command Objects with strong type checking and parameterized queries.\nIf database Stored Procedures can be used, use them.\nDo *not* concatenate strings into queries in the stored procedure, or use 'exec', 'exec immediate', or equivalent functionality!\nDo not create dynamic SQL queries using simple string concatenation.\nEscape all data received from the client.\nApply an 'allow list' of allowed characters, or a 'deny list' of disallowed characters in user input.\nApply the principle of least privilege by using the least privileged database user possible.\nIn particular, avoid using the 'sa' or 'db-owner' database users. This does not eliminate SQL injection, but minimizes its impact.\nGrant the minimum database access that is necessary for the application."
+                            },
+                            "confidence": "low"
+                     },
+                     "relationships": [ 
+                        {
+                           "kinds": [
+                              "superset"
+                           ],
+                           "target": {
+                              "guid":"ff0466a9-1201-3bed-930e-db9d31099304",
+                              "id": "89",
+                              "toolComponent": {
+                                 "guid": "b000a760-3e52-3565-a35c-f61369da53b7",
+                                 "name": "CWE"
+                              }
+                           }
+                        }
+                        
+                     ],
+                     "shortDescription": {
+                        "text": "SQL Injection"
+                     }
+                  },
+                  {
+                     "id": "40026",
+                     "defaultConfiguration": {
+                        "level": "error"
+                     },
+                     "fullDescription": {
+                        "text": "Cross-site Scripting (XSS) is an attack technique that involves echoing attacker-supplied code into a user's browser instance. A browser instance can be a standard web browser client, or a browser object embedded in a software product such as the browser within WinAmp, an RSS reader, or an email client. The code itself is usually written in HTML\/JavaScript, but may also extend to VBScript, ActiveX, Java, Flash, or any other browser-supported technology.\nWhen an attacker gets a user's browser to execute his\/her code, the code will run within the security context (or zone) of the hosting web site. With this level of privilege, the code has the ability to read, modify and transmit any sensitive data accessible by the browser. A Cross-site Scripted user could have his\/her account hijacked (cookie theft), their browser redirected to another location, or possibly shown fraudulent content delivered by the web site they are visiting. Cross-site Scripting attacks essentially compromise the trust relationship between a user and the web site. Applications utilizing browser object instances which load content from the file system may execute code under the local machine zone allowing for system compromise.\n\nThere are three types of Cross-site Scripting attacks: non-persistent, persistent and DOM-based.\nNon-persistent attacks and DOM-based attacks require a user to either visit a specially crafted link laced with malicious code, or visit a malicious web page containing a web form, which when posted to the vulnerable site, will mount the attack. Using a malicious form will oftentimes take place when the vulnerable resource only accepts HTTP POST requests. In such a case, the form can be submitted automatically, without the victim's knowledge (e.g. by using JavaScript). Upon clicking on the malicious link or submitting the malicious form, the XSS payload will get echoed back and will get interpreted by the user's browser and execute. Another technique to send almost arbitrary requests (GET and POST) is by using an embedded client, such as Adobe Flash.\nPersistent attacks occur when the malicious code is submitted to a web site where it's stored for a period of time. Examples of an attacker's favorite targets often include message board posts, web mail messages, and web chat software. The unsuspecting user is not required to interact with any additional site\/link (e.g. an attacker site or a malicious link sent via email), just simply view the web page containing the code."
+                     },
+                     "name": "Cross Site Scripting (DOM Based)",
+                     "properties": {
+                            "references": [
+                                "https:\/\/owasp.org\/www-community\/attacks\/xss\/",
+                                "https:\/\/cwe.mitre.org\/data\/definitions\/79.html"
+                            ],
+                            "solution": {
+                                "text": "Phase: Architecture and Design\nUse a vetted library or framework that does not allow this weakness to occur or provides constructs that make this weakness easier to avoid.\nExamples of libraries and frameworks that make it easier to generate properly encoded output include Microsoft's Anti-XSS library, the OWASP ESAPI Encoding module, and Apache Wicket.\n\nPhases: Implementation; Architecture and Design\nUnderstand the context in which your data will be used and the encoding that will be expected. This is especially important when transmitting data between different components, or when generating outputs that can contain multiple encodings at the same time, such as web pages or multi-part mail messages. Study all expected communication protocols and data representations to determine the required encoding strategies.\nFor any data that will be output to another web page, especially any data that was received from external inputs, use the appropriate encoding on all non-alphanumeric characters.\nConsult the XSS Prevention Cheat Sheet for more details on the types of encoding and escaping that are needed.\n\nPhase: Architecture and Design\nFor any security checks that are performed on the client side, ensure that these checks are duplicated on the server side, in order to avoid CWE-602. Attackers can bypass the client-side checks by modifying values after the checks have been performed, or by changing the client to remove the client-side checks entirely. Then, these modified values would be submitted to the server.\n\nIf available, use structured mechanisms that automatically enforce the separation between data and code. These mechanisms may be able to provide the relevant quoting, encoding, and validation automatically, instead of relying on the developer to provide this capability at every point where output is generated.\n\nPhase: Implementation\nFor every web page that is generated, use and specify a character encoding such as ISO-8859-1 or UTF-8. When an encoding is not specified, the web browser may choose a different encoding by guessing which encoding is actually being used by the web page. This can cause the web browser to treat certain sequences as special, opening up the client to subtle XSS attacks. See CWE-116 for more mitigations related to encoding\/escaping.\n\nTo help mitigate XSS attacks against the user's session cookie, set the session cookie to be HttpOnly. In browsers that support the HttpOnly feature (such as more recent versions of Internet Explorer and Firefox), this attribute can prevent the user's session cookie from being accessible to malicious client-side scripts that use document.cookie. This is not a complete solution, since HttpOnly is not supported by all browsers. More importantly, XMLHTTPRequest and other powerful browser technologies provide read access to HTTP headers, including the Set-Cookie header in which the HttpOnly flag is set.\n\nAssume all input is malicious. Use an \"accept known good\" input validation strategy, i.e., use an allow list of acceptable inputs that strictly conform to specifications. Reject any input that does not strictly conform to specifications, or transform it into something that does. Do not rely exclusively on looking for malicious or malformed inputs (i.e., do not rely on a deny list). However, deny lists can be useful for detecting potential attacks or determining which inputs are so malformed that they should be rejected outright.\n\nWhen performing input validation, consider all potentially relevant properties, including length, type of input, the full range of acceptable values, missing or extra inputs, syntax, consistency across related fields, and conformance to business rules. As an example of business rule logic, \"boat\" may be syntactically valid because it only contains alphanumeric characters, but it is not valid if you are expecting colors such as \"red\" or \"blue.\"\n\nEnsure that you perform input validation at well-defined interfaces within the application. This will help protect the application even if a component is reused or moved elsewhere.\n\t"
+                            },
+                            "confidence": "high"
+                     },
+                     "relationships": [ 
+                        {
+                           "kinds": [
+                              "superset"
+                           ],
+                           "target": {
+                              "guid":"5dd429c8-e5e3-37a8-bf40-f7b2d72a9085",
+                              "id": "79",
+                              "toolComponent": {
+                                 "guid": "b000a760-3e52-3565-a35c-f61369da53b7",
+                                 "name": "CWE"
+                              }
+                           }
+                        }
+                        
+                     ],
+                     "shortDescription": {
+                        "text": "Cross Site Scripting (DOM Based)"
+                     }
+                  },
+                  {
+                     "id": "90020",
+                     "defaultConfiguration": {
+                        "level": "error"
+                     },
+                     "fullDescription": {
+                        "text": "Attack technique used for unauthorized execution of operating system commands. This attack is possible when an application accepts untrusted input to build operating system commands in an insecure manner involving improper data sanitization, and\/or improper calling of external programs."
+                     },
+                     "name": "Remote OS Command Injection",
+                     "properties": {
+                            "references": [
+                                "https:\/\/cwe.mitre.org\/data\/definitions\/78.html",
+                                "https:\/\/owasp.org\/www-community\/attacks\/Command_Injection"
+                            ],
+                            "solution": {
+                                "text": "If at all possible, use library calls rather than external processes to recreate the desired functionality.\n\nRun your code in a \"jail\" or similar sandbox environment that enforces strict boundaries between the process and the operating system. This may effectively restrict which files can be accessed in a particular directory or which commands can be executed by your software.\n\nOS-level examples include the Unix chroot jail, AppArmor, and SELinux. In general, managed code may provide some protection. For example, java.io.FilePermission in the Java SecurityManager allows you to specify restrictions on file operations.\nThis may not be a feasible solution, and it only limits the impact to the operating system; the rest of your application may still be subject to compromise.\n\nFor any data that will be used to generate a command to be executed, keep as much of that data out of external control as possible. For example, in web applications, this may require storing the command locally in the session's state instead of sending it out to the client in a hidden form field.\n\nUse a vetted library or framework that does not allow this weakness to occur or provides constructs that make this weakness easier to avoid.\n\nFor example, consider using the ESAPI Encoding control or a similar tool, library, or framework. These will help the programmer encode outputs in a manner less prone to error.\n\nIf you need to use dynamically-generated query strings or commands in spite of the risk, properly quote arguments and escape any special characters within those arguments. The most conservative approach is to escape or filter all characters that do not pass an extremely strict allow list (such as everything that is not alphanumeric or white space). If some special characters are still needed, such as white space, wrap each argument in quotes after the escaping\/filtering step. Be careful of argument injection.\n\nIf the program to be executed allows arguments to be specified within an input file or from standard input, then consider using that mode to pass arguments instead of the command line.\n\nIf available, use structured mechanisms that automatically enforce the separation between data and code. These mechanisms may be able to provide the relevant quoting, encoding, and validation automatically, instead of relying on the developer to provide this capability at every point where output is generated.\n\nSome languages offer multiple functions that can be used to invoke commands. Where possible, identify any function that invokes a command shell using a single string, and replace it with a function that requires individual arguments. These functions typically perform appropriate quoting and filtering of arguments. For example, in C, the system() function accepts a string that contains the entire command to be executed, whereas execl(), execve(), and others require an array of strings, one for each argument. In Windows, CreateProcess() only accepts one command at a time. In Perl, if system() is provided with an array of arguments, then it will quote each of the arguments.\n\nAssume all input is malicious. Use an \"accept known good\" input validation strategy, i.e., use an allow list of acceptable inputs that strictly conform to specifications. Reject any input that does not strictly conform to specifications, or transform it into something that does. Do not rely exclusively on looking for malicious or malformed inputs (i.e., do not rely on a deny list). However, deny lists can be useful for detecting potential attacks or determining which inputs are so malformed that they should be rejected outright.\n\nWhen performing input validation, consider all potentially relevant properties, including length, type of input, the full range of acceptable values, missing or extra inputs, syntax, consistency across related fields, and conformance to business rules. As an example of business rule logic, \"boat\" may be syntactically valid because it only contains alphanumeric characters, but it is not valid if you are expecting colors such as \"red\" or \"blue.\"\n\nWhen constructing OS command strings, use stringent allow lists that limit the character set based on the expected value of the parameter in the request. This will indirectly limit the scope of an attack, but this technique is less important than proper output encoding and escaping.\n\nNote that proper output encoding, escaping, and quoting is the most effective solution for preventing OS command injection, although input validation may provide some defense-in-depth. This is because it effectively limits what will appear in output. Input validation will not always prevent OS command injection, especially if you are required to support free-form text fields that could contain arbitrary characters. For example, when invoking a mail program, you might need to allow the subject field to contain otherwise-dangerous inputs like \";\" and \">\" characters, which would need to be escaped or otherwise handled. In this case, stripping the character might reduce the risk of OS command injection, but it would produce incorrect behavior because the subject field would not be recorded as the user intended. This might seem to be a minor inconvenience, but it could be more important when the program relies on well-structured subject lines in order to pass messages to other components.\n\nEven if you make a mistake in your validation (such as forgetting one out of 100 input fields), appropriate encoding is still likely to protect you from injection-based attacks. As long as it is not done in isolation, input validation is still a useful technique, since it may significantly reduce your attack surface, allow you to detect some attacks, and provide other security benefits that proper encoding does not address."
+                            },
+                            "confidence": "medium"
+                     },
+                     "relationships": [ 
+                        {
+                           "kinds": [
+                              "superset"
+                           ],
+                           "target": {
+                              "guid":"deb1d258-acdc-37fc-8ba9-037d4256f85e",
+                              "id": "78",
+                              "toolComponent": {
+                                 "guid": "b000a760-3e52-3565-a35c-f61369da53b7",
+                                 "name": "CWE"
+                              }
+                           }
+                        }
+                        
+                     ],
+                     "shortDescription": {
+                        "text": "Remote OS Command Injection"
+                     }
+                  },
+                  {
+                     "id": "90037",
+                     "defaultConfiguration": {
+                        "level": "error"
+                     },
+                     "fullDescription": {
+                        "text": "Attack technique used for unauthorized execution of operating system commands. This attack is possible when an application accepts untrusted input to build operating system commands in an insecure manner involving improper data sanitization, and\/or improper calling of external programs."
+                     },
+                     "name": "Remote OS Command Injection (Time Based)",
+                     "properties": {
+                            "references": [
+                                "https:\/\/cwe.mitre.org\/data\/definitions\/78.html",
+                                "https:\/\/owasp.org\/www-community\/attacks\/Command_Injection"
+                            ],
+                            "solution": {
+                                "text": "If at all possible, use library calls rather than external processes to recreate the desired functionality.\n\nRun your code in a \"jail\" or similar sandbox environment that enforces strict boundaries between the process and the operating system. This may effectively restrict which files can be accessed in a particular directory or which commands can be executed by your software.\n\nOS-level examples include the Unix chroot jail, AppArmor, and SELinux. In general, managed code may provide some protection. For example, java.io.FilePermission in the Java SecurityManager allows you to specify restrictions on file operations.\nThis may not be a feasible solution, and it only limits the impact to the operating system; the rest of your application may still be subject to compromise.\n\nFor any data that will be used to generate a command to be executed, keep as much of that data out of external control as possible. For example, in web applications, this may require storing the command locally in the session's state instead of sending it out to the client in a hidden form field.\n\nUse a vetted library or framework that does not allow this weakness to occur or provides constructs that make this weakness easier to avoid.\n\nFor example, consider using the ESAPI Encoding control or a similar tool, library, or framework. These will help the programmer encode outputs in a manner less prone to error.\n\nIf you need to use dynamically-generated query strings or commands in spite of the risk, properly quote arguments and escape any special characters within those arguments. The most conservative approach is to escape or filter all characters that do not pass an extremely strict allow list (such as everything that is not alphanumeric or white space). If some special characters are still needed, such as white space, wrap each argument in quotes after the escaping\/filtering step. Be careful of argument injection.\n\nIf the program to be executed allows arguments to be specified within an input file or from standard input, then consider using that mode to pass arguments instead of the command line.\n\nIf available, use structured mechanisms that automatically enforce the separation between data and code. These mechanisms may be able to provide the relevant quoting, encoding, and validation automatically, instead of relying on the developer to provide this capability at every point where output is generated.\n\nSome languages offer multiple functions that can be used to invoke commands. Where possible, identify any function that invokes a command shell using a single string, and replace it with a function that requires individual arguments. These functions typically perform appropriate quoting and filtering of arguments. For example, in C, the system() function accepts a string that contains the entire command to be executed, whereas execl(), execve(), and others require an array of strings, one for each argument. In Windows, CreateProcess() only accepts one command at a time. In Perl, if system() is provided with an array of arguments, then it will quote each of the arguments.\n\nAssume all input is malicious. Use an \"accept known good\" input validation strategy, i.e., use an allow list of acceptable inputs that strictly conform to specifications. Reject any input that does not strictly conform to specifications, or transform it into something that does. Do not rely exclusively on looking for malicious or malformed inputs (i.e., do not rely on a deny list). However, deny lists can be useful for detecting potential attacks or determining which inputs are so malformed that they should be rejected outright.\n\nWhen performing input validation, consider all potentially relevant properties, including length, type of input, the full range of acceptable values, missing or extra inputs, syntax, consistency across related fields, and conformance to business rules. As an example of business rule logic, \"boat\" may be syntactically valid because it only contains alphanumeric characters, but it is not valid if you are expecting colors such as \"red\" or \"blue.\"\n\nWhen constructing OS command strings, use stringent allow lists that limit the character set based on the expected value of the parameter in the request. This will indirectly limit the scope of an attack, but this technique is less important than proper output encoding and escaping.\n\nNote that proper output encoding, escaping, and quoting is the most effective solution for preventing OS command injection, although input validation may provide some defense-in-depth. This is because it effectively limits what will appear in output. Input validation will not always prevent OS command injection, especially if you are required to support free-form text fields that could contain arbitrary characters. For example, when invoking a mail program, you might need to allow the subject field to contain otherwise-dangerous inputs like \";\" and \">\" characters, which would need to be escaped or otherwise handled. In this case, stripping the character might reduce the risk of OS command injection, but it would produce incorrect behavior because the subject field would not be recorded as the user intended. This might seem to be a minor inconvenience, but it could be more important when the program relies on well-structured subject lines in order to pass messages to other components.\n\nEven if you make a mistake in your validation (such as forgetting one out of 100 input fields), appropriate encoding is still likely to protect you from injection-based attacks. As long as it is not done in isolation, input validation is still a useful technique, since it may significantly reduce your attack surface, allow you to detect some attacks, and provide other security benefits that proper encoding does not address."
+                            },
+                            "confidence": "medium"
+                     },
+                     "relationships": [ 
+                        {
+                           "kinds": [
+                              "superset"
+                           ],
+                           "target": {
+                              "guid":"deb1d258-acdc-37fc-8ba9-037d4256f85e",
+                              "id": "78",
+                              "toolComponent": {
+                                 "guid": "b000a760-3e52-3565-a35c-f61369da53b7",
+                                 "name": "CWE"
+                              }
+                           }
+                        }
+                        
+                     ],
+                     "shortDescription": {
+                        "text": "Remote OS Command Injection (Time Based)"
+                     }
+                  }
+                  
+               ],
+               "semanticVersion": "2.17.0",
+               "supportedTaxonomies": [ 
+                  {
+                     "guid": "b000a760-3e52-3565-a35c-f61369da53b7",
+                     "name": "CWE"
+                  }
+               ],
+               "version": "2.17.0"
+            }
+         }
+      }
+   ],
+   "$schema": "https://raw.githubusercontent.com/oasis-tcs/sarif-spec/master/Schemata/sarif-schema-2.1.0.json",
+   "version": "2.1.0"
+}

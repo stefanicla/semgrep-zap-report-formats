@@ -1,0 +1,6 @@
+Ruleset   : p/owasp-top-ten (Semgrep Registry, free community rules)
+URL       : https://semgrep.dev/c/p/owasp-top-ten
+Downloaded: 2026-11-06 07:08 UTC
+SHA-256   : b7d924a40f2614bad2780bf82c0050b7e954a59691d04e2cd520a0736c987b64
+Rules     : 559 (all languages; Semgrep runs only those matching the scanned files)
+Licence   : Semgrep Rules License v1.0 - https://semgrep.dev/legal/rules-license

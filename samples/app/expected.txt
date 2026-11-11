@@ -1,0 +1,29 @@
+KNOWN ANSWER - the six flaws seeded in app/app.py and what each tool reports
+(Semgrep 1.182.1 with p/owasp-top-ten; ZAP 2.17.0 with config/zap-plan.yaml)
+
+#  Flaw (line)                          Semgrep (reads the code)                                  ZAP (attacks the running app)
+-- ------------------------------------ --------------------------------------------------------- ----------------------------------------------
+1  Hard-coded DB password in a URL (14)  detected-username-and-password-in-uri                     - (not visible from outside)
+2  Reflected XSS in /hello (39)          directly-returned-format-string, raw-html-format (x2)     Cross Site Scripting (Reflected) - High
+                                                                                                   Cross Site Scripting (DOM Based) - High (*)
+3  SQL injection in /search (46)         tainted-sql-string                                        SQL Injection - High
+4  Command injection in /lookup (54)     subprocess-injection, dangerous-subprocess-use,           Remote OS Command Injection - High
+                                         subprocess-shell-true                                     Remote OS Command Injection (Time Based) - High
+   ...and its output in HTML (55)        directly-returned-format-string, raw-html-format (x2)     -
+5  Cookie without flags in /login (62)   - (no Python cookie rule in p/owasp-top-ten)              Cookie No HttpOnly Flag - Low
+                                                                                                   Cookie without SameSite Attribute - Low
+6  Debug mode on all interfaces (68)     debug-enabled, avoid_app_run_with_bad_host               Server Leaks Version Information ("Server") - Low
+
+Not seeded, found by ZAP on every page (the app sets no security headers):
+   Content Security Policy (CSP) Header Not Set - Medium
+   Missing Anti-clickjacking Header - Medium
+   X-Content-Type-Options Header Missing - Low
+   Session Management Response Identified - Informational
+
+Totals: Semgrep 13 findings (10 distinct rules). ZAP 12 alert types (11 when the DOM-based XSS check runs out of time).
+
+(*) The DOM-based XSS check drives a headless browser and is limited to 1 minute per rule in the plan,
+    so it appears in most runs but not all. Everything else is stable from run to run.
+
+Take-away: each tool sees flaws the other cannot. Semgrep finds the hard-coded password; ZAP finds the
+cookie flags and missing headers. The injections (2, 3, 4) are found by both.

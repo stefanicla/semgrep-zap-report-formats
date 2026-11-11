@@ -1,0 +1,71 @@
+# OWASP ZAP Automation Framework plan: one scan, then one report job per report template.
+# The target is the demo app container on an internal Docker network (see scripts/Invoke-ZapScan.ps1).
+# Templates are those shipped with the "Report Generation" add-on in the pinned ZAP image.
+env:
+  contexts:
+    - name: demo-app
+      urls:
+        - http://demo-app:5000/
+      includePaths:
+        - http://demo-app:5000.*
+  parameters:
+    failOnError: true
+    failOnWarning: false
+    progressToStdout: true
+
+jobs:
+  # 1. Discover pages and parameters.
+  - type: spider
+    parameters:
+      context: demo-app
+      maxDuration: 1
+  - type: passiveScan-wait
+    parameters:
+      maxDuration: 2
+  # 2. Attack the parameters (SQL injection, XSS, command injection, ...). Kept short on purpose.
+  - type: activeScan
+    parameters:
+      context: demo-app
+      maxRuleDurationInMins: 1
+      maxScanDurationInMins: 5
+  - type: passiveScan-wait
+    parameters:
+      maxDuration: 2
+
+  # 3. Reports: the same alerts, written once per template.
+  - type: report
+    name: traditional-html
+    parameters: {template: traditional-html, reportDir: /zap/wrk/out, reportFile: report.traditional.html, reportTitle: ZAP report - demo app}
+  - type: report
+    name: traditional-html-plus
+    parameters: {template: traditional-html-plus, reportDir: /zap/wrk/out, reportFile: report.traditional-plus.html, reportTitle: ZAP report - demo app}
+  - type: report
+    name: traditional-json
+    parameters: {template: traditional-json, reportDir: /zap/wrk/out, reportFile: report.traditional.json, reportTitle: ZAP report - demo app}
+  - type: report
+    name: traditional-json-plus
+    parameters: {template: traditional-json-plus, reportDir: /zap/wrk/out, reportFile: report.traditional-plus.json, reportTitle: ZAP report - demo app}
+  - type: report
+    name: traditional-xml
+    parameters: {template: traditional-xml, reportDir: /zap/wrk/out, reportFile: report.traditional.xml, reportTitle: ZAP report - demo app}
+  - type: report
+    name: traditional-xml-plus
+    parameters: {template: traditional-xml-plus, reportDir: /zap/wrk/out, reportFile: report.traditional-plus.xml, reportTitle: ZAP report - demo app}
+  - type: report
+    name: traditional-md
+    parameters: {template: traditional-md, reportDir: /zap/wrk/out, reportFile: report.traditional.md, reportTitle: ZAP report - demo app}
+  - type: report
+    name: traditional-pdf
+    parameters: {template: traditional-pdf, reportDir: /zap/wrk/out, reportFile: report.pdf, reportTitle: ZAP report - demo app}
+  - type: report
+    name: modern
+    parameters: {template: modern, reportDir: /zap/wrk/out, reportFile: report.modern.html, reportTitle: ZAP report - demo app}
+  - type: report
+    name: risk-confidence-html
+    parameters: {template: risk-confidence-html, reportDir: /zap/wrk/out, reportFile: report.risk-confidence.html, reportTitle: ZAP report - demo app}
+  - type: report
+    name: high-level-report
+    parameters: {template: high-level-report, reportDir: /zap/wrk/out, reportFile: report.high-level.html, reportTitle: ZAP report - demo app}
+  - type: report
+    name: sarif-json
+    parameters: {template: sarif-json, reportDir: /zap/wrk/out, reportFile: report.sarif.json, reportTitle: ZAP report - demo app}

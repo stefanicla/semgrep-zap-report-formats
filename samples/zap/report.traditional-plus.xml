@@ -1,0 +1,4088 @@
+<?xml version="1.0"?>
+<OWASPZAPReport programName="ZAP" version="2.17.0" generated="Fri, 6 Nov 2026 07:10:44" created="2026-11-06T07:10:44.589153487Z">
+	
+		<site name="http://demo-app:5000" host="demo-app" port="5000" ssl="false">
+			<alerts>
+				
+					<alertitem>
+						<pluginid>40026</pluginid>
+						<alertRef>40026</alertRef>
+						<alert>Cross Site Scripting (DOM Based)</alert>
+						<name>Cross Site Scripting (DOM Based)</name>
+						<riskcode>3</riskcode>
+						<confidence>3</confidence>
+						<riskdesc>High (High)</riskdesc>
+						<confidencedesc>High</confidencedesc>
+						<desc>Cross-site Scripting (XSS) is an attack technique that involves echoing attacker-supplied code into a user&apos;s browser instance. A browser instance can be a standard web browser client, or a browser object embedded in a software product such as the browser within WinAmp, an RSS reader, or an email client. The code itself is usually written in HTML/JavaScript, but may also extend to VBScript, ActiveX, Java, Flash, or any other browser-supported technology.
+When an attacker gets a user&apos;s browser to execute his/her code, the code will run within the security context (or zone) of the hosting web site. With this level of privilege, the code has the ability to read, modify and transmit any sensitive data accessible by the browser. A Cross-site Scripted user could have his/her account hijacked (cookie theft), their browser redirected to another location, or possibly shown fraudulent content delivered by the web site they are visiting. Cross-site Scripting attacks essentially compromise the trust relationship between a user and the web site. Applications utilizing browser object instances which load content from the file system may execute code under the local machine zone allowing for system compromise.
+
+There are three types of Cross-site Scripting attacks: non-persistent, persistent and DOM-based.
+Non-persistent attacks and DOM-based attacks require a user to either visit a specially crafted link laced with malicious code, or visit a malicious web page containing a web form, which when posted to the vulnerable site, will mount the attack. Using a malicious form will oftentimes take place when the vulnerable resource only accepts HTTP POST requests. In such a case, the form can be submitted automatically, without the victim&apos;s knowledge (e.g. by using JavaScript). Upon clicking on the malicious link or submitting the malicious form, the XSS payload will get echoed back and will get interpreted by the user&apos;s browser and execute. Another technique to send almost arbitrary requests (GET and POST) is by using an embedded client, such as Adobe Flash.
+Persistent attacks occur when the malicious code is submitted to a web site where it&apos;s stored for a period of time. Examples of an attacker&apos;s favorite targets often include message board posts, web mail messages, and web chat software. The unsuspecting user is not required to interact with any additional site/link (e.g. an attacker site or a malicious link sent via email), just simply view the web page containing the code.</desc>
+						<instances>
+							
+								<instance>
+									<uri>http://demo-app:5000/hello?name=%3Cscript%3Ealert(5397)%3C/script%3E</uri>
+									<nodeName>http://demo-app:5000/hello (name)</nodeName>
+									<method>GET</method>
+									<param>name</param>
+									<attack>&lt;script&gt;alert(5397)&lt;/script&gt;</attack>
+									<evidence></evidence>
+									<otherinfo>The following steps were done to trigger the DOM XSS:
+With &lt;PAYLOAD_1&gt; as: %3Cscript%3Ealert(5397)%3C/script%3E
+Access: http://demo-app:5000/hello?name=&lt;PAYLOAD_1&gt;
+</otherinfo>
+									<requestheader>GET http://demo-app:5000/hello?name=guest HTTP/1.1
+host: demo-app:5000
+user-agent: 
+pragma: no-cache
+cache-control: no-cache
+referer: http://demo-app:5000
+
+</requestheader>
+									<requestbody></requestbody>
+									<responseheader>HTTP/1.1 200 OK
+Server: Werkzeug/3.1.9 Python/3.13.18
+Date: Fri, 06 Nov 2026 07:08:36 GMT
+Content-Type: text/html; charset=utf-8
+Content-Length: 20
+Connection: close
+
+</responseheader>
+									<responsebody>&lt;h1&gt;Hello guest&lt;/h1&gt;</responsebody>
+								</instance>
+							
+						</instances>
+						<count>1</count>
+						<systemic>false</systemic>
+						<solution>Phase: Architecture and Design
+Use a vetted library or framework that does not allow this weakness to occur or provides constructs that make this weakness easier to avoid.
+Examples of libraries and frameworks that make it easier to generate properly encoded output include Microsoft&apos;s Anti-XSS library, the OWASP ESAPI Encoding module, and Apache Wicket.
+
+Phases: Implementation; Architecture and Design
+Understand the context in which your data will be used and the encoding that will be expected. This is especially important when transmitting data between different components, or when generating outputs that can contain multiple encodings at the same time, such as web pages or multi-part mail messages. Study all expected communication protocols and data representations to determine the required encoding strategies.
+For any data that will be output to another web page, especially any data that was received from external inputs, use the appropriate encoding on all non-alphanumeric characters.
+Consult the XSS Prevention Cheat Sheet for more details on the types of encoding and escaping that are needed.
+
+Phase: Architecture and Design
+For any security checks that are performed on the client side, ensure that these checks are duplicated on the server side, in order to avoid CWE-602. Attackers can bypass the client-side checks by modifying values after the checks have been performed, or by changing the client to remove the client-side checks entirely. Then, these modified values would be submitted to the server.
+
+If available, use structured mechanisms that automatically enforce the separation between data and code. These mechanisms may be able to provide the relevant quoting, encoding, and validation automatically, instead of relying on the developer to provide this capability at every point where output is generated.
+
+Phase: Implementation
+For every web page that is generated, use and specify a character encoding such as ISO-8859-1 or UTF-8. When an encoding is not specified, the web browser may choose a different encoding by guessing which encoding is actually being used by the web page. This can cause the web browser to treat certain sequences as special, opening up the client to subtle XSS attacks. See CWE-116 for more mitigations related to encoding/escaping.
+
+To help mitigate XSS attacks against the user&apos;s session cookie, set the session cookie to be HttpOnly. In browsers that support the HttpOnly feature (such as more recent versions of Internet Explorer and Firefox), this attribute can prevent the user&apos;s session cookie from being accessible to malicious client-side scripts that use document.cookie. This is not a complete solution, since HttpOnly is not supported by all browsers. More importantly, XMLHTTPRequest and other powerful browser technologies provide read access to HTTP headers, including the Set-Cookie header in which the HttpOnly flag is set.
+
+Assume all input is malicious. Use an &quot;accept known good&quot; input validation strategy, i.e., use an allow list of acceptable inputs that strictly conform to specifications. Reject any input that does not strictly conform to specifications, or transform it into something that does. Do not rely exclusively on looking for malicious or malformed inputs (i.e., do not rely on a deny list). However, deny lists can be useful for detecting potential attacks or determining which inputs are so malformed that they should be rejected outright.
+
+When performing input validation, consider all potentially relevant properties, including length, type of input, the full range of acceptable values, missing or extra inputs, syntax, consistency across related fields, and conformance to business rules. As an example of business rule logic, &quot;boat&quot; may be syntactically valid because it only contains alphanumeric characters, but it is not valid if you are expecting colors such as &quot;red&quot; or &quot;blue.&quot;
+
+Ensure that you perform input validation at well-defined interfaces within the application. This will help protect the application even if a component is reused or moved elsewhere.
+	</solution>
+						<otherinfo>The following steps were done to trigger the DOM XSS:
+With &lt;PAYLOAD_1&gt; as: %3Cscript%3Ealert(5397)%3C/script%3E
+Access: http://demo-app:5000/hello?name=&lt;PAYLOAD_1&gt;
+</otherinfo>
+						<reference>https://owasp.org/www-community/attacks/xss/
+https://cwe.mitre.org/data/definitions/79.html</reference>
+						<cweid>79</cweid>
+						<wascid>8</wascid>
+						<sourceid>24</sourceid>
+						<tags>
+							
+								<tag>
+									<tag>OWASP_2025_A05</tag>
+									<link>https://owasp.org/Top10/2025/A05_2025-Injection/</link>
+								</tag>
+							
+							
+								<tag>
+									<tag>WSTG-v42-CLNT-01</tag>
+									<link>https://owasp.org/www-project-web-security-testing-guide/v42/4-Web_Application_Security_Testing/11-Client-side_Testing/01-Testing_for_DOM-based_Cross_Site_Scripting</link>
+								</tag>
+							
+							
+								<tag>
+									<tag>CWE-79</tag>
+									<link>https://cwe.mitre.org/data/definitions/79.html</link>
+								</tag>
+							
+							
+								<tag>
+									<tag>POLICY_SEQUENCE</tag>
+									<link></link>
+								</tag>
+							
+							
+								<tag>
+									<tag>OWASP_2021_A03</tag>
+									<link>https://owasp.org/Top10/2021/A03_2021-Injection/</link>
+								</tag>
+							
+							
+								<tag>
+									<tag>POLICY_DEV_FULL</tag>
+									<link></link>
+								</tag>
+							
+							
+								<tag>
+									<tag>POLICY_QA_STD</tag>
+									<link></link>
+								</tag>
+							
+							
+								<tag>
+									<tag>POLICY_QA_FULL</tag>
+									<link></link>
+								</tag>
+							
+							
+								<tag>
+									<tag>OWASP_2017_A07</tag>
+									<link>https://owasp.org/www-project-top-ten/2017/A7_2017-Cross-Site_Scripting_(XSS).html</link>
+								</tag>
+							
+						</tags>
+					</alertitem>
+				
+				
+					<alertitem>
+						<pluginid>40012</pluginid>
+						<alertRef>40012</alertRef>
+						<alert>Cross Site Scripting (Reflected)</alert>
+						<name>Cross Site Scripting (Reflected)</name>
+						<riskcode>3</riskcode>
+						<confidence>2</confidence>
+						<riskdesc>High (Medium)</riskdesc>
+						<confidencedesc>Medium</confidencedesc>
+						<desc>Cross-site Scripting (XSS) is an attack technique that involves echoing attacker-supplied code into a user&apos;s browser instance. A browser instance can be a standard web browser client, or a browser object embedded in a software product such as the browser within WinAmp, an RSS reader, or an email client. The code itself is usually written in HTML/JavaScript, but may also extend to VBScript, ActiveX, Java, Flash, or any other browser-supported technology.
+When an attacker gets a user&apos;s browser to execute his/her code, the code will run within the security context (or zone) of the hosting web site. With this level of privilege, the code has the ability to read, modify and transmit any sensitive data accessible by the browser. A Cross-site Scripted user could have his/her account hijacked (cookie theft), their browser redirected to another location, or possibly shown fraudulent content delivered by the web site they are visiting. Cross-site Scripting attacks essentially compromise the trust relationship between a user and the web site. Applications utilizing browser object instances which load content from the file system may execute code under the local machine zone allowing for system compromise.
+
+There are three types of Cross-site Scripting attacks: non-persistent, persistent and DOM-based.
+Non-persistent attacks and DOM-based attacks require a user to either visit a specially crafted link laced with malicious code, or visit a malicious web page containing a web form, which when posted to the vulnerable site, will mount the attack. Using a malicious form will oftentimes take place when the vulnerable resource only accepts HTTP POST requests. In such a case, the form can be submitted automatically, without the victim&apos;s knowledge (e.g. by using JavaScript). Upon clicking on the malicious link or submitting the malicious form, the XSS payload will get echoed back and will get interpreted by the user&apos;s browser and execute. Another technique to send almost arbitrary requests (GET and POST) is by using an embedded client, such as Adobe Flash.
+Persistent attacks occur when the malicious code is submitted to a web site where it&apos;s stored for a period of time. Examples of an attacker&apos;s favorite targets often include message board posts, web mail messages, and web chat software. The unsuspecting user is not required to interact with any additional site/link (e.g. an attacker site or a malicious link sent via email), just simply view the web page containing the code.</desc>
+						<instances>
+							
+								<instance>
+									<uri>http://demo-app:5000/hello?name=%3C%2Fh1%3E%3CscrIpt%3Ealert%281%29%3B%3C%2FscRipt%3E%3Ch1%3E</uri>
+									<nodeName>http://demo-app:5000/hello (name)</nodeName>
+									<method>GET</method>
+									<param>name</param>
+									<attack>&lt;/h1&gt;&lt;scrIpt&gt;alert(1);&lt;/scRipt&gt;&lt;h1&gt;</attack>
+									<evidence>&lt;/h1&gt;&lt;scrIpt&gt;alert(1);&lt;/scRipt&gt;&lt;h1&gt;</evidence>
+									<otherinfo></otherinfo>
+									<requestheader>GET http://demo-app:5000/hello?name=%3C%2Fh1%3E%3CscrIpt%3Ealert%281%29%3B%3C%2FscRipt%3E%3Ch1%3E HTTP/1.1
+host: demo-app:5000
+user-agent: 
+pragma: no-cache
+cache-control: no-cache
+referer: http://demo-app:5000
+
+</requestheader>
+									<requestbody></requestbody>
+									<responseheader>HTTP/1.1 200 OK
+Server: Werkzeug/3.1.9 Python/3.13.18
+Date: Fri, 06 Nov 2026 07:08:37 GMT
+Content-Type: text/html; charset=utf-8
+Content-Length: 50
+Connection: close
+
+</responseheader>
+									<responsebody>&lt;h1&gt;Hello &lt;/h1&gt;&lt;scrIpt&gt;alert(1);&lt;/scRipt&gt;&lt;h1&gt;&lt;/h1&gt;</responsebody>
+								</instance>
+							
+						</instances>
+						<count>1</count>
+						<systemic>false</systemic>
+						<solution>Phase: Architecture and Design
+Use a vetted library or framework that does not allow this weakness to occur or provides constructs that make this weakness easier to avoid.
+Examples of libraries and frameworks that make it easier to generate properly encoded output include Microsoft&apos;s Anti-XSS library, the OWASP ESAPI Encoding module, and Apache Wicket.
+
+Phases: Implementation; Architecture and Design
+Understand the context in which your data will be used and the encoding that will be expected. This is especially important when transmitting data between different components, or when generating outputs that can contain multiple encodings at the same time, such as web pages or multi-part mail messages. Study all expected communication protocols and data representations to determine the required encoding strategies.
+For any data that will be output to another web page, especially any data that was received from external inputs, use the appropriate encoding on all non-alphanumeric characters.
+Consult the XSS Prevention Cheat Sheet for more details on the types of encoding and escaping that are needed.
+
+Phase: Architecture and Design
+For any security checks that are performed on the client side, ensure that these checks are duplicated on the server side, in order to avoid CWE-602. Attackers can bypass the client-side checks by modifying values after the checks have been performed, or by changing the client to remove the client-side checks entirely. Then, these modified values would be submitted to the server.
+
+If available, use structured mechanisms that automatically enforce the separation between data and code. These mechanisms may be able to provide the relevant quoting, encoding, and validation automatically, instead of relying on the developer to provide this capability at every point where output is generated.
+
+Phase: Implementation
+For every web page that is generated, use and specify a character encoding such as ISO-8859-1 or UTF-8. When an encoding is not specified, the web browser may choose a different encoding by guessing which encoding is actually being used by the web page. This can cause the web browser to treat certain sequences as special, opening up the client to subtle XSS attacks. See CWE-116 for more mitigations related to encoding/escaping.
+
+To help mitigate XSS attacks against the user&apos;s session cookie, set the session cookie to be HttpOnly. In browsers that support the HttpOnly feature (such as more recent versions of Internet Explorer and Firefox), this attribute can prevent the user&apos;s session cookie from being accessible to malicious client-side scripts that use document.cookie. This is not a complete solution, since HttpOnly is not supported by all browsers. More importantly, XMLHTTPRequest and other powerful browser technologies provide read access to HTTP headers, including the Set-Cookie header in which the HttpOnly flag is set.
+
+Assume all input is malicious. Use an &quot;accept known good&quot; input validation strategy, i.e., use an allow list of acceptable inputs that strictly conform to specifications. Reject any input that does not strictly conform to specifications, or transform it into something that does. Do not rely exclusively on looking for malicious or malformed inputs (i.e., do not rely on a deny list). However, deny lists can be useful for detecting potential attacks or determining which inputs are so malformed that they should be rejected outright.
+
+When performing input validation, consider all potentially relevant properties, including length, type of input, the full range of acceptable values, missing or extra inputs, syntax, consistency across related fields, and conformance to business rules. As an example of business rule logic, &quot;boat&quot; may be syntactically valid because it only contains alphanumeric characters, but it is not valid if you are expecting colors such as &quot;red&quot; or &quot;blue.&quot;
+
+Ensure that you perform input validation at well-defined interfaces within the application. This will help protect the application even if a component is reused or moved elsewhere.
+	</solution>
+						<otherinfo></otherinfo>
+						<reference>https://owasp.org/www-community/attacks/xss/
+https://cwe.mitre.org/data/definitions/79.html</reference>
+						<cweid>79</cweid>
+						<wascid>8</wascid>
+						<sourceid>22</sourceid>
+						<tags>
+							
+								<tag>
+									<tag>CWE-79</tag>
+									<link>https://cwe.mitre.org/data/definitions/79.html</link>
+								</tag>
+							
+							
+								<tag>
+									<tag>POLICY_SEQUENCE</tag>
+									<link></link>
+								</tag>
+							
+							
+								<tag>
+									<tag>OWASP_2021_A03</tag>
+									<link>https://owasp.org/Top10/2021/A03_2021-Injection/</link>
+								</tag>
+							
+							
+								<tag>
+									<tag>PCI_DSS</tag>
+									<link>https://www.zaproxy.org/docs/desktop/addons/common-library/alerttags/#compliance</link>
+								</tag>
+							
+							
+								<tag>
+									<tag>WSTG-v42-INPV-01</tag>
+									<link>https://owasp.org/www-project-web-security-testing-guide/v42/4-Web_Application_Security_Testing/07-Input_Validation_Testing/01-Testing_for_Reflected_Cross_Site_Scripting</link>
+								</tag>
+							
+							
+								<tag>
+									<tag>POLICY_QA_CICD</tag>
+									<link></link>
+								</tag>
+							
+							
+								<tag>
+									<tag>POLICY_DEV_CICD</tag>
+									<link></link>
+								</tag>
+							
+							
+								<tag>
+									<tag>OWASP_2025_A05</tag>
+									<link>https://owasp.org/Top10/2025/A05_2025-Injection/</link>
+								</tag>
+							
+							
+								<tag>
+									<tag>POLICY_DEV_FULL</tag>
+									<link></link>
+								</tag>
+							
+							
+								<tag>
+									<tag>POLICY_QA_STD</tag>
+									<link></link>
+								</tag>
+							
+							
+								<tag>
+									<tag>POLICY_QA_FULL</tag>
+									<link></link>
+								</tag>
+							
+							
+								<tag>
+									<tag>POLICY_PENTEST</tag>
+									<link></link>
+								</tag>
+							
+							
+								<tag>
+									<tag>HIPAA</tag>
+									<link>https://www.zaproxy.org/docs/desktop/addons/common-library/alerttags/#compliance</link>
+								</tag>
+							
+							
+								<tag>
+									<tag>OWASP_2017_A07</tag>
+									<link>https://owasp.org/www-project-top-ten/2017/A7_2017-Cross-Site_Scripting_(XSS).html</link>
+								</tag>
+							
+							
+								<tag>
+									<tag>POLICY_DEV_STD</tag>
+									<link></link>
+								</tag>
+							
+						</tags>
+					</alertitem>
+				
+				
+					<alertitem>
+						<pluginid>90020</pluginid>
+						<alertRef>90020</alertRef>
+						<alert>Remote OS Command Injection</alert>
+						<name>Remote OS Command Injection</name>
+						<riskcode>3</riskcode>
+						<confidence>2</confidence>
+						<riskdesc>High (Medium)</riskdesc>
+						<confidencedesc>Medium</confidencedesc>
+						<desc>Attack technique used for unauthorized execution of operating system commands. This attack is possible when an application accepts untrusted input to build operating system commands in an insecure manner involving improper data sanitization, and/or improper calling of external programs.</desc>
+						<instances>
+							
+								<instance>
+									<uri>http://demo-app:5000/lookup?host=localhost%26cat+%2Fetc%2Fpasswd%26</uri>
+									<nodeName>http://demo-app:5000/lookup (host)</nodeName>
+									<method>GET</method>
+									<param>host</param>
+									<attack>localhost&amp;cat /etc/passwd&amp;</attack>
+									<evidence>root:x:0:0</evidence>
+									<otherinfo>The scan rule was able to retrieve the content of a file or command by sending [localhost&amp;cat /etc/passwd&amp;] to the operating system running this application.</otherinfo>
+									<requestheader>GET http://demo-app:5000/lookup?host=localhost%26cat+%2Fetc%2Fpasswd%26 HTTP/1.1
+host: demo-app:5000
+user-agent: 
+pragma: no-cache
+cache-control: no-cache
+referer: http://demo-app:5000
+
+</requestheader>
+									<requestbody></requestbody>
+									<responseheader>HTTP/1.1 200 OK
+Server: Werkzeug/3.1.9 Python/3.13.18
+Date: Fri, 06 Nov 2026 07:10:08 GMT
+Content-Type: text/html; charset=utf-8
+Content-Length: 903
+Connection: close
+
+</responseheader>
+									<responsebody>&lt;pre&gt;::1             localhost ip6-localhost ip6-loopback
+root:x:0:0:root:/root:/bin/bash
+daemon:x:1:1:daemon:/usr/sbin:/usr/sbin/nologin
+bin:x:2:2:bin:/bin:/usr/sbin/nologin
+sys:x:3:3:sys:/dev:/usr/sbin/nologin
+sync:x:4:65534:sync:/bin:/bin/sync
+games:x:5:60:games:/usr/games:/usr/sbin/nologin
+man:x:6:12:man:/var/cache/man:/usr/sbin/nologin
+lp:x:7:7:lp:/var/spool/lpd:/usr/sbin/nologin
+mail:x:8:8:mail:/var/mail:/usr/sbin/nologin
+news:x:9:9:news:/var/spool/news:/usr/sbin/nologin
+uucp:x:10:10:uucp:/var/spool/uucp:/usr/sbin/nologin
+proxy:x:13:13:proxy:/bin:/usr/sbin/nologin
+www-data:x:33:33:www-data:/var/www:/usr/sbin/nologin
+backup:x:34:34:backup:/var/backups:/usr/sbin/nologin
+list:x:38:38:Mailing List Manager:/var/list:/usr/sbin/nologin
+irc:x:39:39:ircd:/run/ircd:/usr/sbin/nologin
+_apt:x:42:65534::/nonexistent:/usr/sbin/nologin
+nobody:x:65534:65534:nobody:/nonexistent:/usr/sbin/nologin
+&lt;/pre&gt;</responsebody>
+								</instance>
+							
+						</instances>
+						<count>1</count>
+						<systemic>false</systemic>
+						<solution>If at all possible, use library calls rather than external processes to recreate the desired functionality.
+
+Run your code in a &quot;jail&quot; or similar sandbox environment that enforces strict boundaries between the process and the operating system. This may effectively restrict which files can be accessed in a particular directory or which commands can be executed by your software.
+
+OS-level examples include the Unix chroot jail, AppArmor, and SELinux. In general, managed code may provide some protection. For example, java.io.FilePermission in the Java SecurityManager allows you to specify restrictions on file operations.
+This may not be a feasible solution, and it only limits the impact to the operating system; the rest of your application may still be subject to compromise.
+
+For any data that will be used to generate a command to be executed, keep as much of that data out of external control as possible. For example, in web applications, this may require storing the command locally in the session&apos;s state instead of sending it out to the client in a hidden form field.
+
+Use a vetted library or framework that does not allow this weakness to occur or provides constructs that make this weakness easier to avoid.
+
+For example, consider using the ESAPI Encoding control or a similar tool, library, or framework. These will help the programmer encode outputs in a manner less prone to error.
+
+If you need to use dynamically-generated query strings or commands in spite of the risk, properly quote arguments and escape any special characters within those arguments. The most conservative approach is to escape or filter all characters that do not pass an extremely strict allow list (such as everything that is not alphanumeric or white space). If some special characters are still needed, such as white space, wrap each argument in quotes after the escaping/filtering step. Be careful of argument injection.
+
+If the program to be executed allows arguments to be specified within an input file or from standard input, then consider using that mode to pass arguments instead of the command line.
+
+If available, use structured mechanisms that automatically enforce the separation between data and code. These mechanisms may be able to provide the relevant quoting, encoding, and validation automatically, instead of relying on the developer to provide this capability at every point where output is generated.
+
+Some languages offer multiple functions that can be used to invoke commands. Where possible, identify any function that invokes a command shell using a single string, and replace it with a function that requires individual arguments. These functions typically perform appropriate quoting and filtering of arguments. For example, in C, the system() function accepts a string that contains the entire command to be executed, whereas execl(), execve(), and others require an array of strings, one for each argument. In Windows, CreateProcess() only accepts one command at a time. In Perl, if system() is provided with an array of arguments, then it will quote each of the arguments.
+
+Assume all input is malicious. Use an &quot;accept known good&quot; input validation strategy, i.e., use an allow list of acceptable inputs that strictly conform to specifications. Reject any input that does not strictly conform to specifications, or transform it into something that does. Do not rely exclusively on looking for malicious or malformed inputs (i.e., do not rely on a deny list). However, deny lists can be useful for detecting potential attacks or determining which inputs are so malformed that they should be rejected outright.
+
+When performing input validation, consider all potentially relevant properties, including length, type of input, the full range of acceptable values, missing or extra inputs, syntax, consistency across related fields, and conformance to business rules. As an example of business rule logic, &quot;boat&quot; may be syntactically valid because it only contains alphanumeric characters, but it is not valid if you are expecting colors such as &quot;red&quot; or &quot;blue.&quot;
+
+When constructing OS command strings, use stringent allow lists that limit the character set based on the expected value of the parameter in the request. This will indirectly limit the scope of an attack, but this technique is less important than proper output encoding and escaping.
+
+Note that proper output encoding, escaping, and quoting is the most effective solution for preventing OS command injection, although input validation may provide some defense-in-depth. This is because it effectively limits what will appear in output. Input validation will not always prevent OS command injection, especially if you are required to support free-form text fields that could contain arbitrary characters. For example, when invoking a mail program, you might need to allow the subject field to contain otherwise-dangerous inputs like &quot;;&quot; and &quot;&gt;&quot; characters, which would need to be escaped or otherwise handled. In this case, stripping the character might reduce the risk of OS command injection, but it would produce incorrect behavior because the subject field would not be recorded as the user intended. This might seem to be a minor inconvenience, but it could be more important when the program relies on well-structured subject lines in order to pass messages to other components.
+
+Even if you make a mistake in your validation (such as forgetting one out of 100 input fields), appropriate encoding is still likely to protect you from injection-based attacks. As long as it is not done in isolation, input validation is still a useful technique, since it may significantly reduce your attack surface, allow you to detect some attacks, and provide other security benefits that proper encoding does not address.</solution>
+						<otherinfo>The scan rule was able to retrieve the content of a file or command by sending [localhost&amp;cat /etc/passwd&amp;] to the operating system running this application.</otherinfo>
+						<reference>https://cwe.mitre.org/data/definitions/78.html
+https://owasp.org/www-community/attacks/Command_Injection</reference>
+						<cweid>78</cweid>
+						<wascid>31</wascid>
+						<sourceid>25</sourceid>
+						<tags>
+							
+								<tag>
+									<tag>POLICY_SEQUENCE</tag>
+									<link></link>
+								</tag>
+							
+							
+								<tag>
+									<tag>OWASP_2021_A03</tag>
+									<link>https://owasp.org/Top10/2021/A03_2021-Injection/</link>
+								</tag>
+							
+							
+								<tag>
+									<tag>PCI_DSS</tag>
+									<link>https://www.zaproxy.org/docs/desktop/addons/common-library/alerttags/#compliance</link>
+								</tag>
+							
+							
+								<tag>
+									<tag>CWE-78</tag>
+									<link>https://cwe.mitre.org/data/definitions/78.html</link>
+								</tag>
+							
+							
+								<tag>
+									<tag>WSTG-v42-INPV-12</tag>
+									<link>https://owasp.org/www-project-web-security-testing-guide/v42/4-Web_Application_Security_Testing/07-Input_Validation_Testing/12-Testing_for_Command_Injection</link>
+								</tag>
+							
+							
+								<tag>
+									<tag>POLICY_QA_CICD</tag>
+									<link></link>
+								</tag>
+							
+							
+								<tag>
+									<tag>POLICY_DEV_CICD</tag>
+									<link></link>
+								</tag>
+							
+							
+								<tag>
+									<tag>OWASP_2025_A05</tag>
+									<link>https://owasp.org/Top10/2025/A05_2025-Injection/</link>
+								</tag>
+							
+							
+								<tag>
+									<tag>POLICY_API</tag>
+									<link></link>
+								</tag>
+							
+							
+								<tag>
+									<tag>POLICY_DEV_FULL</tag>
+									<link></link>
+								</tag>
+							
+							
+								<tag>
+									<tag>POLICY_QA_STD</tag>
+									<link></link>
+								</tag>
+							
+							
+								<tag>
+									<tag>POLICY_QA_FULL</tag>
+									<link></link>
+								</tag>
+							
+							
+								<tag>
+									<tag>POLICY_PENTEST</tag>
+									<link></link>
+								</tag>
+							
+							
+								<tag>
+									<tag>HIPAA</tag>
+									<link>https://www.zaproxy.org/docs/desktop/addons/common-library/alerttags/#compliance</link>
+								</tag>
+							
+							
+								<tag>
+									<tag>OWASP_2017_A01</tag>
+									<link>https://owasp.org/www-project-top-ten/2017/A1_2017-Injection.html</link>
+								</tag>
+							
+							
+								<tag>
+									<tag>API_2023_API10</tag>
+									<link>https://owasp.org/API-Security/editions/2023/en/0xaa-unsafe-consumption-of-apis/</link>
+								</tag>
+							
+							
+								<tag>
+									<tag>POLICY_DEV_STD</tag>
+									<link></link>
+								</tag>
+							
+						</tags>
+					</alertitem>
+				
+				
+					<alertitem>
+						<pluginid>90037</pluginid>
+						<alertRef>90037</alertRef>
+						<alert>Remote OS Command Injection (Time Based)</alert>
+						<name>Remote OS Command Injection (Time Based)</name>
+						<riskcode>3</riskcode>
+						<confidence>2</confidence>
+						<riskdesc>High (Medium)</riskdesc>
+						<confidencedesc>Medium</confidencedesc>
+						<desc>Attack technique used for unauthorized execution of operating system commands. This attack is possible when an application accepts untrusted input to build operating system commands in an insecure manner involving improper data sanitization, and/or improper calling of external programs.</desc>
+						<instances>
+							
+								<instance>
+									<uri>http://demo-app:5000/lookup?host=localhost%26sleep+1.0%26</uri>
+									<nodeName>http://demo-app:5000/lookup (host)</nodeName>
+									<method>GET</method>
+									<param>host</param>
+									<attack>localhost&amp;sleep 15&amp;</attack>
+									<evidence></evidence>
+									<otherinfo>The scan rule was able to control the timing of the application response by sending [localhost&amp;sleep 15&amp;] to the operating system running this application.</otherinfo>
+									<requestheader>GET http://demo-app:5000/lookup?host=localhost%26sleep+1.0%26 HTTP/1.1
+host: demo-app:5000
+user-agent: 
+pragma: no-cache
+cache-control: no-cache
+referer: http://demo-app:5000
+
+</requestheader>
+									<requestbody></requestbody>
+									<responseheader>HTTP/1.1 200 OK
+Server: Werkzeug/3.1.9 Python/3.13.18
+Date: Fri, 06 Nov 2026 07:10:41 GMT
+Content-Type: text/html; charset=utf-8
+Content-Length: 64
+Connection: close
+
+</responseheader>
+									<responsebody>&lt;pre&gt;::1             localhost ip6-localhost ip6-loopback
+&lt;/pre&gt;</responsebody>
+								</instance>
+							
+						</instances>
+						<count>1</count>
+						<systemic>false</systemic>
+						<solution>If at all possible, use library calls rather than external processes to recreate the desired functionality.
+
+Run your code in a &quot;jail&quot; or similar sandbox environment that enforces strict boundaries between the process and the operating system. This may effectively restrict which files can be accessed in a particular directory or which commands can be executed by your software.
+
+OS-level examples include the Unix chroot jail, AppArmor, and SELinux. In general, managed code may provide some protection. For example, java.io.FilePermission in the Java SecurityManager allows you to specify restrictions on file operations.
+This may not be a feasible solution, and it only limits the impact to the operating system; the rest of your application may still be subject to compromise.
+
+For any data that will be used to generate a command to be executed, keep as much of that data out of external control as possible. For example, in web applications, this may require storing the command locally in the session&apos;s state instead of sending it out to the client in a hidden form field.
+
+Use a vetted library or framework that does not allow this weakness to occur or provides constructs that make this weakness easier to avoid.
+
+For example, consider using the ESAPI Encoding control or a similar tool, library, or framework. These will help the programmer encode outputs in a manner less prone to error.
+
+If you need to use dynamically-generated query strings or commands in spite of the risk, properly quote arguments and escape any special characters within those arguments. The most conservative approach is to escape or filter all characters that do not pass an extremely strict allow list (such as everything that is not alphanumeric or white space). If some special characters are still needed, such as white space, wrap each argument in quotes after the escaping/filtering step. Be careful of argument injection.
+
+If the program to be executed allows arguments to be specified within an input file or from standard input, then consider using that mode to pass arguments instead of the command line.
+
+If available, use structured mechanisms that automatically enforce the separation between data and code. These mechanisms may be able to provide the relevant quoting, encoding, and validation automatically, instead of relying on the developer to provide this capability at every point where output is generated.
+
+Some languages offer multiple functions that can be used to invoke commands. Where possible, identify any function that invokes a command shell using a single string, and replace it with a function that requires individual arguments. These functions typically perform appropriate quoting and filtering of arguments. For example, in C, the system() function accepts a string that contains the entire command to be executed, whereas execl(), execve(), and others require an array of strings, one for each argument. In Windows, CreateProcess() only accepts one command at a time. In Perl, if system() is provided with an array of arguments, then it will quote each of the arguments.
+
+Assume all input is malicious. Use an &quot;accept known good&quot; input validation strategy, i.e., use an allow list of acceptable inputs that strictly conform to specifications. Reject any input that does not strictly conform to specifications, or transform it into something that does. Do not rely exclusively on looking for malicious or malformed inputs (i.e., do not rely on a deny list). However, deny lists can be useful for detecting potential attacks or determining which inputs are so malformed that they should be rejected outright.
+
+When performing input validation, consider all potentially relevant properties, including length, type of input, the full range of acceptable values, missing or extra inputs, syntax, consistency across related fields, and conformance to business rules. As an example of business rule logic, &quot;boat&quot; may be syntactically valid because it only contains alphanumeric characters, but it is not valid if you are expecting colors such as &quot;red&quot; or &quot;blue.&quot;
+
+When constructing OS command strings, use stringent allow lists that limit the character set based on the expected value of the parameter in the request. This will indirectly limit the scope of an attack, but this technique is less important than proper output encoding and escaping.
+
+Note that proper output encoding, escaping, and quoting is the most effective solution for preventing OS command injection, although input validation may provide some defense-in-depth. This is because it effectively limits what will appear in output. Input validation will not always prevent OS command injection, especially if you are required to support free-form text fields that could contain arbitrary characters. For example, when invoking a mail program, you might need to allow the subject field to contain otherwise-dangerous inputs like &quot;;&quot; and &quot;&gt;&quot; characters, which would need to be escaped or otherwise handled. In this case, stripping the character might reduce the risk of OS command injection, but it would produce incorrect behavior because the subject field would not be recorded as the user intended. This might seem to be a minor inconvenience, but it could be more important when the program relies on well-structured subject lines in order to pass messages to other components.
+
+Even if you make a mistake in your validation (such as forgetting one out of 100 input fields), appropriate encoding is still likely to protect you from injection-based attacks. As long as it is not done in isolation, input validation is still a useful technique, since it may significantly reduce your attack surface, allow you to detect some attacks, and provide other security benefits that proper encoding does not address.</solution>
+						<otherinfo>The scan rule was able to control the timing of the application response by sending [localhost&amp;sleep 15&amp;] to the operating system running this application.</otherinfo>
+						<reference>https://cwe.mitre.org/data/definitions/78.html
+https://owasp.org/www-community/attacks/Command_Injection</reference>
+						<cweid>78</cweid>
+						<wascid>31</wascid>
+						<sourceid>26</sourceid>
+						<tags>
+							
+								<tag>
+									<tag>POLICY_SEQUENCE</tag>
+									<link></link>
+								</tag>
+							
+							
+								<tag>
+									<tag>OWASP_2021_A03</tag>
+									<link>https://owasp.org/Top10/2021/A03_2021-Injection/</link>
+								</tag>
+							
+							
+								<tag>
+									<tag>PCI_DSS</tag>
+									<link>https://www.zaproxy.org/docs/desktop/addons/common-library/alerttags/#compliance</link>
+								</tag>
+							
+							
+								<tag>
+									<tag>CWE-78</tag>
+									<link>https://cwe.mitre.org/data/definitions/78.html</link>
+								</tag>
+							
+							
+								<tag>
+									<tag>WSTG-v42-INPV-12</tag>
+									<link>https://owasp.org/www-project-web-security-testing-guide/v42/4-Web_Application_Security_Testing/07-Input_Validation_Testing/12-Testing_for_Command_Injection</link>
+								</tag>
+							
+							
+								<tag>
+									<tag>POLICY_QA_CICD</tag>
+									<link></link>
+								</tag>
+							
+							
+								<tag>
+									<tag>TEST_TIMING</tag>
+									<link></link>
+								</tag>
+							
+							
+								<tag>
+									<tag>POLICY_DEV_CICD</tag>
+									<link></link>
+								</tag>
+							
+							
+								<tag>
+									<tag>OWASP_2025_A05</tag>
+									<link>https://owasp.org/Top10/2025/A05_2025-Injection/</link>
+								</tag>
+							
+							
+								<tag>
+									<tag>POLICY_API</tag>
+									<link></link>
+								</tag>
+							
+							
+								<tag>
+									<tag>POLICY_DEV_FULL</tag>
+									<link></link>
+								</tag>
+							
+							
+								<tag>
+									<tag>POLICY_QA_STD</tag>
+									<link></link>
+								</tag>
+							
+							
+								<tag>
+									<tag>POLICY_QA_FULL</tag>
+									<link></link>
+								</tag>
+							
+							
+								<tag>
+									<tag>POLICY_PENTEST</tag>
+									<link></link>
+								</tag>
+							
+							
+								<tag>
+									<tag>HIPAA</tag>
+									<link>https://www.zaproxy.org/docs/desktop/addons/common-library/alerttags/#compliance</link>
+								</tag>
+							
+							
+								<tag>
+									<tag>OWASP_2017_A01</tag>
+									<link>https://owasp.org/www-project-top-ten/2017/A1_2017-Injection.html</link>
+								</tag>
+							
+							
+								<tag>
+									<tag>API_2023_API10</tag>
+									<link>https://owasp.org/API-Security/editions/2023/en/0xaa-unsafe-consumption-of-apis/</link>
+								</tag>
+							
+							
+								<tag>
+									<tag>POLICY_DEV_STD</tag>
+									<link></link>
+								</tag>
+							
+						</tags>
+					</alertitem>
+				
+				
+					<alertitem>
+						<pluginid>40018</pluginid>
+						<alertRef>40018</alertRef>
+						<alert>SQL Injection</alert>
+						<name>SQL Injection</name>
+						<riskcode>3</riskcode>
+						<confidence>1</confidence>
+						<riskdesc>High (Low)</riskdesc>
+						<confidencedesc>Low</confidencedesc>
+						<desc>SQL injection may be possible.</desc>
+						<instances>
+							
+								<instance>
+									<uri>http://demo-app:5000/search?q=%27</uri>
+									<nodeName>http://demo-app:5000/search (q)</nodeName>
+									<method>GET</method>
+									<param>q</param>
+									<attack>&apos;</attack>
+									<evidence>HTTP/1.1 500 INTERNAL SERVER ERROR</evidence>
+									<otherinfo></otherinfo>
+									<requestheader>GET http://demo-app:5000/search?q=%27 HTTP/1.1
+host: demo-app:5000
+user-agent: 
+pragma: no-cache
+cache-control: no-cache
+referer: http://demo-app:5000
+Cookie: session_id=demo-session
+
+</requestheader>
+									<requestbody></requestbody>
+									<responseheader>HTTP/1.1 500 INTERNAL SERVER ERROR
+Server: Werkzeug/3.1.9 Python/3.13.18
+Date: Fri, 06 Nov 2026 07:08:37 GMT
+Content-Type: text/html; charset=utf-8
+Content-Length: 14210
+Connection: close
+
+</responseheader>
+									<responsebody>&lt;!doctype html&gt;
+&lt;html lang=en&gt;
+  &lt;head&gt;
+    &lt;title&gt;sqlite3.OperationalError: unrecognized token: &amp;#34;&amp;#39;&amp;#39;&amp;#39;&amp;#34;
+ // Werkzeug Debugger&lt;/title&gt;
+    &lt;link rel=&quot;stylesheet&quot; href=&quot;?__debugger__=yes&amp;amp;cmd=resource&amp;amp;f=style.css&quot;&gt;
+    &lt;link rel=&quot;shortcut icon&quot;
+        href=&quot;?__debugger__=yes&amp;amp;cmd=resource&amp;amp;f=console.png&quot;&gt;
+    &lt;script src=&quot;?__debugger__=yes&amp;amp;cmd=resource&amp;amp;f=debugger.js&quot;&gt;&lt;/script&gt;
+    &lt;script&gt;
+      var CONSOLE_MODE = false,
+          EVALEX = false,
+          EVALEX_TRUSTED = false,
+          SECRET = &quot;Sj6xrmaHlyHIugcKhgjO&quot;;
+    &lt;/script&gt;
+  &lt;/head&gt;
+  &lt;body style=&quot;background-color: #fff&quot;&gt;
+    &lt;div class=&quot;debugger&quot;&gt;
+&lt;h1&gt;sqlite3.OperationalError&lt;/h1&gt;
+&lt;div class=&quot;detail&quot;&gt;
+  &lt;p class=&quot;errormsg&quot;&gt;sqlite3.OperationalError: unrecognized token: &amp;#34;&amp;#39;&amp;#39;&amp;#39;&amp;#34;
+&lt;/p&gt;
+&lt;/div&gt;
+&lt;h2 class=&quot;traceback&quot;&gt;Traceback &lt;em&gt;(most recent call last)&lt;/em&gt;&lt;/h2&gt;
+&lt;div class=&quot;traceback&quot;&gt;
+  &lt;h3&gt;&lt;/h3&gt;
+  &lt;ul&gt;&lt;li&gt;&lt;div class=&quot;frame&quot; id=&quot;frame-139725869462720&quot;&gt;
+  &lt;h4&gt;File &lt;cite class=&quot;filename&quot;&gt;&quot;/usr/local/lib/python3.13/site-packages/flask/app.py&quot;&lt;/cite&gt;,
+      line &lt;em class=&quot;line&quot;&gt;1536&lt;/em&gt;,
+      in &lt;code class=&quot;function&quot;&gt;__call__&lt;/code&gt;&lt;/h4&gt;
+  &lt;div class=&quot;source library&quot;&gt;&lt;pre class=&quot;line before&quot;&gt;&lt;span class=&quot;ws&quot;&gt;    &lt;/span&gt;) -&amp;gt; cabc.Iterable[bytes]:&lt;/pre&gt;
+&lt;pre class=&quot;line before&quot;&gt;&lt;span class=&quot;ws&quot;&gt;        &lt;/span&gt;&amp;#34;&amp;#34;&amp;#34;The WSGI server calls the Flask application object as the&lt;/pre&gt;
+&lt;pre class=&quot;line before&quot;&gt;&lt;span class=&quot;ws&quot;&gt;        &lt;/span&gt;WSGI application. This calls :meth:`wsgi_app`, which can be&lt;/pre&gt;
+&lt;pre class=&quot;line before&quot;&gt;&lt;span class=&quot;ws&quot;&gt;        &lt;/span&gt;wrapped to apply middleware.&lt;/pre&gt;
+&lt;pre class=&quot;line before&quot;&gt;&lt;span class=&quot;ws&quot;&gt;        &lt;/span&gt;&amp;#34;&amp;#34;&amp;#34;&lt;/pre&gt;
+&lt;pre class=&quot;line current&quot;&gt;&lt;span class=&quot;ws&quot;&gt;        &lt;/span&gt;return self.wsgi_app(environ, start_response)
+&lt;span class=&quot;ws&quot;&gt;        &lt;/span&gt;       ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^&lt;/pre&gt;&lt;/div&gt;
+&lt;/div&gt;
+
+&lt;li&gt;&lt;div class=&quot;frame&quot; id=&quot;frame-139725869464960&quot;&gt;
+  &lt;h4&gt;File &lt;cite class=&quot;filename&quot;&gt;&quot;/usr/local/lib/python3.13/site-packages/flask/app.py&quot;&lt;/cite&gt;,
+      line &lt;em class=&quot;line&quot;&gt;1514&lt;/em&gt;,
+      in &lt;code class=&quot;function&quot;&gt;wsgi_app&lt;/code&gt;&lt;/h4&gt;
+  &lt;div class=&quot;source library&quot;&gt;&lt;pre class=&quot;line before&quot;&gt;&lt;span class=&quot;ws&quot;&gt;            &lt;/span&gt;try:&lt;/pre&gt;
+&lt;pre class=&quot;line before&quot;&gt;&lt;span class=&quot;ws&quot;&gt;                &lt;/span&gt;ctx.push()&lt;/pre&gt;
+&lt;pre class=&quot;line before&quot;&gt;&lt;span class=&quot;ws&quot;&gt;                &lt;/span&gt;response = self.full_dispatch_request()&lt;/pre&gt;
+&lt;pre class=&quot;line before&quot;&gt;&lt;span class=&quot;ws&quot;&gt;            &lt;/span&gt;except Exception as e:&lt;/pre&gt;
+&lt;pre class=&quot;line before&quot;&gt;&lt;span class=&quot;ws&quot;&gt;                &lt;/span&gt;error = e&lt;/pre&gt;
+&lt;pre class=&quot;line current&quot;&gt;&lt;span class=&quot;ws&quot;&gt;                &lt;/span&gt;response = self.handle_exception(e)
+&lt;span class=&quot;ws&quot;&gt;                &lt;/span&gt;           ^^^^^^^^^^^^^^^^^^^^^^^^&lt;/pre&gt;
+&lt;pre class=&quot;line after&quot;&gt;&lt;span class=&quot;ws&quot;&gt;            &lt;/span&gt;except:&lt;/pre&gt;
+&lt;pre class=&quot;line after&quot;&gt;&lt;span class=&quot;ws&quot;&gt;                &lt;/span&gt;error = sys.exc_info()[1]&lt;/pre&gt;
+&lt;pre class=&quot;line after&quot;&gt;&lt;span class=&quot;ws&quot;&gt;                &lt;/span&gt;raise&lt;/pre&gt;
+&lt;pre class=&quot;line after&quot;&gt;&lt;span class=&quot;ws&quot;&gt;            &lt;/span&gt;return response(environ, start_response)&lt;/pre&gt;
+&lt;pre class=&quot;line after&quot;&gt;&lt;span class=&quot;ws&quot;&gt;        &lt;/span&gt;finally:&lt;/pre&gt;&lt;/div&gt;
+&lt;/div&gt;
+
+&lt;li&gt;&lt;div class=&quot;frame&quot; id=&quot;frame-139725869464800&quot;&gt;
+  &lt;h4&gt;File &lt;cite class=&quot;filename&quot;&gt;&quot;/usr/local/lib/python3.13/site-packages/flask/app.py&quot;&lt;/cite&gt;,
+      line &lt;em class=&quot;line&quot;&gt;1511&lt;/em&gt;,
+      in &lt;code class=&quot;function&quot;&gt;wsgi_app&lt;/code&gt;&lt;/h4&gt;
+  &lt;div class=&quot;source library&quot;&gt;&lt;pre class=&quot;line before&quot;&gt;&lt;span class=&quot;ws&quot;&gt;        &lt;/span&gt;ctx = self.request_context(environ)&lt;/pre&gt;
+&lt;pre class=&quot;line before&quot;&gt;&lt;span class=&quot;ws&quot;&gt;        &lt;/span&gt;error: BaseException | None = None&lt;/pre&gt;
+&lt;pre class=&quot;line before&quot;&gt;&lt;span class=&quot;ws&quot;&gt;        &lt;/span&gt;try:&lt;/pre&gt;
+&lt;pre class=&quot;line before&quot;&gt;&lt;span class=&quot;ws&quot;&gt;            &lt;/span&gt;try:&lt;/pre&gt;
+&lt;pre class=&quot;line before&quot;&gt;&lt;span class=&quot;ws&quot;&gt;                &lt;/span&gt;ctx.push()&lt;/pre&gt;
+&lt;pre class=&quot;line current&quot;&gt;&lt;span class=&quot;ws&quot;&gt;                &lt;/span&gt;response = self.full_dispatch_request()
+&lt;span class=&quot;ws&quot;&gt;                &lt;/span&gt;           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^&lt;/pre&gt;
+&lt;pre class=&quot;line after&quot;&gt;&lt;span class=&quot;ws&quot;&gt;            &lt;/span&gt;except Exception as e:&lt;/pre&gt;
+&lt;pre class=&quot;line after&quot;&gt;&lt;span class=&quot;ws&quot;&gt;                &lt;/span&gt;error = e&lt;/pre&gt;
+&lt;pre class=&quot;line after&quot;&gt;&lt;span class=&quot;ws&quot;&gt;                &lt;/span&gt;response = self.handle_exception(e)&lt;/pre&gt;
+&lt;pre class=&quot;line after&quot;&gt;&lt;span class=&quot;ws&quot;&gt;            &lt;/span&gt;except:&lt;/pre&gt;
+&lt;pre class=&quot;line after&quot;&gt;&lt;span class=&quot;ws&quot;&gt;                &lt;/span&gt;error = sys.exc_info()[1]&lt;/pre&gt;&lt;/div&gt;
+&lt;/div&gt;
+
+&lt;li&gt;&lt;div class=&quot;frame&quot; id=&quot;frame-139725869465280&quot;&gt;
+  &lt;h4&gt;File &lt;cite class=&quot;filename&quot;&gt;&quot;/usr/local/lib/python3.13/site-packages/flask/app.py&quot;&lt;/cite&gt;,
+      line &lt;em class=&quot;line&quot;&gt;919&lt;/em&gt;,
+      in &lt;code class=&quot;function&quot;&gt;full_dispatch_request&lt;/code&gt;&lt;/h4&gt;
+  &lt;div class=&quot;source library&quot;&gt;&lt;pre class=&quot;line before&quot;&gt;&lt;span class=&quot;ws&quot;&gt;            &lt;/span&gt;request_started.send(self, _async_wrapper=self.ensure_sync)&lt;/pre&gt;
+&lt;pre class=&quot;line before&quot;&gt;&lt;span class=&quot;ws&quot;&gt;            &lt;/span&gt;rv = self.preprocess_request()&lt;/pre&gt;
+&lt;pre class=&quot;line before&quot;&gt;&lt;span class=&quot;ws&quot;&gt;            &lt;/span&gt;if rv is None:&lt;/pre&gt;
+&lt;pre class=&quot;line before&quot;&gt;&lt;span class=&quot;ws&quot;&gt;                &lt;/span&gt;rv = self.dispatch_request()&lt;/pre&gt;
+&lt;pre class=&quot;line before&quot;&gt;&lt;span class=&quot;ws&quot;&gt;        &lt;/span&gt;except Exception as e:&lt;/pre&gt;
+&lt;pre class=&quot;line current&quot;&gt;&lt;span class=&quot;ws&quot;&gt;            &lt;/span&gt;rv = self.handle_user_exception(e)
+&lt;span class=&quot;ws&quot;&gt;            &lt;/span&gt;     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^&lt;/pre&gt;
+&lt;pre class=&quot;line after&quot;&gt;&lt;span class=&quot;ws&quot;&gt;        &lt;/span&gt;return self.finalize_request(rv)&lt;/pre&gt;
+&lt;pre class=&quot;line after&quot;&gt;&lt;span class=&quot;ws&quot;&gt;&lt;/span&gt; &lt;/pre&gt;
+&lt;pre class=&quot;line after&quot;&gt;&lt;span class=&quot;ws&quot;&gt;    &lt;/span&gt;def finalize_request(&lt;/pre&gt;
+&lt;pre class=&quot;line after&quot;&gt;&lt;span class=&quot;ws&quot;&gt;        &lt;/span&gt;self,&lt;/pre&gt;
+&lt;pre class=&quot;line after&quot;&gt;&lt;span class=&quot;ws&quot;&gt;        &lt;/span&gt;rv: ft.ResponseReturnValue | HTTPException,&lt;/pre&gt;&lt;/div&gt;
+&lt;/div&gt;
+
+&lt;li&gt;&lt;div class=&quot;frame&quot; id=&quot;frame-139725869676192&quot;&gt;
+  &lt;h4&gt;File &lt;cite class=&quot;filename&quot;&gt;&quot;/usr/local/lib/python3.13/site-packages/flask/app.py&quot;&lt;/cite&gt;,
+      line &lt;em class=&quot;line&quot;&gt;917&lt;/em&gt;,
+      in &lt;code class=&quot;function&quot;&gt;full_dispatch_request&lt;/code&gt;&lt;/h4&gt;
+  &lt;div class=&quot;source library&quot;&gt;&lt;pre class=&quot;line before&quot;&gt;&lt;span class=&quot;ws&quot;&gt;&lt;/span&gt; &lt;/pre&gt;
+&lt;pre class=&quot;line before&quot;&gt;&lt;span class=&quot;ws&quot;&gt;        &lt;/span&gt;try:&lt;/pre&gt;
+&lt;pre class=&quot;line before&quot;&gt;&lt;span class=&quot;ws&quot;&gt;            &lt;/span&gt;request_started.send(self, _async_wrapper=self.ensure_sync)&lt;/pre&gt;
+&lt;pre class=&quot;line before&quot;&gt;&lt;span class=&quot;ws&quot;&gt;            &lt;/span&gt;rv = self.preprocess_request()&lt;/pre&gt;
+&lt;pre class=&quot;line before&quot;&gt;&lt;span class=&quot;ws&quot;&gt;            &lt;/span&gt;if rv is None:&lt;/pre&gt;
+&lt;pre class=&quot;line current&quot;&gt;&lt;span class=&quot;ws&quot;&gt;                &lt;/span&gt;rv = self.dispatch_request()
+&lt;span class=&quot;ws&quot;&gt;                &lt;/span&gt;     ^^^^^^^^^^^^^^^^^^^^^^^&lt;/pre&gt;
+&lt;pre class=&quot;line after&quot;&gt;&lt;span class=&quot;ws&quot;&gt;        &lt;/span&gt;except Exception as e:&lt;/pre&gt;
+&lt;pre class=&quot;line after&quot;&gt;&lt;span class=&quot;ws&quot;&gt;            &lt;/span&gt;rv = self.handle_user_exception(e)&lt;/pre&gt;
+&lt;pre class=&quot;line after&quot;&gt;&lt;span class=&quot;ws&quot;&gt;        &lt;/span&gt;return self.finalize_request(rv)&lt;/pre&gt;
+&lt;pre class=&quot;line after&quot;&gt;&lt;span class=&quot;ws&quot;&gt;&lt;/span&gt; &lt;/pre&gt;
+&lt;pre class=&quot;line after&quot;&gt;&lt;span class=&quot;ws&quot;&gt;    &lt;/span&gt;def finalize_request(&lt;/pre&gt;&lt;/div&gt;
+&lt;/div&gt;
+
+&lt;li&gt;&lt;div class=&quot;frame&quot; id=&quot;frame-139725869666752&quot;&gt;
+  &lt;h4&gt;File &lt;cite class=&quot;filename&quot;&gt;&quot;/usr/local/lib/python3.13/site-packages/flask/app.py&quot;&lt;/cite&gt;,
+      line &lt;em class=&quot;line&quot;&gt;902&lt;/em&gt;,
+      in &lt;code class=&quot;function&quot;&gt;dispatch_request&lt;/code&gt;&lt;/h4&gt;
+  &lt;div class=&quot;source library&quot;&gt;&lt;pre class=&quot;line before&quot;&gt;&lt;span class=&quot;ws&quot;&gt;            &lt;/span&gt;and req.method == &amp;#34;OPTIONS&amp;#34;&lt;/pre&gt;
+&lt;pre class=&quot;line before&quot;&gt;&lt;span class=&quot;ws&quot;&gt;        &lt;/span&gt;):&lt;/pre&gt;
+&lt;pre class=&quot;line before&quot;&gt;&lt;span class=&quot;ws&quot;&gt;            &lt;/span&gt;return self.make_default_options_response()&lt;/pre&gt;
+&lt;pre class=&quot;line before&quot;&gt;&lt;span class=&quot;ws&quot;&gt;        &lt;/span&gt;# otherwise dispatch to the handler for that endpoint&lt;/pre&gt;
+&lt;pre class=&quot;line before&quot;&gt;&lt;span class=&quot;ws&quot;&gt;        &lt;/span&gt;view_args: dict[str, t.Any] = req.view_args  # type: ignore[assignment]&lt;/pre&gt;
+&lt;pre class=&quot;line current&quot;&gt;&lt;span class=&quot;ws&quot;&gt;        &lt;/span&gt;return self.ensure_sync(self.view_functions[rule.endpoint])(**view_args)  # type: ignore[no-any-return]
+&lt;span class=&quot;ws&quot;&gt;        &lt;/span&gt;       ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^&lt;/pre&gt;
+&lt;pre class=&quot;line after&quot;&gt;&lt;span class=&quot;ws&quot;&gt;&lt;/span&gt; &lt;/pre&gt;
+&lt;pre class=&quot;line after&quot;&gt;&lt;span class=&quot;ws&quot;&gt;    &lt;/span&gt;def full_dispatch_request(self) -&amp;gt; Response:&lt;/pre&gt;
+&lt;pre class=&quot;line after&quot;&gt;&lt;span class=&quot;ws&quot;&gt;        &lt;/span&gt;&amp;#34;&amp;#34;&amp;#34;Dispatches the request and on top of that performs request&lt;/pre&gt;
+&lt;pre class=&quot;line after&quot;&gt;&lt;span class=&quot;ws&quot;&gt;        &lt;/span&gt;pre and postprocessing as well as HTTP exception catching and&lt;/pre&gt;
+&lt;pre class=&quot;line after&quot;&gt;&lt;span class=&quot;ws&quot;&gt;        &lt;/span&gt;error handling.&lt;/pre&gt;&lt;/div&gt;
+&lt;/div&gt;
+
+&lt;li&gt;&lt;div class=&quot;frame&quot; id=&quot;frame-139725869674752&quot;&gt;
+  &lt;h4&gt;File &lt;cite class=&quot;filename&quot;&gt;&quot;/app/app.py&quot;&lt;/cite&gt;,
+      line &lt;em class=&quot;line&quot;&gt;46&lt;/em&gt;,
+      in &lt;code class=&quot;function&quot;&gt;search&lt;/code&gt;&lt;/h4&gt;
+  &lt;div class=&quot;source &quot;&gt;&lt;pre class=&quot;line before&quot;&gt;&lt;span class=&quot;ws&quot;&gt;&lt;/span&gt; &lt;/pre&gt;
+&lt;pre class=&quot;line before&quot;&gt;&lt;span class=&quot;ws&quot;&gt;&lt;/span&gt;@app.route(&amp;#34;/search&amp;#34;)&lt;/pre&gt;
+&lt;pre class=&quot;line before&quot;&gt;&lt;span class=&quot;ws&quot;&gt;&lt;/span&gt;def search():&lt;/pre&gt;
+&lt;pre class=&quot;line before&quot;&gt;&lt;span class=&quot;ws&quot;&gt;    &lt;/span&gt;q = request.args.get(&amp;#34;q&amp;#34;, &amp;#34;&amp;#34;)&lt;/pre&gt;
+&lt;pre class=&quot;line before&quot;&gt;&lt;span class=&quot;ws&quot;&gt;    &lt;/span&gt;# FLAW 3 - SQL injection: user input is concatenated into the query.&lt;/pre&gt;
+&lt;pre class=&quot;line current&quot;&gt;&lt;span class=&quot;ws&quot;&gt;    &lt;/span&gt;rows = db.execute(&amp;#34;SELECT name, price FROM products WHERE name = &amp;#39;&amp;#34; + q + &amp;#34;&amp;#39;&amp;#34;).fetchall()
+&lt;span class=&quot;ws&quot;&gt;    &lt;/span&gt;       ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^&lt;/pre&gt;
+&lt;pre class=&quot;line after&quot;&gt;&lt;span class=&quot;ws&quot;&gt;    &lt;/span&gt;return {&amp;#34;results&amp;#34;: rows}&lt;/pre&gt;
+&lt;pre class=&quot;line after&quot;&gt;&lt;span class=&quot;ws&quot;&gt;&lt;/span&gt; &lt;/pre&gt;
+&lt;pre class=&quot;line after&quot;&gt;&lt;span class=&quot;ws&quot;&gt;&lt;/span&gt; &lt;/pre&gt;
+&lt;pre class=&quot;line after&quot;&gt;&lt;span class=&quot;ws&quot;&gt;&lt;/span&gt;@app.route(&amp;#34;/lookup&amp;#34;)&lt;/pre&gt;
+&lt;pre class=&quot;line after&quot;&gt;&lt;span class=&quot;ws&quot;&gt;&lt;/span&gt;def lookup():&lt;/pre&gt;&lt;/div&gt;
+&lt;/div&gt;
+&lt;/ul&gt;
+  &lt;blockquote&gt;sqlite3.OperationalError: unrecognized token: &amp;#34;&amp;#39;&amp;#39;&amp;#39;&amp;#34;
+&lt;/blockquote&gt;
+&lt;/div&gt;
+
+&lt;div class=&quot;plain&quot;&gt;
+    &lt;p&gt;
+      This is the Copy/Paste friendly version of the traceback.
+    &lt;/p&gt;
+    &lt;textarea cols=&quot;50&quot; rows=&quot;10&quot; name=&quot;code&quot; readonly&gt;Traceback (most recent call last):
+  File &amp;#34;/usr/local/lib/python3.13/site-packages/flask/app.py&amp;#34;, line 1536, in __call__
+    return self.wsgi_app(environ, start_response)
+           ~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^
+  File &amp;#34;/usr/local/lib/python3.13/site-packages/flask/app.py&amp;#34;, line 1514, in wsgi_app
+    response = self.handle_exception(e)
+  File &amp;#34;/usr/local/lib/python3.13/site-packages/flask/app.py&amp;#34;, line 1511, in wsgi_app
+    response = self.full_dispatch_request()
+  File &amp;#34;/usr/local/lib/python3.13/site-packages/flask/app.py&amp;#34;, line 919, in full_dispatch_request
+    rv = self.handle_user_exception(e)
+  File &amp;#34;/usr/local/lib/python3.13/site-packages/flask/app.py&amp;#34;, line 917, in full_dispatch_request
+    rv = self.dispatch_request()
+  File &amp;#34;/usr/local/lib/python3.13/site-packages/flask/app.py&amp;#34;, line 902, in dispatch_request
+    return self.ensure_sync(self.view_functions[rule.endpoint])(**view_args)  # type: ignore[no-any-return]
+           ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^
+  File &amp;#34;/app/app.py&amp;#34;, line 46, in search
+    rows = db.execute(&amp;#34;SELECT name, price FROM products WHERE name = &amp;#39;&amp;#34; + q + &amp;#34;&amp;#39;&amp;#34;).fetchall()
+           ~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+sqlite3.OperationalError: unrecognized token: &amp;#34;&amp;#39;&amp;#39;&amp;#39;&amp;#34;
+&lt;/textarea&gt;
+&lt;/div&gt;
+&lt;div class=&quot;explanation&quot;&gt;
+  The debugger caught an exception in your WSGI application.  You can now
+  look at the traceback which led to the error.  &lt;span class=&quot;nojavascript&quot;&gt;
+  If you enable JavaScript you can also use additional features such as code
+  execution (if the evalex feature is enabled), automatic pasting of the
+  exceptions and much more.&lt;/span&gt;
+&lt;/div&gt;
+      &lt;div class=&quot;footer&quot;&gt;
+        Brought to you by &lt;strong class=&quot;arthur&quot;&gt;DON&apos;T PANIC&lt;/strong&gt;, your
+        friendly Werkzeug powered traceback interpreter.
+      &lt;/div&gt;
+    &lt;/div&gt;
+
+    &lt;div class=&quot;pin-prompt&quot;&gt;
+      &lt;div class=&quot;inner&quot;&gt;
+        &lt;h3&gt;Console Locked&lt;/h3&gt;
+        &lt;p&gt;
+          The console is locked and needs to be unlocked by entering the PIN.
+          You can find the PIN printed out on the standard output of your
+          shell that runs the server.
+        &lt;form&gt;
+          &lt;p&gt;PIN:
+            &lt;input type=text name=pin size=14&gt;
+            &lt;input type=submit name=btn value=&quot;Confirm Pin&quot;&gt;
+        &lt;/form&gt;
+      &lt;/div&gt;
+    &lt;/div&gt;
+  &lt;/body&gt;
+&lt;/html&gt;
+
+&lt;!--
+
+Traceback (most recent call last):
+  File &quot;/usr/local/lib/python3.13/site-packages/flask/app.py&quot;, line 1536, in __call__
+    return self.wsgi_app(environ, start_response)
+           ~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^
+  File &quot;/usr/local/lib/python3.13/site-packages/flask/app.py&quot;, line 1514, in wsgi_app
+    response = self.handle_exception(e)
+  File &quot;/usr/local/lib/python3.13/site-packages/flask/app.py&quot;, line 1511, in wsgi_app
+    response = self.full_dispatch_request()
+  File &quot;/usr/local/lib/python3.13/site-packages/flask/app.py&quot;, line 919, in full_dispatch_request
+    rv = self.handle_user_exception(e)
+  File &quot;/usr/local/lib/python3.13/site-packages/flask/app.py&quot;, line 917, in full_dispatch_request
+    rv = self.dispatch_request()
+  File &quot;/usr/local/lib/python3.13/site-packages/flask/app.py&quot;, line 902, in dispatch_request
+    return self.ensure_sync(self.view_functions[rule.endpoint])(**view_args)  # type: ignore[no-any-return]
+           ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^
+  File &quot;/app/app.py&quot;, line 46, in search
+    rows = db.execute(&quot;SELECT name, price FROM products WHERE name = &apos;&quot; + q + &quot;&apos;&quot;).fetchall()
+           ~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+sqlite3.OperationalError: unrecognized token: &quot;&apos;&apos;&apos;&quot;
+
+
+--&gt;
+</responsebody>
+								</instance>
+							
+						</instances>
+						<count>1</count>
+						<systemic>false</systemic>
+						<solution>Do not trust client side input, even if there is client side validation in place.
+In general, type check all data on the server side.
+If the application uses JDBC, use PreparedStatement or CallableStatement, with parameters passed by &apos;?&apos;
+If the application uses ASP, use ADO Command Objects with strong type checking and parameterized queries.
+If database Stored Procedures can be used, use them.
+Do *not* concatenate strings into queries in the stored procedure, or use &apos;exec&apos;, &apos;exec immediate&apos;, or equivalent functionality!
+Do not create dynamic SQL queries using simple string concatenation.
+Escape all data received from the client.
+Apply an &apos;allow list&apos; of allowed characters, or a &apos;deny list&apos; of disallowed characters in user input.
+Apply the principle of least privilege by using the least privileged database user possible.
+In particular, avoid using the &apos;sa&apos; or &apos;db-owner&apos; database users. This does not eliminate SQL injection, but minimizes its impact.
+Grant the minimum database access that is necessary for the application.</solution>
+						<otherinfo></otherinfo>
+						<reference>https://cheatsheetseries.owasp.org/cheatsheets/SQL_Injection_Prevention_Cheat_Sheet.html</reference>
+						<cweid>89</cweid>
+						<wascid>19</wascid>
+						<sourceid>23</sourceid>
+						<tags>
+							
+								<tag>
+									<tag>POLICY_SEQUENCE</tag>
+									<link></link>
+								</tag>
+							
+							
+								<tag>
+									<tag>OWASP_2021_A03</tag>
+									<link>https://owasp.org/Top10/2021/A03_2021-Injection/</link>
+								</tag>
+							
+							
+								<tag>
+									<tag>PCI_DSS</tag>
+									<link>https://www.zaproxy.org/docs/desktop/addons/common-library/alerttags/#compliance</link>
+								</tag>
+							
+							
+								<tag>
+									<tag>CWE-89</tag>
+									<link>https://cwe.mitre.org/data/definitions/89.html</link>
+								</tag>
+							
+							
+								<tag>
+									<tag>POLICY_QA_CICD</tag>
+									<link></link>
+								</tag>
+							
+							
+								<tag>
+									<tag>POLICY_DEV_CICD</tag>
+									<link></link>
+								</tag>
+							
+							
+								<tag>
+									<tag>OWASP_2025_A05</tag>
+									<link>https://owasp.org/Top10/2025/A05_2025-Injection/</link>
+								</tag>
+							
+							
+								<tag>
+									<tag>WSTG-v42-INPV-05</tag>
+									<link>https://owasp.org/www-project-web-security-testing-guide/v42/4-Web_Application_Security_Testing/07-Input_Validation_Testing/05-Testing_for_SQL_Injection</link>
+								</tag>
+							
+							
+								<tag>
+									<tag>POLICY_API</tag>
+									<link></link>
+								</tag>
+							
+							
+								<tag>
+									<tag>POLICY_DEV_FULL</tag>
+									<link></link>
+								</tag>
+							
+							
+								<tag>
+									<tag>POLICY_QA_STD</tag>
+									<link></link>
+								</tag>
+							
+							
+								<tag>
+									<tag>POLICY_QA_FULL</tag>
+									<link></link>
+								</tag>
+							
+							
+								<tag>
+									<tag>POLICY_PENTEST</tag>
+									<link></link>
+								</tag>
+							
+							
+								<tag>
+									<tag>HIPAA</tag>
+									<link>https://www.zaproxy.org/docs/desktop/addons/common-library/alerttags/#compliance</link>
+								</tag>
+							
+							
+								<tag>
+									<tag>OWASP_2017_A01</tag>
+									<link>https://owasp.org/www-project-top-ten/2017/A1_2017-Injection.html</link>
+								</tag>
+							
+							
+								<tag>
+									<tag>API_2023_API10</tag>
+									<link>https://owasp.org/API-Security/editions/2023/en/0xaa-unsafe-consumption-of-apis/</link>
+								</tag>
+							
+							
+								<tag>
+									<tag>POLICY_DEV_STD</tag>
+									<link></link>
+								</tag>
+							
+						</tags>
+					</alertitem>
+				
+				
+					<alertitem>
+						<pluginid>10038</pluginid>
+						<alertRef>10038-1</alertRef>
+						<alert>Content Security Policy (CSP) Header Not Set</alert>
+						<name>Content Security Policy (CSP) Header Not Set</name>
+						<riskcode>2</riskcode>
+						<confidence>3</confidence>
+						<riskdesc>Medium (High)</riskdesc>
+						<confidencedesc>High</confidencedesc>
+						<desc>Content Security Policy (CSP) is an added layer of security that helps to detect and mitigate certain types of attacks, including Cross Site Scripting (XSS) and data injection attacks. These attacks are used for everything from data theft to site defacement or distribution of malware. CSP provides a set of standard HTTP headers that allow website owners to declare approved sources of content that browsers should be allowed to load on that page &#x2014; covered types are JavaScript, CSS, HTML frames, fonts, images and embeddable objects such as Java applets, ActiveX, audio and video files.</desc>
+						<instances>
+							
+								<instance>
+									<uri>http://demo-app:5000</uri>
+									<nodeName>http://demo-app:5000</nodeName>
+									<method>GET</method>
+									<param></param>
+									<attack></attack>
+									<evidence></evidence>
+									<otherinfo></otherinfo>
+									<requestheader>GET http://demo-app:5000 HTTP/1.1
+host: demo-app:5000
+user-agent: 
+pragma: no-cache
+cache-control: no-cache
+
+</requestheader>
+									<requestbody></requestbody>
+									<responseheader>HTTP/1.1 200 OK
+Server: Werkzeug/3.1.9 Python/3.13.18
+Date: Fri, 06 Nov 2026 07:08:36 GMT
+Content-Type: text/html; charset=utf-8
+Content-Length: 389
+Connection: close
+
+</responseheader>
+									<responsebody>&lt;html&gt;&lt;head&gt;&lt;title&gt;Demo shop&lt;/title&gt;&lt;/head&gt;&lt;body&gt;
+&lt;h1&gt;Demo shop&lt;/h1&gt;
+&lt;ul&gt;
+  &lt;li&gt;&lt;a href=&quot;/hello?name=guest&quot;&gt;Say hello&lt;/a&gt;&lt;/li&gt;
+  &lt;li&gt;&lt;a href=&quot;/search?q=apple&quot;&gt;Search products&lt;/a&gt;&lt;/li&gt;
+  &lt;li&gt;&lt;a href=&quot;/lookup?host=localhost&quot;&gt;Look up a host&lt;/a&gt;&lt;/li&gt;
+  &lt;li&gt;&lt;a href=&quot;/login&quot;&gt;Log in&lt;/a&gt;&lt;/li&gt;
+&lt;/ul&gt;
+&lt;form action=&quot;/search&quot; method=&quot;get&quot;&gt;&lt;input name=&quot;q&quot;&gt;&lt;button&gt;Search&lt;/button&gt;&lt;/form&gt;
+&lt;/body&gt;&lt;/html&gt;</responsebody>
+								</instance>
+							
+							
+								<instance>
+									<uri>http://demo-app:5000/</uri>
+									<nodeName>http://demo-app:5000/</nodeName>
+									<method>GET</method>
+									<param></param>
+									<attack></attack>
+									<evidence></evidence>
+									<otherinfo></otherinfo>
+									<requestheader>GET http://demo-app:5000/ HTTP/1.1
+host: demo-app:5000
+user-agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/141.0.0.0 Safari/537.36
+pragma: no-cache
+cache-control: no-cache
+
+</requestheader>
+									<requestbody></requestbody>
+									<responseheader>HTTP/1.1 200 OK
+Server: Werkzeug/3.1.9 Python/3.13.18
+Date: Fri, 06 Nov 2026 07:08:36 GMT
+Content-Type: text/html; charset=utf-8
+Content-Length: 389
+Connection: close
+
+</responseheader>
+									<responsebody>&lt;html&gt;&lt;head&gt;&lt;title&gt;Demo shop&lt;/title&gt;&lt;/head&gt;&lt;body&gt;
+&lt;h1&gt;Demo shop&lt;/h1&gt;
+&lt;ul&gt;
+  &lt;li&gt;&lt;a href=&quot;/hello?name=guest&quot;&gt;Say hello&lt;/a&gt;&lt;/li&gt;
+  &lt;li&gt;&lt;a href=&quot;/search?q=apple&quot;&gt;Search products&lt;/a&gt;&lt;/li&gt;
+  &lt;li&gt;&lt;a href=&quot;/lookup?host=localhost&quot;&gt;Look up a host&lt;/a&gt;&lt;/li&gt;
+  &lt;li&gt;&lt;a href=&quot;/login&quot;&gt;Log in&lt;/a&gt;&lt;/li&gt;
+&lt;/ul&gt;
+&lt;form action=&quot;/search&quot; method=&quot;get&quot;&gt;&lt;input name=&quot;q&quot;&gt;&lt;button&gt;Search&lt;/button&gt;&lt;/form&gt;
+&lt;/body&gt;&lt;/html&gt;</responsebody>
+								</instance>
+							
+							
+								<instance>
+									<uri>http://demo-app:5000/login</uri>
+									<nodeName>http://demo-app:5000/login</nodeName>
+									<method>GET</method>
+									<param></param>
+									<attack></attack>
+									<evidence></evidence>
+									<otherinfo></otherinfo>
+									<requestheader>GET http://demo-app:5000/login HTTP/1.1
+host: demo-app:5000
+user-agent: 
+pragma: no-cache
+cache-control: no-cache
+referer: http://demo-app:5000/
+
+</requestheader>
+									<requestbody></requestbody>
+									<responseheader>HTTP/1.1 200 OK
+Server: Werkzeug/3.1.9 Python/3.13.18
+Date: Fri, 06 Nov 2026 07:08:36 GMT
+Content-Type: text/html; charset=utf-8
+Content-Length: 25
+Set-Cookie: session_id=demo-session; Path=/
+Connection: close
+
+</responseheader>
+									<responsebody>&lt;p&gt;Logged in as demo.&lt;/p&gt;</responsebody>
+								</instance>
+							
+							
+								<instance>
+									<uri>http://demo-app:5000/robots.txt</uri>
+									<nodeName>http://demo-app:5000/robots.txt</nodeName>
+									<method>GET</method>
+									<param></param>
+									<attack></attack>
+									<evidence></evidence>
+									<otherinfo></otherinfo>
+									<requestheader>GET http://demo-app:5000/robots.txt HTTP/1.1
+host: demo-app:5000
+user-agent: 
+pragma: no-cache
+cache-control: no-cache
+
+</requestheader>
+									<requestbody></requestbody>
+									<responseheader>HTTP/1.1 404 NOT FOUND
+Server: Werkzeug/3.1.9 Python/3.13.18
+Date: Fri, 06 Nov 2026 07:08:36 GMT
+Content-Type: text/html; charset=utf-8
+Content-Length: 207
+Connection: close
+
+</responseheader>
+									<responsebody>&lt;!doctype html&gt;
+&lt;html lang=en&gt;
+&lt;title&gt;404 Not Found&lt;/title&gt;
+&lt;h1&gt;Not Found&lt;/h1&gt;
+&lt;p&gt;The requested URL was not found on the server. If you entered the URL manually please check your spelling and try again.&lt;/p&gt;
+</responsebody>
+								</instance>
+							
+						</instances>
+						<count>4</count>
+						<systemic>true</systemic>
+						<solution>Ensure that your web server, application server, load balancer, etc. is configured to set the Content-Security-Policy header.</solution>
+						<otherinfo></otherinfo>
+						<reference>https://developer.mozilla.org/en-US/docs/Web/HTTP/Guides/CSP
+https://cheatsheetseries.owasp.org/cheatsheets/Content_Security_Policy_Cheat_Sheet.html
+https://www.w3.org/TR/CSP/
+https://w3c.github.io/webappsec-csp/
+https://web.dev/articles/csp
+https://caniuse.com/#feat=contentsecuritypolicy
+https://content-security-policy.com/</reference>
+						<cweid>693</cweid>
+						<wascid>15</wascid>
+						<sourceid>9</sourceid>
+						<tags>
+							
+								<tag>
+									<tag>OWASP_2021_A05</tag>
+									<link>https://owasp.org/Top10/2021/A05_2021-Security_Misconfiguration/</link>
+								</tag>
+							
+							
+								<tag>
+									<tag>POLICY_QA_STD</tag>
+									<link></link>
+								</tag>
+							
+							
+								<tag>
+									<tag>POLICY_PENTEST</tag>
+									<link></link>
+								</tag>
+							
+							
+								<tag>
+									<tag>SYSTEMIC</tag>
+									<link>https://www.zaproxy.org/docs/desktop/addons/common-library/alerttags/#systemic</link>
+								</tag>
+							
+							
+								<tag>
+									<tag>CWE-693</tag>
+									<link>https://cwe.mitre.org/data/definitions/693.html</link>
+								</tag>
+							
+							
+								<tag>
+									<tag>OWASP_2017_A06</tag>
+									<link>https://owasp.org/www-project-top-ten/2017/A6_2017-Security_Misconfiguration.html</link>
+								</tag>
+							
+							
+								<tag>
+									<tag>OWASP_2025_A02</tag>
+									<link>https://owasp.org/Top10/2025/A02_2025-Security_Misconfiguration/</link>
+								</tag>
+							
+						</tags>
+					</alertitem>
+				
+				
+					<alertitem>
+						<pluginid>10020</pluginid>
+						<alertRef>10020-1</alertRef>
+						<alert>Missing Anti-clickjacking Header</alert>
+						<name>Missing Anti-clickjacking Header</name>
+						<riskcode>2</riskcode>
+						<confidence>2</confidence>
+						<riskdesc>Medium (Medium)</riskdesc>
+						<confidencedesc>Medium</confidencedesc>
+						<desc>The response does not protect against &apos;ClickJacking&apos; attacks. It should include either Content-Security-Policy with &apos;frame-ancestors&apos; directive or X-Frame-Options.</desc>
+						<instances>
+							
+								<instance>
+									<uri>http://demo-app:5000/</uri>
+									<nodeName>http://demo-app:5000/</nodeName>
+									<method>GET</method>
+									<param>x-frame-options</param>
+									<attack></attack>
+									<evidence></evidence>
+									<otherinfo></otherinfo>
+									<requestheader>GET http://demo-app:5000/ HTTP/1.1
+host: demo-app:5000
+user-agent: 
+pragma: no-cache
+cache-control: no-cache
+
+</requestheader>
+									<requestbody></requestbody>
+									<responseheader>HTTP/1.1 200 OK
+Server: Werkzeug/3.1.9 Python/3.13.18
+Date: Fri, 06 Nov 2026 07:08:36 GMT
+Content-Type: text/html; charset=utf-8
+Content-Length: 389
+Connection: close
+
+</responseheader>
+									<responsebody>&lt;html&gt;&lt;head&gt;&lt;title&gt;Demo shop&lt;/title&gt;&lt;/head&gt;&lt;body&gt;
+&lt;h1&gt;Demo shop&lt;/h1&gt;
+&lt;ul&gt;
+  &lt;li&gt;&lt;a href=&quot;/hello?name=guest&quot;&gt;Say hello&lt;/a&gt;&lt;/li&gt;
+  &lt;li&gt;&lt;a href=&quot;/search?q=apple&quot;&gt;Search products&lt;/a&gt;&lt;/li&gt;
+  &lt;li&gt;&lt;a href=&quot;/lookup?host=localhost&quot;&gt;Look up a host&lt;/a&gt;&lt;/li&gt;
+  &lt;li&gt;&lt;a href=&quot;/login&quot;&gt;Log in&lt;/a&gt;&lt;/li&gt;
+&lt;/ul&gt;
+&lt;form action=&quot;/search&quot; method=&quot;get&quot;&gt;&lt;input name=&quot;q&quot;&gt;&lt;button&gt;Search&lt;/button&gt;&lt;/form&gt;
+&lt;/body&gt;&lt;/html&gt;</responsebody>
+								</instance>
+							
+							
+								<instance>
+									<uri>http://demo-app:5000/hello?name=guest</uri>
+									<nodeName>http://demo-app:5000/hello (name)</nodeName>
+									<method>GET</method>
+									<param>x-frame-options</param>
+									<attack></attack>
+									<evidence></evidence>
+									<otherinfo></otherinfo>
+									<requestheader>GET http://demo-app:5000/hello?name=guest HTTP/1.1
+host: demo-app:5000
+user-agent: 
+pragma: no-cache
+cache-control: no-cache
+referer: http://demo-app:5000
+
+</requestheader>
+									<requestbody></requestbody>
+									<responseheader>HTTP/1.1 200 OK
+Server: Werkzeug/3.1.9 Python/3.13.18
+Date: Fri, 06 Nov 2026 07:08:36 GMT
+Content-Type: text/html; charset=utf-8
+Content-Length: 20
+Connection: close
+
+</responseheader>
+									<responsebody>&lt;h1&gt;Hello guest&lt;/h1&gt;</responsebody>
+								</instance>
+							
+							
+								<instance>
+									<uri>http://demo-app:5000/login</uri>
+									<nodeName>http://demo-app:5000/login</nodeName>
+									<method>GET</method>
+									<param>x-frame-options</param>
+									<attack></attack>
+									<evidence></evidence>
+									<otherinfo></otherinfo>
+									<requestheader>GET http://demo-app:5000/login HTTP/1.1
+host: demo-app:5000
+user-agent: 
+pragma: no-cache
+cache-control: no-cache
+referer: http://demo-app:5000/
+
+</requestheader>
+									<requestbody></requestbody>
+									<responseheader>HTTP/1.1 200 OK
+Server: Werkzeug/3.1.9 Python/3.13.18
+Date: Fri, 06 Nov 2026 07:08:36 GMT
+Content-Type: text/html; charset=utf-8
+Content-Length: 25
+Set-Cookie: session_id=demo-session; Path=/
+Connection: close
+
+</responseheader>
+									<responsebody>&lt;p&gt;Logged in as demo.&lt;/p&gt;</responsebody>
+								</instance>
+							
+							
+								<instance>
+									<uri>http://demo-app:5000/lookup?host=localhost</uri>
+									<nodeName>http://demo-app:5000/lookup (host)</nodeName>
+									<method>GET</method>
+									<param>x-frame-options</param>
+									<attack></attack>
+									<evidence></evidence>
+									<otherinfo></otherinfo>
+									<requestheader>GET http://demo-app:5000/lookup?host=localhost HTTP/1.1
+host: demo-app:5000
+user-agent: 
+pragma: no-cache
+cache-control: no-cache
+referer: http://demo-app:5000
+
+</requestheader>
+									<requestbody></requestbody>
+									<responseheader>HTTP/1.1 200 OK
+Server: Werkzeug/3.1.9 Python/3.13.18
+Date: Fri, 06 Nov 2026 07:08:36 GMT
+Content-Type: text/html; charset=utf-8
+Content-Length: 64
+Connection: close
+
+</responseheader>
+									<responsebody>&lt;pre&gt;::1             localhost ip6-localhost ip6-loopback
+&lt;/pre&gt;</responsebody>
+								</instance>
+							
+						</instances>
+						<count>4</count>
+						<systemic>false</systemic>
+						<solution>Modern Web browsers support the Content-Security-Policy and X-Frame-Options HTTP headers. Ensure one of them is set on all web pages returned by your site/app.
+If you expect the page to be framed only by pages on your server (e.g. it&apos;s part of a FRAMESET) then you&apos;ll want to use SAMEORIGIN, otherwise if you never expect the page to be framed, you should use DENY. Alternatively consider implementing Content Security Policy&apos;s &quot;frame-ancestors&quot; directive.</solution>
+						<otherinfo></otherinfo>
+						<reference>https://developer.mozilla.org/en-US/docs/Web/HTTP/Reference/Headers/X-Frame-Options</reference>
+						<cweid>1021</cweid>
+						<wascid>15</wascid>
+						<sourceid>8</sourceid>
+						<tags>
+							
+								<tag>
+									<tag>OWASP_2021_A05</tag>
+									<link>https://owasp.org/Top10/2021/A05_2021-Security_Misconfiguration/</link>
+								</tag>
+							
+							
+								<tag>
+									<tag>POLICY_QA_STD</tag>
+									<link></link>
+								</tag>
+							
+							
+								<tag>
+									<tag>POLICY_PENTEST</tag>
+									<link></link>
+								</tag>
+							
+							
+								<tag>
+									<tag>CWE-1021</tag>
+									<link>https://cwe.mitre.org/data/definitions/1021.html</link>
+								</tag>
+							
+							
+								<tag>
+									<tag>SYSTEMIC</tag>
+									<link>https://www.zaproxy.org/docs/desktop/addons/common-library/alerttags/#systemic</link>
+								</tag>
+							
+							
+								<tag>
+									<tag>WSTG-v42-CLNT-09</tag>
+									<link>https://owasp.org/www-project-web-security-testing-guide/v42/4-Web_Application_Security_Testing/11-Client-side_Testing/09-Testing_for_Clickjacking</link>
+								</tag>
+							
+							
+								<tag>
+									<tag>OWASP_2017_A06</tag>
+									<link>https://owasp.org/www-project-top-ten/2017/A6_2017-Security_Misconfiguration.html</link>
+								</tag>
+							
+							
+								<tag>
+									<tag>OWASP_2025_A02</tag>
+									<link>https://owasp.org/Top10/2025/A02_2025-Security_Misconfiguration/</link>
+								</tag>
+							
+						</tags>
+					</alertitem>
+				
+				
+					<alertitem>
+						<pluginid>10010</pluginid>
+						<alertRef>10010</alertRef>
+						<alert>Cookie No HttpOnly Flag</alert>
+						<name>Cookie No HttpOnly Flag</name>
+						<riskcode>1</riskcode>
+						<confidence>2</confidence>
+						<riskdesc>Low (Medium)</riskdesc>
+						<confidencedesc>Medium</confidencedesc>
+						<desc>A cookie has been set without the HttpOnly flag, which means that the cookie can be accessed by JavaScript. If a malicious script can be run on this page then the cookie will be accessible and can be transmitted to another site. If this is a session cookie then session hijacking may be possible.</desc>
+						<instances>
+							
+								<instance>
+									<uri>http://demo-app:5000/login</uri>
+									<nodeName>http://demo-app:5000/login</nodeName>
+									<method>GET</method>
+									<param>session_id</param>
+									<attack></attack>
+									<evidence>Set-Cookie: session_id</evidence>
+									<otherinfo></otherinfo>
+									<requestheader>GET http://demo-app:5000/login HTTP/1.1
+host: demo-app:5000
+user-agent: 
+pragma: no-cache
+cache-control: no-cache
+referer: http://demo-app:5000/
+
+</requestheader>
+									<requestbody></requestbody>
+									<responseheader>HTTP/1.1 200 OK
+Server: Werkzeug/3.1.9 Python/3.13.18
+Date: Fri, 06 Nov 2026 07:08:36 GMT
+Content-Type: text/html; charset=utf-8
+Content-Length: 25
+Set-Cookie: session_id=demo-session; Path=/
+Connection: close
+
+</responseheader>
+									<responsebody>&lt;p&gt;Logged in as demo.&lt;/p&gt;</responsebody>
+								</instance>
+							
+						</instances>
+						<count>1</count>
+						<systemic>false</systemic>
+						<solution>Ensure that the HttpOnly flag is set for all cookies.</solution>
+						<otherinfo></otherinfo>
+						<reference>https://owasp.org/www-community/HttpOnly</reference>
+						<cweid>1004</cweid>
+						<wascid>13</wascid>
+						<sourceid>18</sourceid>
+						<tags>
+							
+								<tag>
+									<tag>CWE-1004</tag>
+									<link>https://cwe.mitre.org/data/definitions/1004.html</link>
+								</tag>
+							
+							
+								<tag>
+									<tag>OWASP_2021_A05</tag>
+									<link>https://owasp.org/Top10/2021/A05_2021-Security_Misconfiguration/</link>
+								</tag>
+							
+							
+								<tag>
+									<tag>POLICY_QA_STD</tag>
+									<link></link>
+								</tag>
+							
+							
+								<tag>
+									<tag>WSTG-v42-SESS-02</tag>
+									<link>https://owasp.org/www-project-web-security-testing-guide/v42/4-Web_Application_Security_Testing/06-Session_Management_Testing/02-Testing_for_Cookies_Attributes</link>
+								</tag>
+							
+							
+								<tag>
+									<tag>POLICY_PENTEST</tag>
+									<link></link>
+								</tag>
+							
+							
+								<tag>
+									<tag>SYSTEMIC</tag>
+									<link>https://www.zaproxy.org/docs/desktop/addons/common-library/alerttags/#systemic</link>
+								</tag>
+							
+							
+								<tag>
+									<tag>OWASP_2017_A06</tag>
+									<link>https://owasp.org/www-project-top-ten/2017/A6_2017-Security_Misconfiguration.html</link>
+								</tag>
+							
+							
+								<tag>
+									<tag>OWASP_2025_A02</tag>
+									<link>https://owasp.org/Top10/2025/A02_2025-Security_Misconfiguration/</link>
+								</tag>
+							
+							
+								<tag>
+									<tag>POLICY_DEV_STD</tag>
+									<link></link>
+								</tag>
+							
+						</tags>
+					</alertitem>
+				
+				
+					<alertitem>
+						<pluginid>10054</pluginid>
+						<alertRef>10054-1</alertRef>
+						<alert>Cookie without SameSite Attribute</alert>
+						<name>Cookie without SameSite Attribute</name>
+						<riskcode>1</riskcode>
+						<confidence>2</confidence>
+						<riskdesc>Low (Medium)</riskdesc>
+						<confidencedesc>Medium</confidencedesc>
+						<desc>A cookie has been set without the SameSite attribute, which means that the cookie can be sent as a result of a &apos;cross-site&apos; request. The SameSite attribute is an effective counter measure to cross-site request forgery, cross-site script inclusion, and timing attacks.</desc>
+						<instances>
+							
+								<instance>
+									<uri>http://demo-app:5000/login</uri>
+									<nodeName>http://demo-app:5000/login</nodeName>
+									<method>GET</method>
+									<param>session_id</param>
+									<attack></attack>
+									<evidence>Set-Cookie: session_id</evidence>
+									<otherinfo></otherinfo>
+									<requestheader>GET http://demo-app:5000/login HTTP/1.1
+host: demo-app:5000
+user-agent: 
+pragma: no-cache
+cache-control: no-cache
+referer: http://demo-app:5000/
+
+</requestheader>
+									<requestbody></requestbody>
+									<responseheader>HTTP/1.1 200 OK
+Server: Werkzeug/3.1.9 Python/3.13.18
+Date: Fri, 06 Nov 2026 07:08:36 GMT
+Content-Type: text/html; charset=utf-8
+Content-Length: 25
+Set-Cookie: session_id=demo-session; Path=/
+Connection: close
+
+</responseheader>
+									<responsebody>&lt;p&gt;Logged in as demo.&lt;/p&gt;</responsebody>
+								</instance>
+							
+						</instances>
+						<count>1</count>
+						<systemic>false</systemic>
+						<solution>Ensure that the SameSite attribute is set to either &apos;lax&apos; or ideally &apos;strict&apos; for all cookies.</solution>
+						<otherinfo></otherinfo>
+						<reference>https://datatracker.ietf.org/doc/html/draft-ietf-httpbis-cookie-same-site</reference>
+						<cweid>1275</cweid>
+						<wascid>13</wascid>
+						<sourceid>18</sourceid>
+						<tags>
+							
+								<tag>
+									<tag>OWASP_2021_A01</tag>
+									<link>https://owasp.org/Top10/2021/A01_2021-Broken_Access_Control/</link>
+								</tag>
+							
+							
+								<tag>
+									<tag>POLICY_QA_STD</tag>
+									<link></link>
+								</tag>
+							
+							
+								<tag>
+									<tag>WSTG-v42-SESS-02</tag>
+									<link>https://owasp.org/www-project-web-security-testing-guide/v42/4-Web_Application_Security_Testing/06-Session_Management_Testing/02-Testing_for_Cookies_Attributes</link>
+								</tag>
+							
+							
+								<tag>
+									<tag>POLICY_PENTEST</tag>
+									<link></link>
+								</tag>
+							
+							
+								<tag>
+									<tag>SYSTEMIC</tag>
+									<link>https://www.zaproxy.org/docs/desktop/addons/common-library/alerttags/#systemic</link>
+								</tag>
+							
+							
+								<tag>
+									<tag>CWE-1275</tag>
+									<link>https://cwe.mitre.org/data/definitions/1275.html</link>
+								</tag>
+							
+							
+								<tag>
+									<tag>OWASP_2025_A01</tag>
+									<link>https://owasp.org/Top10/2025/A01_2025-Broken_Access_Control/</link>
+								</tag>
+							
+							
+								<tag>
+									<tag>OWASP_2017_A05</tag>
+									<link>https://owasp.org/www-project-top-ten/2017/A5_2017-Broken_Access_Control.html</link>
+								</tag>
+							
+							
+								<tag>
+									<tag>POLICY_DEV_STD</tag>
+									<link></link>
+								</tag>
+							
+						</tags>
+					</alertitem>
+				
+				
+					<alertitem>
+						<pluginid>10036</pluginid>
+						<alertRef>10036-2</alertRef>
+						<alert>Server Leaks Version Information via &quot;Server&quot; HTTP Response Header Field</alert>
+						<name>Server Leaks Version Information via &quot;Server&quot; HTTP Response Header Field</name>
+						<riskcode>1</riskcode>
+						<confidence>3</confidence>
+						<riskdesc>Low (High)</riskdesc>
+						<confidencedesc>High</confidencedesc>
+						<desc>The web/application server is leaking version information via the &quot;Server&quot; HTTP response header. Access to such information may facilitate attackers identifying other vulnerabilities your web/application server is subject to.</desc>
+						<instances>
+							
+								<instance>
+									<uri>http://demo-app:5000</uri>
+									<nodeName>http://demo-app:5000</nodeName>
+									<method>GET</method>
+									<param></param>
+									<attack></attack>
+									<evidence>Werkzeug/3.1.9 Python/3.13.18</evidence>
+									<otherinfo></otherinfo>
+									<requestheader>GET http://demo-app:5000 HTTP/1.1
+host: demo-app:5000
+user-agent: 
+pragma: no-cache
+cache-control: no-cache
+
+</requestheader>
+									<requestbody></requestbody>
+									<responseheader>HTTP/1.1 200 OK
+Server: Werkzeug/3.1.9 Python/3.13.18
+Date: Fri, 06 Nov 2026 07:08:36 GMT
+Content-Type: text/html; charset=utf-8
+Content-Length: 389
+Connection: close
+
+</responseheader>
+									<responsebody>&lt;html&gt;&lt;head&gt;&lt;title&gt;Demo shop&lt;/title&gt;&lt;/head&gt;&lt;body&gt;
+&lt;h1&gt;Demo shop&lt;/h1&gt;
+&lt;ul&gt;
+  &lt;li&gt;&lt;a href=&quot;/hello?name=guest&quot;&gt;Say hello&lt;/a&gt;&lt;/li&gt;
+  &lt;li&gt;&lt;a href=&quot;/search?q=apple&quot;&gt;Search products&lt;/a&gt;&lt;/li&gt;
+  &lt;li&gt;&lt;a href=&quot;/lookup?host=localhost&quot;&gt;Look up a host&lt;/a&gt;&lt;/li&gt;
+  &lt;li&gt;&lt;a href=&quot;/login&quot;&gt;Log in&lt;/a&gt;&lt;/li&gt;
+&lt;/ul&gt;
+&lt;form action=&quot;/search&quot; method=&quot;get&quot;&gt;&lt;input name=&quot;q&quot;&gt;&lt;button&gt;Search&lt;/button&gt;&lt;/form&gt;
+&lt;/body&gt;&lt;/html&gt;</responsebody>
+								</instance>
+							
+							
+								<instance>
+									<uri>http://demo-app:5000/</uri>
+									<nodeName>http://demo-app:5000/</nodeName>
+									<method>GET</method>
+									<param></param>
+									<attack></attack>
+									<evidence>Werkzeug/3.1.9 Python/3.13.18</evidence>
+									<otherinfo></otherinfo>
+									<requestheader>GET http://demo-app:5000/ HTTP/1.1
+host: demo-app:5000
+user-agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/141.0.0.0 Safari/537.36
+pragma: no-cache
+cache-control: no-cache
+
+</requestheader>
+									<requestbody></requestbody>
+									<responseheader>HTTP/1.1 200 OK
+Server: Werkzeug/3.1.9 Python/3.13.18
+Date: Fri, 06 Nov 2026 07:08:36 GMT
+Content-Type: text/html; charset=utf-8
+Content-Length: 389
+Connection: close
+
+</responseheader>
+									<responsebody>&lt;html&gt;&lt;head&gt;&lt;title&gt;Demo shop&lt;/title&gt;&lt;/head&gt;&lt;body&gt;
+&lt;h1&gt;Demo shop&lt;/h1&gt;
+&lt;ul&gt;
+  &lt;li&gt;&lt;a href=&quot;/hello?name=guest&quot;&gt;Say hello&lt;/a&gt;&lt;/li&gt;
+  &lt;li&gt;&lt;a href=&quot;/search?q=apple&quot;&gt;Search products&lt;/a&gt;&lt;/li&gt;
+  &lt;li&gt;&lt;a href=&quot;/lookup?host=localhost&quot;&gt;Look up a host&lt;/a&gt;&lt;/li&gt;
+  &lt;li&gt;&lt;a href=&quot;/login&quot;&gt;Log in&lt;/a&gt;&lt;/li&gt;
+&lt;/ul&gt;
+&lt;form action=&quot;/search&quot; method=&quot;get&quot;&gt;&lt;input name=&quot;q&quot;&gt;&lt;button&gt;Search&lt;/button&gt;&lt;/form&gt;
+&lt;/body&gt;&lt;/html&gt;</responsebody>
+								</instance>
+							
+							
+								<instance>
+									<uri>http://demo-app:5000/lookup?host=localhost</uri>
+									<nodeName>http://demo-app:5000/lookup (host)</nodeName>
+									<method>GET</method>
+									<param></param>
+									<attack></attack>
+									<evidence>Werkzeug/3.1.9 Python/3.13.18</evidence>
+									<otherinfo></otherinfo>
+									<requestheader>GET http://demo-app:5000/lookup?host=localhost HTTP/1.1
+host: demo-app:5000
+user-agent: 
+pragma: no-cache
+cache-control: no-cache
+referer: http://demo-app:5000
+
+</requestheader>
+									<requestbody></requestbody>
+									<responseheader>HTTP/1.1 200 OK
+Server: Werkzeug/3.1.9 Python/3.13.18
+Date: Fri, 06 Nov 2026 07:08:36 GMT
+Content-Type: text/html; charset=utf-8
+Content-Length: 64
+Connection: close
+
+</responseheader>
+									<responsebody>&lt;pre&gt;::1             localhost ip6-localhost ip6-loopback
+&lt;/pre&gt;</responsebody>
+								</instance>
+							
+							
+								<instance>
+									<uri>http://demo-app:5000/robots.txt</uri>
+									<nodeName>http://demo-app:5000/robots.txt</nodeName>
+									<method>GET</method>
+									<param></param>
+									<attack></attack>
+									<evidence>Werkzeug/3.1.9 Python/3.13.18</evidence>
+									<otherinfo></otherinfo>
+									<requestheader>GET http://demo-app:5000/robots.txt HTTP/1.1
+host: demo-app:5000
+user-agent: 
+pragma: no-cache
+cache-control: no-cache
+
+</requestheader>
+									<requestbody></requestbody>
+									<responseheader>HTTP/1.1 404 NOT FOUND
+Server: Werkzeug/3.1.9 Python/3.13.18
+Date: Fri, 06 Nov 2026 07:08:36 GMT
+Content-Type: text/html; charset=utf-8
+Content-Length: 207
+Connection: close
+
+</responseheader>
+									<responsebody>&lt;!doctype html&gt;
+&lt;html lang=en&gt;
+&lt;title&gt;404 Not Found&lt;/title&gt;
+&lt;h1&gt;Not Found&lt;/h1&gt;
+&lt;p&gt;The requested URL was not found on the server. If you entered the URL manually please check your spelling and try again.&lt;/p&gt;
+</responsebody>
+								</instance>
+							
+							
+								<instance>
+									<uri>http://demo-app:5000/search?q=ZAP</uri>
+									<nodeName>http://demo-app:5000/search (q)</nodeName>
+									<method>GET</method>
+									<param></param>
+									<attack></attack>
+									<evidence>Werkzeug/3.1.9 Python/3.13.18</evidence>
+									<otherinfo></otherinfo>
+									<requestheader>GET http://demo-app:5000/search?q=ZAP HTTP/1.1
+host: demo-app:5000
+user-agent: 
+pragma: no-cache
+cache-control: no-cache
+referer: http://demo-app:5000
+Cookie: session_id=demo-session
+
+</requestheader>
+									<requestbody></requestbody>
+									<responseheader>HTTP/1.1 200 OK
+Server: Werkzeug/3.1.9 Python/3.13.18
+Date: Fri, 06 Nov 2026 07:08:36 GMT
+Content-Type: application/json
+Content-Length: 20
+Connection: close
+
+</responseheader>
+									<responsebody>{
+  &quot;results&quot;: []
+}
+</responsebody>
+								</instance>
+							
+						</instances>
+						<count>5</count>
+						<systemic>true</systemic>
+						<solution>Ensure that your web server, application server, load balancer, etc. is configured to suppress the &quot;Server&quot; header or provide generic details.</solution>
+						<otherinfo></otherinfo>
+						<reference>https://httpd.apache.org/docs/current/mod/core.html#servertokens
+https://learn.microsoft.com/en-us/previous-versions/msp-n-p/ff648552(v=pandp.10)
+https://www.troyhunt.com/shhh-dont-let-your-response-headers/</reference>
+						<cweid>497</cweid>
+						<wascid>13</wascid>
+						<sourceid>9</sourceid>
+						<tags>
+							
+								<tag>
+									<tag>OWASP_2021_A05</tag>
+									<link>https://owasp.org/Top10/2021/A05_2021-Security_Misconfiguration/</link>
+								</tag>
+							
+							
+								<tag>
+									<tag>POLICY_QA_STD</tag>
+									<link></link>
+								</tag>
+							
+							
+								<tag>
+									<tag>POLICY_PENTEST</tag>
+									<link></link>
+								</tag>
+							
+							
+								<tag>
+									<tag>SYSTEMIC</tag>
+									<link>https://www.zaproxy.org/docs/desktop/addons/common-library/alerttags/#systemic</link>
+								</tag>
+							
+							
+								<tag>
+									<tag>OWASP_2017_A06</tag>
+									<link>https://owasp.org/www-project-top-ten/2017/A6_2017-Security_Misconfiguration.html</link>
+								</tag>
+							
+							
+								<tag>
+									<tag>WSTG-v42-INFO-02</tag>
+									<link>https://owasp.org/www-project-web-security-testing-guide/v42/4-Web_Application_Security_Testing/01-Information_Gathering/02-Fingerprint_Web_Server</link>
+								</tag>
+							
+							
+								<tag>
+									<tag>CWE-497</tag>
+									<link>https://cwe.mitre.org/data/definitions/497.html</link>
+								</tag>
+							
+							
+								<tag>
+									<tag>OWASP_2025_A02</tag>
+									<link>https://owasp.org/Top10/2025/A02_2025-Security_Misconfiguration/</link>
+								</tag>
+							
+						</tags>
+					</alertitem>
+				
+				
+					<alertitem>
+						<pluginid>10021</pluginid>
+						<alertRef>10021</alertRef>
+						<alert>X-Content-Type-Options Header Missing</alert>
+						<name>X-Content-Type-Options Header Missing</name>
+						<riskcode>1</riskcode>
+						<confidence>2</confidence>
+						<riskdesc>Low (Medium)</riskdesc>
+						<confidencedesc>Medium</confidencedesc>
+						<desc>The Anti-MIME-Sniffing header X-Content-Type-Options was not set to &apos;nosniff&apos;. This allows older versions of Internet Explorer and Chrome to perform MIME-sniffing on the response body, potentially causing the response body to be interpreted and displayed as a content type other than the declared content type. Current (early 2014) and legacy versions of Firefox will use the declared content type (if one is set), rather than performing MIME-sniffing.</desc>
+						<instances>
+							
+								<instance>
+									<uri>http://demo-app:5000</uri>
+									<nodeName>http://demo-app:5000</nodeName>
+									<method>GET</method>
+									<param>x-content-type-options</param>
+									<attack></attack>
+									<evidence></evidence>
+									<otherinfo>This issue still applies to error type pages (401, 403, 500, etc.) as those pages are often still affected by injection issues, in which case there is still concern for browsers sniffing pages away from their actual content type.
+At &quot;High&quot; threshold this scan rule will not alert on client or server error responses.</otherinfo>
+									<requestheader>GET http://demo-app:5000 HTTP/1.1
+host: demo-app:5000
+user-agent: 
+pragma: no-cache
+cache-control: no-cache
+
+</requestheader>
+									<requestbody></requestbody>
+									<responseheader>HTTP/1.1 200 OK
+Server: Werkzeug/3.1.9 Python/3.13.18
+Date: Fri, 06 Nov 2026 07:08:36 GMT
+Content-Type: text/html; charset=utf-8
+Content-Length: 389
+Connection: close
+
+</responseheader>
+									<responsebody>&lt;html&gt;&lt;head&gt;&lt;title&gt;Demo shop&lt;/title&gt;&lt;/head&gt;&lt;body&gt;
+&lt;h1&gt;Demo shop&lt;/h1&gt;
+&lt;ul&gt;
+  &lt;li&gt;&lt;a href=&quot;/hello?name=guest&quot;&gt;Say hello&lt;/a&gt;&lt;/li&gt;
+  &lt;li&gt;&lt;a href=&quot;/search?q=apple&quot;&gt;Search products&lt;/a&gt;&lt;/li&gt;
+  &lt;li&gt;&lt;a href=&quot;/lookup?host=localhost&quot;&gt;Look up a host&lt;/a&gt;&lt;/li&gt;
+  &lt;li&gt;&lt;a href=&quot;/login&quot;&gt;Log in&lt;/a&gt;&lt;/li&gt;
+&lt;/ul&gt;
+&lt;form action=&quot;/search&quot; method=&quot;get&quot;&gt;&lt;input name=&quot;q&quot;&gt;&lt;button&gt;Search&lt;/button&gt;&lt;/form&gt;
+&lt;/body&gt;&lt;/html&gt;</responsebody>
+								</instance>
+							
+							
+								<instance>
+									<uri>http://demo-app:5000/</uri>
+									<nodeName>http://demo-app:5000/</nodeName>
+									<method>GET</method>
+									<param>x-content-type-options</param>
+									<attack></attack>
+									<evidence></evidence>
+									<otherinfo>This issue still applies to error type pages (401, 403, 500, etc.) as those pages are often still affected by injection issues, in which case there is still concern for browsers sniffing pages away from their actual content type.
+At &quot;High&quot; threshold this scan rule will not alert on client or server error responses.</otherinfo>
+									<requestheader>GET http://demo-app:5000/ HTTP/1.1
+host: demo-app:5000
+user-agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/141.0.0.0 Safari/537.36
+pragma: no-cache
+cache-control: no-cache
+
+</requestheader>
+									<requestbody></requestbody>
+									<responseheader>HTTP/1.1 200 OK
+Server: Werkzeug/3.1.9 Python/3.13.18
+Date: Fri, 06 Nov 2026 07:08:36 GMT
+Content-Type: text/html; charset=utf-8
+Content-Length: 389
+Connection: close
+
+</responseheader>
+									<responsebody>&lt;html&gt;&lt;head&gt;&lt;title&gt;Demo shop&lt;/title&gt;&lt;/head&gt;&lt;body&gt;
+&lt;h1&gt;Demo shop&lt;/h1&gt;
+&lt;ul&gt;
+  &lt;li&gt;&lt;a href=&quot;/hello?name=guest&quot;&gt;Say hello&lt;/a&gt;&lt;/li&gt;
+  &lt;li&gt;&lt;a href=&quot;/search?q=apple&quot;&gt;Search products&lt;/a&gt;&lt;/li&gt;
+  &lt;li&gt;&lt;a href=&quot;/lookup?host=localhost&quot;&gt;Look up a host&lt;/a&gt;&lt;/li&gt;
+  &lt;li&gt;&lt;a href=&quot;/login&quot;&gt;Log in&lt;/a&gt;&lt;/li&gt;
+&lt;/ul&gt;
+&lt;form action=&quot;/search&quot; method=&quot;get&quot;&gt;&lt;input name=&quot;q&quot;&gt;&lt;button&gt;Search&lt;/button&gt;&lt;/form&gt;
+&lt;/body&gt;&lt;/html&gt;</responsebody>
+								</instance>
+							
+							
+								<instance>
+									<uri>http://demo-app:5000/login</uri>
+									<nodeName>http://demo-app:5000/login</nodeName>
+									<method>GET</method>
+									<param>x-content-type-options</param>
+									<attack></attack>
+									<evidence></evidence>
+									<otherinfo>This issue still applies to error type pages (401, 403, 500, etc.) as those pages are often still affected by injection issues, in which case there is still concern for browsers sniffing pages away from their actual content type.
+At &quot;High&quot; threshold this scan rule will not alert on client or server error responses.</otherinfo>
+									<requestheader>GET http://demo-app:5000/login HTTP/1.1
+host: demo-app:5000
+user-agent: 
+pragma: no-cache
+cache-control: no-cache
+referer: http://demo-app:5000/
+
+</requestheader>
+									<requestbody></requestbody>
+									<responseheader>HTTP/1.1 200 OK
+Server: Werkzeug/3.1.9 Python/3.13.18
+Date: Fri, 06 Nov 2026 07:08:36 GMT
+Content-Type: text/html; charset=utf-8
+Content-Length: 25
+Set-Cookie: session_id=demo-session; Path=/
+Connection: close
+
+</responseheader>
+									<responsebody>&lt;p&gt;Logged in as demo.&lt;/p&gt;</responsebody>
+								</instance>
+							
+							
+								<instance>
+									<uri>http://demo-app:5000/lookup?host=localhost</uri>
+									<nodeName>http://demo-app:5000/lookup (host)</nodeName>
+									<method>GET</method>
+									<param>x-content-type-options</param>
+									<attack></attack>
+									<evidence></evidence>
+									<otherinfo>This issue still applies to error type pages (401, 403, 500, etc.) as those pages are often still affected by injection issues, in which case there is still concern for browsers sniffing pages away from their actual content type.
+At &quot;High&quot; threshold this scan rule will not alert on client or server error responses.</otherinfo>
+									<requestheader>GET http://demo-app:5000/lookup?host=localhost HTTP/1.1
+host: demo-app:5000
+user-agent: 
+pragma: no-cache
+cache-control: no-cache
+referer: http://demo-app:5000
+
+</requestheader>
+									<requestbody></requestbody>
+									<responseheader>HTTP/1.1 200 OK
+Server: Werkzeug/3.1.9 Python/3.13.18
+Date: Fri, 06 Nov 2026 07:08:36 GMT
+Content-Type: text/html; charset=utf-8
+Content-Length: 64
+Connection: close
+
+</responseheader>
+									<responsebody>&lt;pre&gt;::1             localhost ip6-localhost ip6-loopback
+&lt;/pre&gt;</responsebody>
+								</instance>
+							
+							
+								<instance>
+									<uri>http://demo-app:5000/search?q=apple</uri>
+									<nodeName>http://demo-app:5000/search (q)</nodeName>
+									<method>GET</method>
+									<param>x-content-type-options</param>
+									<attack></attack>
+									<evidence></evidence>
+									<otherinfo>This issue still applies to error type pages (401, 403, 500, etc.) as those pages are often still affected by injection issues, in which case there is still concern for browsers sniffing pages away from their actual content type.
+At &quot;High&quot; threshold this scan rule will not alert on client or server error responses.</otherinfo>
+									<requestheader>GET http://demo-app:5000/search?q=apple HTTP/1.1
+host: demo-app:5000
+user-agent: 
+pragma: no-cache
+cache-control: no-cache
+referer: http://demo-app:5000/
+
+</requestheader>
+									<requestbody></requestbody>
+									<responseheader>HTTP/1.1 200 OK
+Server: Werkzeug/3.1.9 Python/3.13.18
+Date: Fri, 06 Nov 2026 07:08:36 GMT
+Content-Type: application/json
+Content-Length: 60
+Connection: close
+
+</responseheader>
+									<responsebody>{
+  &quot;results&quot;: [
+    [
+      &quot;apple&quot;,
+      1.0
+    ]
+  ]
+}
+</responsebody>
+								</instance>
+							
+						</instances>
+						<count>5</count>
+						<systemic>true</systemic>
+						<solution>Ensure that the application/web server sets the Content-Type header appropriately, and that it sets the X-Content-Type-Options header to &apos;nosniff&apos; for all web pages.
+If possible, ensure that the end user uses a standards-compliant and modern web browser that does not perform MIME-sniffing at all, or that can be directed by the web application/web server to not perform MIME-sniffing.</solution>
+						<otherinfo>This issue still applies to error type pages (401, 403, 500, etc.) as those pages are often still affected by injection issues, in which case there is still concern for browsers sniffing pages away from their actual content type.
+At &quot;High&quot; threshold this scan rule will not alert on client or server error responses.</otherinfo>
+						<reference>https://learn.microsoft.com/en-us/previous-versions/windows/internet-explorer/ie-developer/compatibility/gg622941(v=vs.85)
+https://owasp.org/www-community/Security_Headers</reference>
+						<cweid>693</cweid>
+						<wascid>15</wascid>
+						<sourceid>9</sourceid>
+						<tags>
+							
+								<tag>
+									<tag>OWASP_2021_A05</tag>
+									<link>https://owasp.org/Top10/2021/A05_2021-Security_Misconfiguration/</link>
+								</tag>
+							
+							
+								<tag>
+									<tag>POLICY_QA_STD</tag>
+									<link></link>
+								</tag>
+							
+							
+								<tag>
+									<tag>POLICY_PENTEST</tag>
+									<link></link>
+								</tag>
+							
+							
+								<tag>
+									<tag>SYSTEMIC</tag>
+									<link>https://www.zaproxy.org/docs/desktop/addons/common-library/alerttags/#systemic</link>
+								</tag>
+							
+							
+								<tag>
+									<tag>CWE-693</tag>
+									<link>https://cwe.mitre.org/data/definitions/693.html</link>
+								</tag>
+							
+							
+								<tag>
+									<tag>OWASP_2017_A06</tag>
+									<link>https://owasp.org/www-project-top-ten/2017/A6_2017-Security_Misconfiguration.html</link>
+								</tag>
+							
+							
+								<tag>
+									<tag>OWASP_2025_A02</tag>
+									<link>https://owasp.org/Top10/2025/A02_2025-Security_Misconfiguration/</link>
+								</tag>
+							
+						</tags>
+					</alertitem>
+				
+				
+					<alertitem>
+						<pluginid>10112</pluginid>
+						<alertRef>10112</alertRef>
+						<alert>Session Management Response Identified</alert>
+						<name>Session Management Response Identified</name>
+						<riskcode>0</riskcode>
+						<confidence>2</confidence>
+						<riskdesc>Informational (Medium)</riskdesc>
+						<confidencedesc>Medium</confidencedesc>
+						<desc>The given response has been identified as containing a session management token. The &apos;Other Info&apos; field contains a set of header tokens that can be used in the Header Based Session Management Method. If the request is in a context which has a Session Management Method set to &quot;Auto-Detect&quot; then this rule will change the session management to use the tokens identified.</desc>
+						<instances>
+							
+								<instance>
+									<uri>http://demo-app:5000/login</uri>
+									<nodeName>http://demo-app:5000/login</nodeName>
+									<method>GET</method>
+									<param>session_id</param>
+									<attack></attack>
+									<evidence>session_id</evidence>
+									<otherinfo>cookie:session_id</otherinfo>
+									<requestheader>GET http://demo-app:5000/login HTTP/1.1
+host: demo-app:5000
+user-agent: 
+pragma: no-cache
+cache-control: no-cache
+referer: http://demo-app:5000/
+
+</requestheader>
+									<requestbody></requestbody>
+									<responseheader>HTTP/1.1 200 OK
+Server: Werkzeug/3.1.9 Python/3.13.18
+Date: Fri, 06 Nov 2026 07:08:36 GMT
+Content-Type: text/html; charset=utf-8
+Content-Length: 25
+Set-Cookie: session_id=demo-session; Path=/
+Connection: close
+
+</responseheader>
+									<responsebody>&lt;p&gt;Logged in as demo.&lt;/p&gt;</responsebody>
+								</instance>
+							
+							
+								<instance>
+									<uri>http://demo-app:5000/login</uri>
+									<nodeName>http://demo-app:5000/login</nodeName>
+									<method>GET</method>
+									<param>session_id</param>
+									<attack></attack>
+									<evidence>session_id</evidence>
+									<otherinfo>cookie:session_id</otherinfo>
+									<requestheader>GET http://demo-app:5000/login HTTP/1.1
+host: demo-app:5000
+user-agent: 
+pragma: no-cache
+cache-control: no-cache
+referer: http://demo-app:5000/
+
+</requestheader>
+									<requestbody></requestbody>
+									<responseheader>HTTP/1.1 200 OK
+Server: Werkzeug/3.1.9 Python/3.13.18
+Date: Fri, 06 Nov 2026 07:08:36 GMT
+Content-Type: text/html; charset=utf-8
+Content-Length: 25
+Set-Cookie: session_id=demo-session; Path=/
+Connection: close
+
+</responseheader>
+									<responsebody>&lt;p&gt;Logged in as demo.&lt;/p&gt;</responsebody>
+								</instance>
+							
+						</instances>
+						<count>2</count>
+						<systemic>false</systemic>
+						<solution>This is an informational alert rather than a vulnerability and so there is nothing to fix.</solution>
+						<otherinfo>cookie:session_id</otherinfo>
+						<reference>https://www.zaproxy.org/docs/desktop/addons/authentication-helper/session-mgmt-id/</reference>
+						<cweid>-1</cweid>
+						<wascid>-1</wascid>
+						<sourceid>18</sourceid>
+						<tags>
+							
+						</tags>
+					</alertitem>
+				
+			</alerts>
+			<statistics>
+				
+					<statistic>
+						<key>stats.responseTime.16</key>
+						<value>3</value>
+					</statistic>
+				
+				
+					<statistic>
+						<key>stats.tag.JSON</key>
+						<value>2</value>
+					</statistic>
+				
+				
+					<statistic>
+						<key>stats.responseTime.32</key>
+						<value>2</value>
+					</statistic>
+				
+				
+					<statistic>
+						<key>stats.code.404</key>
+						<value>3</value>
+					</statistic>
+				
+				
+					<statistic>
+						<key>stats.tag.Form</key>
+						<value>4</value>
+					</statistic>
+				
+				
+					<statistic>
+						<key>stats.tag.SetCookie</key>
+						<value>1</value>
+					</statistic>
+				
+				
+					<statistic>
+						<key>stats.code.200</key>
+						<value>11</value>
+					</statistic>
+				
+				
+					<statistic>
+						<key>stats.code.500</key>
+						<value>1</value>
+					</statistic>
+				
+				
+					<statistic>
+						<key>stats.responseTime.1024</key>
+						<value>1</value>
+					</statistic>
+				
+				
+					<statistic>
+						<key>stats.contentType.text/html; charset=utf-8</key>
+						<value>13</value>
+					</statistic>
+				
+				
+					<statistic>
+						<key>stats.tag.Script</key>
+						<value>2</value>
+					</statistic>
+				
+				
+					<statistic>
+						<key>stats.responseTime.4</key>
+						<value>4</value>
+					</statistic>
+				
+				
+					<statistic>
+						<key>stats.contentType.application/json</key>
+						<value>2</value>
+					</statistic>
+				
+				
+					<statistic>
+						<key>stats.auth.sessiontoken.session_id</key>
+						<value>2</value>
+					</statistic>
+				
+				
+					<statistic>
+						<key>stats.responseTime.8</key>
+						<value>5</value>
+					</statistic>
+				
+				
+					<statistic>
+						<key>stats.tag.Comment</key>
+						<value>1</value>
+					</statistic>
+				
+			</statistics>
+		</site>
+	
+	<statistics>
+		
+			<statistic>
+				<key>stats.ascan.90035.started</key>
+				<value>1</value>
+			</statistic>
+		
+		
+			<statistic>
+				<key>stats.auto.job.spider.run</key>
+				<value>1</value>
+			</statistic>
+		
+		
+			<statistic>
+				<key>stats.pscan.10027.time</key>
+				<value>1</value>
+			</statistic>
+		
+		
+			<statistic>
+				<key>stats.reports.generated.traditional-json</key>
+				<value>1</value>
+			</statistic>
+		
+		
+			<statistic>
+				<key>stats.ascan.40035.started</key>
+				<value>1</value>
+			</statistic>
+		
+		
+			<statistic>
+				<key>stats.ascan.40027.time</key>
+				<value>150</value>
+			</statistic>
+		
+		
+			<statistic>
+				<key>stats.ascan.20017.urls</key>
+				<value>6</value>
+			</statistic>
+		
+		
+			<statistic>
+				<key>stats.pscan.90022.time</key>
+				<value>26</value>
+			</statistic>
+		
+		
+			<statistic>
+				<key>stats.ascan.40027.urls</key>
+				<value>30</value>
+			</statistic>
+		
+		
+			<statistic>
+				<key>stats.ascan.20017.time</key>
+				<value>45</value>
+			</statistic>
+		
+		
+			<statistic>
+				<key>stats.pscan.10112.time</key>
+				<value>41</value>
+			</statistic>
+		
+		
+			<statistic>
+				<key>stats.ascan.40026.started</key>
+				<value>1</value>
+			</statistic>
+		
+		
+			<statistic>
+				<key>stats.pscan.10042.time</key>
+				<value>0</value>
+			</statistic>
+		
+		
+			<statistic>
+				<key>stats.ascan.40026.alerts</key>
+				<value>1</value>
+			</statistic>
+		
+		
+			<statistic>
+				<key>stats.ascan.40044.time</key>
+				<value>74</value>
+			</statistic>
+		
+		
+			<statistic>
+				<key>stats.ascan.10058.started</key>
+				<value>1</value>
+			</statistic>
+		
+		
+			<statistic>
+				<key>stats.pscan.10056.time</key>
+				<value>0</value>
+			</statistic>
+		
+		
+			<statistic>
+				<key>stats.ascan.90017.urls</key>
+				<value>24</value>
+			</statistic>
+		
+		
+			<statistic>
+				<key>stats.ascan.40029.started</key>
+				<value>1</value>
+			</statistic>
+		
+		
+			<statistic>
+				<key>stats.pscan.10061.time</key>
+				<value>0</value>
+			</statistic>
+		
+		
+			<statistic>
+				<key>stats.ascan.10106.started</key>
+				<value>1</value>
+			</statistic>
+		
+		
+			<statistic>
+				<key>stats.spider.url.found</key>
+				<value>9</value>
+			</statistic>
+		
+		
+			<statistic>
+				<key>stats.pscan.10109.time</key>
+				<value>0</value>
+			</statistic>
+		
+		
+			<statistic>
+				<key>stats.ascan.40008.time</key>
+				<value>64</value>
+			</statistic>
+		
+		
+			<statistic>
+				<key>stats.ascan.90029.started</key>
+				<value>1</value>
+			</statistic>
+		
+		
+			<statistic>
+				<key>stats.ascan.40044.started</key>
+				<value>1</value>
+			</statistic>
+		
+		
+			<statistic>
+				<key>stats.ascan.20015.time</key>
+				<value>4</value>
+			</statistic>
+		
+		
+			<statistic>
+				<key>stats.ascan.20015.urls</key>
+				<value>3</value>
+			</statistic>
+		
+		
+			<statistic>
+				<key>stats.ascan.40003.started</key>
+				<value>1</value>
+			</statistic>
+		
+		
+			<statistic>
+				<key>stats.ascan.40032.started</key>
+				<value>1</value>
+			</statistic>
+		
+		
+			<statistic>
+				<key>stats.reports.generated.traditional-json-plus</key>
+				<value>1</value>
+			</statistic>
+		
+		
+			<statistic>
+				<key>stats.ascan.40017.started</key>
+				<value>1</value>
+			</statistic>
+		
+		
+			<statistic>
+				<key>stats.selenium.launch.2.firefox-headless</key>
+				<value>8</value>
+			</statistic>
+		
+		
+			<statistic>
+				<key>stats.ascan.20017.started</key>
+				<value>1</value>
+			</statistic>
+		
+		
+			<statistic>
+				<key>stats.auto.job.passiveScan-wait.run</key>
+				<value>2</value>
+			</statistic>
+		
+		
+			<statistic>
+				<key>stats.ascan.0.started</key>
+				<value>1</value>
+			</statistic>
+		
+		
+			<statistic>
+				<key>stats.ascan.40008.urls</key>
+				<value>21</value>
+			</statistic>
+		
+		
+			<statistic>
+				<key>stats.ascan.90034.time</key>
+				<value>44</value>
+			</statistic>
+		
+		
+			<statistic>
+				<key>stats.pscan.90003.time</key>
+				<value>3</value>
+			</statistic>
+		
+		
+			<statistic>
+				<key>stats.pscan.10040.time</key>
+				<value>0</value>
+			</statistic>
+		
+		
+			<statistic>
+				<key>stats.ascan.started.policy.dock-default</key>
+				<value>1</value>
+			</statistic>
+		
+		
+			<statistic>
+				<key>stats.pscan.10023.time</key>
+				<value>1</value>
+			</statistic>
+		
+		
+			<statistic>
+				<key>stats.ascan.90023.started</key>
+				<value>1</value>
+			</statistic>
+		
+		
+			<statistic>
+				<key>stats.ascan.90034.urls</key>
+				<value>13</value>
+			</statistic>
+		
+		
+			<statistic>
+				<key>stats.pscan.10029.time</key>
+				<value>0</value>
+			</statistic>
+		
+		
+			<statistic>
+				<key>stats.ascan.90017.started</key>
+				<value>1</value>
+			</statistic>
+		
+		
+			<statistic>
+				<key>stats.ascan.10047.time</key>
+				<value>4</value>
+			</statistic>
+		
+		
+			<statistic>
+				<key>stats.pscan.10017.time</key>
+				<value>0</value>
+			</statistic>
+		
+		
+			<statistic>
+				<key>stats.ascan.40014.started</key>
+				<value>1</value>
+			</statistic>
+		
+		
+			<statistic>
+				<key>stats.ascan.10047.started</key>
+				<value>1</value>
+			</statistic>
+		
+		
+			<statistic>
+				<key>stats.pscan.10011.time</key>
+				<value>0</value>
+			</statistic>
+		
+		
+			<statistic>
+				<key>stats.ascan.90037.alerts</key>
+				<value>1</value>
+			</statistic>
+		
+		
+			<statistic>
+				<key>stats.ascan.40034.urls</key>
+				<value>1</value>
+			</statistic>
+		
+		
+			<statistic>
+				<key>stats.pscan.10112.alerts</key>
+				<value>2</value>
+			</statistic>
+		
+		
+			<statistic>
+				<key>stats.pscan.10030.time</key>
+				<value>0</value>
+			</statistic>
+		
+		
+			<statistic>
+				<key>domxss.scan.count</key>
+				<value>10</value>
+			</statistic>
+		
+		
+			<statistic>
+				<key>stats.ascan.40034.time</key>
+				<value>6</value>
+			</statistic>
+		
+		
+			<statistic>
+				<key>stats.pscan.10039.time</key>
+				<value>0</value>
+			</statistic>
+		
+		
+			<statistic>
+				<key>stats.pscan.10010.alerts</key>
+				<value>1</value>
+			</statistic>
+		
+		
+			<statistic>
+				<key>stats.pscan.10052.time</key>
+				<value>0</value>
+			</statistic>
+		
+		
+			<statistic>
+				<key>stats.ascan.90026.started</key>
+				<value>1</value>
+			</statistic>
+		
+		
+			<statistic>
+				<key>stats.pscan.10105.time</key>
+				<value>0</value>
+			</statistic>
+		
+		
+			<statistic>
+				<key>stats.ascan.90037.time</key>
+				<value>32044</value>
+			</statistic>
+		
+		
+			<statistic>
+				<key>stats.pscan.10035.time</key>
+				<value>0</value>
+			</statistic>
+		
+		
+			<statistic>
+				<key>stats.ascan.40019.urls</key>
+				<value>30</value>
+			</statistic>
+		
+		
+			<statistic>
+				<key>stats.ascan.90037.started</key>
+				<value>1</value>
+			</statistic>
+		
+		
+			<statistic>
+				<key>stats.ascan.40026.skipped</key>
+				<value>1</value>
+			</statistic>
+		
+		
+			<statistic>
+				<key>stats.pscan.90001.time</key>
+				<value>0</value>
+			</statistic>
+		
+		
+			<statistic>
+				<key>stats.ascan.90036.time</key>
+				<value>55</value>
+			</statistic>
+		
+		
+			<statistic>
+				<key>stats.auto.jobs.run</key>
+				<value>9</value>
+			</statistic>
+		
+		
+			<statistic>
+				<key>stats.pscan.10020.time</key>
+				<value>88</value>
+			</statistic>
+		
+		
+			<statistic>
+				<key>stats.ascan.90020.started</key>
+				<value>1</value>
+			</statistic>
+		
+		
+			<statistic>
+				<key>stats.pscan.10034.time</key>
+				<value>0</value>
+			</statistic>
+		
+		
+			<statistic>
+				<key>stats.ascan.10058.time</key>
+				<value>3</value>
+			</statistic>
+		
+		
+			<statistic>
+				<key>stats.ascan.40022.time</key>
+				<value>28</value>
+			</statistic>
+		
+		
+			<statistic>
+				<key>stats.ascan.90035.time</key>
+				<value>75</value>
+			</statistic>
+		
+		
+			<statistic>
+				<key>stats.ascan.30001.started</key>
+				<value>1</value>
+			</statistic>
+		
+		
+			<statistic>
+				<key>stats.pscan.90030.time</key>
+				<value>0</value>
+			</statistic>
+		
+		
+			<statistic>
+				<key>stats.ascan.6.started</key>
+				<value>1</value>
+			</statistic>
+		
+		
+			<statistic>
+				<key>stats.ascan.20015.started</key>
+				<value>1</value>
+			</statistic>
+		
+		
+			<statistic>
+				<key>stats.ascan.40027.started</key>
+				<value>1</value>
+			</statistic>
+		
+		
+			<statistic>
+				<key>stats.ascan.40019.time</key>
+				<value>64</value>
+			</statistic>
+		
+		
+			<statistic>
+				<key>stats.ascan.40003.time</key>
+				<value>59</value>
+			</statistic>
+		
+		
+			<statistic>
+				<key>stats.auto.job.report.run</key>
+				<value>5</value>
+			</statistic>
+		
+		
+			<statistic>
+				<key>stats.spider.started</key>
+				<value>1</value>
+			</statistic>
+		
+		
+			<statistic>
+				<key>stats.pscan.10097.time</key>
+				<value>1</value>
+			</statistic>
+		
+		
+			<statistic>
+				<key>stats.ascan.40003.urls</key>
+				<value>21</value>
+			</statistic>
+		
+		
+			<statistic>
+				<key>stats.reports.generated.traditional-xml</key>
+				<value>1</value>
+			</statistic>
+		
+		
+			<statistic>
+				<key>stats.ascan.40022.urls</key>
+				<value>15</value>
+			</statistic>
+		
+		
+			<statistic>
+				<key>stats.ascan.90036.urls</key>
+				<value>36</value>
+			</statistic>
+		
+		
+			<statistic>
+				<key>stats.pscan.10202.time</key>
+				<value>4</value>
+			</statistic>
+		
+		
+			<statistic>
+				<key>stats.ascan.6.time</key>
+				<value>103</value>
+			</statistic>
+		
+		
+			<statistic>
+				<key>stats.ascan.40008.started</key>
+				<value>1</value>
+			</statistic>
+		
+		
+			<statistic>
+				<key>stats.ascan.40021.started</key>
+				<value>1</value>
+			</statistic>
+		
+		
+			<statistic>
+				<key>stats.ascan.7.urls</key>
+				<value>30</value>
+			</statistic>
+		
+		
+			<statistic>
+				<key>stats.pscan.10020.alerts</key>
+				<value>6</value>
+			</statistic>
+		
+		
+			<statistic>
+				<key>stats.ascan.40029.time</key>
+				<value>12</value>
+			</statistic>
+		
+		
+			<statistic>
+				<key>stats.ascan.90020.time</key>
+				<value>72</value>
+			</statistic>
+		
+		
+			<statistic>
+				<key>stats.pscan.10054.time</key>
+				<value>13</value>
+			</statistic>
+		
+		
+			<statistic>
+				<key>stats.auto.job.activeScan.run</key>
+				<value>1</value>
+			</statistic>
+		
+		
+			<statistic>
+				<key>stats.ascan.0.time</key>
+				<value>25</value>
+			</statistic>
+		
+		
+			<statistic>
+				<key>stats.ascan.40032.time</key>
+				<value>8</value>
+			</statistic>
+		
+		
+			<statistic>
+				<key>stats.reports.generated.traditional-html</key>
+				<value>1</value>
+			</statistic>
+		
+		
+			<statistic>
+				<key>stats.ascan.90017.time</key>
+				<value>52</value>
+			</statistic>
+		
+		
+			<statistic>
+				<key>stats.log.warn.org.zaproxy.addon.client.RedirectScript</key>
+				<value>8</value>
+			</statistic>
+		
+		
+			<statistic>
+				<key>stats.ascan.90035.urls</key>
+				<value>42</value>
+			</statistic>
+		
+		
+			<statistic>
+				<key>stats.ascan.90020.urls</key>
+				<value>40</value>
+			</statistic>
+		
+		
+			<statistic>
+				<key>stats.ascan.40032.urls</key>
+				<value>1</value>
+			</statistic>
+		
+		
+			<statistic>
+				<key>stats.pscan.90011.time</key>
+				<value>0</value>
+			</statistic>
+		
+		
+			<statistic>
+				<key>stats.pscan.10015.time</key>
+				<value>0</value>
+			</statistic>
+		
+		
+			<statistic>
+				<key>stats.ascan.7.time</key>
+				<value>60</value>
+			</statistic>
+		
+		
+			<statistic>
+				<key>stats.ascan.90019.started</key>
+				<value>1</value>
+			</statistic>
+		
+		
+			<statistic>
+				<key>stats.ascan.40042.started</key>
+				<value>1</value>
+			</statistic>
+		
+		
+			<statistic>
+				<key>stats.ascan.50000.time</key>
+				<value>176</value>
+			</statistic>
+		
+		
+			<statistic>
+				<key>stats.ascan.6.urls</key>
+				<value>45</value>
+			</statistic>
+		
+		
+			<statistic>
+				<key>stats.ascan.40029.urls</key>
+				<value>2</value>
+			</statistic>
+		
+		
+			<statistic>
+				<key>stats.pscan.90002.time</key>
+				<value>0</value>
+			</statistic>
+		
+		
+			<statistic>
+				<key>stats.ascan.40045.started</key>
+				<value>1</value>
+			</statistic>
+		
+		
+			<statistic>
+				<key>stats.pscan.10025.time</key>
+				<value>0</value>
+			</statistic>
+		
+		
+			<statistic>
+				<key>stats.pscan.10098.time</key>
+				<value>0</value>
+			</statistic>
+		
+		
+			<statistic>
+				<key>stats.ascan.0.urls</key>
+				<value>8</value>
+			</statistic>
+		
+		
+			<statistic>
+				<key>stats.ascan.started</key>
+				<value>1</value>
+			</statistic>
+		
+		
+			<statistic>
+				<key>domxss.attack.&lt;script&gt;alert(5397)&lt;/script&gt;</key>
+				<value>1</value>
+			</statistic>
+		
+		
+			<statistic>
+				<key>stats.ascan.40012.started</key>
+				<value>1</value>
+			</statistic>
+		
+		
+			<statistic>
+				<key>stats.network.send.success</key>
+				<value>846</value>
+			</statistic>
+		
+		
+			<statistic>
+				<key>stats.ascan.30002.time</key>
+				<value>38</value>
+			</statistic>
+		
+		
+			<statistic>
+				<key>stats.pscan.50001.time</key>
+				<value>0</value>
+			</statistic>
+		
+		
+			<statistic>
+				<key>stats.ascan.40048.time</key>
+				<value>5</value>
+			</statistic>
+		
+		
+			<statistic>
+				<key>stats.ascan.40042.urls</key>
+				<value>2</value>
+			</statistic>
+		
+		
+			<statistic>
+				<key>stats.ascan.90020.alerts</key>
+				<value>1</value>
+			</statistic>
+		
+		
+			<statistic>
+				<key>stats.pscan.10044.time</key>
+				<value>0</value>
+			</statistic>
+		
+		
+			<statistic>
+				<key>stats.pscan.10113.time</key>
+				<value>8</value>
+			</statistic>
+		
+		
+			<statistic>
+				<key>stats.pscan.Parameter Scanner</key>
+				<value>1027</value>
+			</statistic>
+		
+		
+			<statistic>
+				<key>stats.ascan.30002.urls</key>
+				<value>9</value>
+			</statistic>
+		
+		
+			<statistic>
+				<key>stats.ascan.40048.urls</key>
+				<value>1</value>
+			</statistic>
+		
+		
+			<statistic>
+				<key>stats.ascan.40042.time</key>
+				<value>9</value>
+			</statistic>
+		
+		
+			<statistic>
+				<key>stats.ascan.90026.time</key>
+				<value>3</value>
+			</statistic>
+		
+		
+			<statistic>
+				<key>stats.network.send.failure</key>
+				<value>167</value>
+			</statistic>
+		
+		
+			<statistic>
+				<key>stats.ascan.40043.time</key>
+				<value>1</value>
+			</statistic>
+		
+		
+			<statistic>
+				<key>stats.ascan.40022.started</key>
+				<value>1</value>
+			</statistic>
+		
+		
+			<statistic>
+				<key>stats.ascan.40043.skipped</key>
+				<value>1</value>
+			</statistic>
+		
+		
+			<statistic>
+				<key>stats.ascan.10104.time</key>
+				<value>107</value>
+			</statistic>
+		
+		
+			<statistic>
+				<key>stats.ascan.30001.urls</key>
+				<value>3</value>
+			</statistic>
+		
+		
+			<statistic>
+				<key>stats.script.call.Graal.js.active</key>
+				<value>39</value>
+			</statistic>
+		
+		
+			<statistic>
+				<key>stats.pscan.10036.alerts</key>
+				<value>10</value>
+			</statistic>
+		
+		
+			<statistic>
+				<key>stats.pscan.10043.time</key>
+				<value>0</value>
+			</statistic>
+		
+		
+			<statistic>
+				<key>stats.auth.detect.session.session_id</key>
+				<value>2</value>
+			</statistic>
+		
+		
+			<statistic>
+				<key>stats.ascan.40009.time</key>
+				<value>22</value>
+			</statistic>
+		
+		
+			<statistic>
+				<key>stats.pscan.10057.time</key>
+				<value>17</value>
+			</statistic>
+		
+		
+			<statistic>
+				<key>stats.ascan.30001.time</key>
+				<value>39</value>
+			</statistic>
+		
+		
+			<statistic>
+				<key>stats.ascan.10104.urls</key>
+				<value>96</value>
+			</statistic>
+		
+		
+			<statistic>
+				<key>stats.ascan.40028.time</key>
+				<value>10</value>
+			</statistic>
+		
+		
+			<statistic>
+				<key>stats.pscan.10111.time</key>
+				<value>4</value>
+			</statistic>
+		
+		
+			<statistic>
+				<key>automation.spider.urls.added</key>
+				<value>9</value>
+			</statistic>
+		
+		
+			<statistic>
+				<key>stats.ascan.10048.started</key>
+				<value>1</value>
+			</statistic>
+		
+		
+			<statistic>
+				<key>stats.ascan.20018.time</key>
+				<value>22</value>
+			</statistic>
+		
+		
+			<statistic>
+				<key>stats.ascan.40014.time</key>
+				<value>4</value>
+			</statistic>
+		
+		
+			<statistic>
+				<key>stats.ascan.10048.urls</key>
+				<value>6</value>
+			</statistic>
+		
+		
+			<statistic>
+				<key>stats.pscan.50003.time</key>
+				<value>2</value>
+			</statistic>
+		
+		
+			<statistic>
+				<key>stats.ascan.20018.urls</key>
+				<value>16</value>
+			</statistic>
+		
+		
+			<statistic>
+				<key>stats.ascan.10106.time</key>
+				<value>41</value>
+			</statistic>
+		
+		
+			<statistic>
+				<key>stats.ascan.100043.started</key>
+				<value>1</value>
+			</statistic>
+		
+		
+			<statistic>
+				<key>stats.ascan.40028.urls</key>
+				<value>1</value>
+			</statistic>
+		
+		
+			<statistic>
+				<key>stats.ascan.10048.time</key>
+				<value>42</value>
+			</statistic>
+		
+		
+			<statistic>
+				<key>stats.ascan.40048.started</key>
+				<value>1</value>
+			</statistic>
+		
+		
+			<statistic>
+				<key>stats.pscan.10010.time</key>
+				<value>6</value>
+			</statistic>
+		
+		
+			<statistic>
+				<key>stats.ascan.40009.urls</key>
+				<value>12</value>
+			</statistic>
+		
+		
+			<statistic>
+				<key>stats.pscan.2.time</key>
+				<value>3</value>
+			</statistic>
+		
+		
+			<statistic>
+				<key>stats.ascan.90034.started</key>
+				<value>1</value>
+			</statistic>
+		
+		
+			<statistic>
+				<key>stats.pscan.10024.time</key>
+				<value>0</value>
+			</statistic>
+		
+		
+			<statistic>
+				<key>stats.ascan.40018.alerts</key>
+				<value>1</value>
+			</statistic>
+		
+		
+			<statistic>
+				<key>stats.pscan.10021.alerts</key>
+				<value>8</value>
+			</statistic>
+		
+		
+			<statistic>
+				<key>domxss.vulns.get1</key>
+				<value>1</value>
+			</statistic>
+		
+		
+			<statistic>
+				<key>stats.ascan.10104.started</key>
+				<value>1</value>
+			</statistic>
+		
+		
+			<statistic>
+				<key>stats.pscan.10062.time</key>
+				<value>58</value>
+			</statistic>
+		
+		
+			<statistic>
+				<key>stats.pscan.10115.time</key>
+				<value>0</value>
+			</statistic>
+		
+		
+			<statistic>
+				<key>stats.pscan.-1.time</key>
+				<value>7</value>
+			</statistic>
+		
+		
+			<statistic>
+				<key>stats.ascan.90021.time</key>
+				<value>15</value>
+			</statistic>
+		
+		
+			<statistic>
+				<key>stats.auth.sessiontokens.max</key>
+				<value>2</value>
+			</statistic>
+		
+		
+			<statistic>
+				<key>stats.ascan.40012.urls</key>
+				<value>12</value>
+			</statistic>
+		
+		
+			<statistic>
+				<key>stats.ascan.40043.started</key>
+				<value>1</value>
+			</statistic>
+		
+		
+			<statistic>
+				<key>stats.ascan.40018.urls</key>
+				<value>48</value>
+			</statistic>
+		
+		
+			<statistic>
+				<key>stats.ascan.7.started</key>
+				<value>1</value>
+			</statistic>
+		
+		
+			<statistic>
+				<key>stats.ascan.100043.time</key>
+				<value>385</value>
+			</statistic>
+		
+		
+			<statistic>
+				<key>stats.ascan.40018.started</key>
+				<value>1</value>
+			</statistic>
+		
+		
+			<statistic>
+				<key>stats.pscan.10033.time</key>
+				<value>0</value>
+			</statistic>
+		
+		
+			<statistic>
+				<key>stats.reports.generated.traditional-html-plus</key>
+				<value>1</value>
+			</statistic>
+		
+		
+			<statistic>
+				<key>stats.pscan.10108.time</key>
+				<value>3</value>
+			</statistic>
+		
+		
+			<statistic>
+				<key>stats.ascan.20018.started</key>
+				<value>1</value>
+			</statistic>
+		
+		
+			<statistic>
+				<key>stats.pscan.10036.time</key>
+				<value>161</value>
+			</statistic>
+		
+		
+			<statistic>
+				<key>stats.ascan.90021.urls</key>
+				<value>9</value>
+			</statistic>
+		
+		
+			<statistic>
+				<key>stats.ascan.40012.time</key>
+				<value>54</value>
+			</statistic>
+		
+		
+			<statistic>
+				<key>stats.pscan.10055.time</key>
+				<value>1</value>
+			</statistic>
+		
+		
+			<statistic>
+				<key>stats.ascan.30002.started</key>
+				<value>1</value>
+			</statistic>
+		
+		
+			<statistic>
+				<key>stats.client.launch.fail.firefox</key>
+				<value>8</value>
+			</statistic>
+		
+		
+			<statistic>
+				<key>stats.ascan.40018.time</key>
+				<value>123</value>
+			</statistic>
+		
+		
+			<statistic>
+				<key>stats.pscan.10021.time</key>
+				<value>67</value>
+			</statistic>
+		
+		
+			<statistic>
+				<key>stats.pscan.recordsToScan</key>
+				<value>21</value>
+			</statistic>
+		
+		
+			<statistic>
+				<key>stats.ascan.40009.started</key>
+				<value>1</value>
+			</statistic>
+		
+		
+			<statistic>
+				<key>stats.ascan.40020.started</key>
+				<value>1</value>
+			</statistic>
+		
+		
+			<statistic>
+				<key>stats.ascan.90023.time</key>
+				<value>2</value>
+			</statistic>
+		
+		
+			<statistic>
+				<key>stats.pscan.Anti CSRF Token Detection</key>
+				<value>1</value>
+			</statistic>
+		
+		
+			<statistic>
+				<key>stats.ascan.40035.time</key>
+				<value>96</value>
+			</statistic>
+		
+		
+			<statistic>
+				<key>stats.pscan.10096.time</key>
+				<value>1</value>
+			</statistic>
+		
+		
+			<statistic>
+				<key>stats.ascan.40021.urls</key>
+				<value>15</value>
+			</statistic>
+		
+		
+			<statistic>
+				<key>stats.ascan.40035.urls</key>
+				<value>52</value>
+			</statistic>
+		
+		
+			<statistic>
+				<key>stats.pscan.10054.alerts</key>
+				<value>1</value>
+			</statistic>
+		
+		
+			<statistic>
+				<key>stats.ascan.40021.time</key>
+				<value>29</value>
+			</statistic>
+		
+		
+			<statistic>
+				<key>stats.ascan.90037.urls</key>
+				<value>36</value>
+			</statistic>
+		
+		
+			<statistic>
+				<key>stats.ascan.100043.urls</key>
+				<value>13</value>
+			</statistic>
+		
+		
+			<statistic>
+				<key>stats.ascan.90019.time</key>
+				<value>42</value>
+			</statistic>
+		
+		
+			<statistic>
+				<key>stats.ascan.time</key>
+				<value>124697</value>
+			</statistic>
+		
+		
+			<statistic>
+				<key>stats.auto.plans.run</key>
+				<value>1</value>
+			</statistic>
+		
+		
+			<statistic>
+				<key>stats.ascan.90024.time</key>
+				<value>3</value>
+			</statistic>
+		
+		
+			<statistic>
+				<key>stats.pscan.10050.time</key>
+				<value>0</value>
+			</statistic>
+		
+		
+			<statistic>
+				<key>stats.ascan.40017.time</key>
+				<value>11</value>
+			</statistic>
+		
+		
+			<statistic>
+				<key>stats.pscan.90033.time</key>
+				<value>1</value>
+			</statistic>
+		
+		
+			<statistic>
+				<key>stats.ascan.10045.urls</key>
+				<value>2</value>
+			</statistic>
+		
+		
+			<statistic>
+				<key>stats.ascan.40019.started</key>
+				<value>1</value>
+			</statistic>
+		
+		
+			<statistic>
+				<key>stats.ascan.40017.urls</key>
+				<value>8</value>
+			</statistic>
+		
+		
+			<statistic>
+				<key>stats.pscan.10019.time</key>
+				<value>0</value>
+			</statistic>
+		
+		
+			<statistic>
+				<key>domxss.gets.count</key>
+				<value>91</value>
+			</statistic>
+		
+		
+			<statistic>
+				<key>stats.ascan.urls</key>
+				<value>837</value>
+			</statistic>
+		
+		
+			<statistic>
+				<key>stats.spider.time</key>
+				<value>69</value>
+			</statistic>
+		
+		
+			<statistic>
+				<key>stats.ascan.40034.started</key>
+				<value>1</value>
+			</statistic>
+		
+		
+			<statistic>
+				<key>stats.pscan.3.time</key>
+				<value>2</value>
+			</statistic>
+		
+		
+			<statistic>
+				<key>stats.ascan.20019.started</key>
+				<value>1</value>
+			</statistic>
+		
+		
+			<statistic>
+				<key>stats.ascan.10045.time</key>
+				<value>10</value>
+			</statistic>
+		
+		
+			<statistic>
+				<key>stats.pscan.10032.time</key>
+				<value>1</value>
+			</statistic>
+		
+		
+			<statistic>
+				<key>stats.ascan.90036.started</key>
+				<value>1</value>
+			</statistic>
+		
+		
+			<statistic>
+				<key>stats.ascan.40012.alerts</key>
+				<value>1</value>
+			</statistic>
+		
+		
+			<statistic>
+				<key>stats.ascan.40016.urls</key>
+				<value>3</value>
+			</statistic>
+		
+		
+			<statistic>
+				<key>stats.pscan.10038.time</key>
+				<value>92</value>
+			</statistic>
+		
+		
+			<statistic>
+				<key>stats.log.warn</key>
+				<value>8</value>
+			</statistic>
+		
+		
+			<statistic>
+				<key>stats.ascan.40016.time</key>
+				<value>11</value>
+			</statistic>
+		
+		
+			<statistic>
+				<key>stats.pscan.10037.time</key>
+				<value>0</value>
+			</statistic>
+		
+		
+			<statistic>
+				<key>stats.ascan.90021.started</key>
+				<value>1</value>
+			</statistic>
+		
+		
+			<statistic>
+				<key>stats.pscan.10031.time</key>
+				<value>0</value>
+			</statistic>
+		
+		
+			<statistic>
+				<key>stats.ascan.40026.urls</key>
+				<value>28</value>
+			</statistic>
+		
+		
+			<statistic>
+				<key>stats.ascan.40020.urls</key>
+				<value>30</value>
+			</statistic>
+		
+		
+			<statistic>
+				<key>stats.pscan.10028.time</key>
+				<value>0</value>
+			</statistic>
+		
+		
+			<statistic>
+				<key>stats.ascan.10045.started</key>
+				<value>1</value>
+			</statistic>
+		
+		
+			<statistic>
+				<key>stats.ascan.20019.urls</key>
+				<value>27</value>
+			</statistic>
+		
+		
+			<statistic>
+				<key>stats.pscan.10003.time</key>
+				<value>46</value>
+			</statistic>
+		
+		
+			<statistic>
+				<key>stats.ascan.40028.started</key>
+				<value>1</value>
+			</statistic>
+		
+		
+			<statistic>
+				<key>stats.pscan.10009.time</key>
+				<value>1</value>
+			</statistic>
+		
+		
+			<statistic>
+				<key>stats.ascan.40045.urls</key>
+				<value>16</value>
+			</statistic>
+		
+		
+			<statistic>
+				<key>stats.ascan.90024.started</key>
+				<value>1</value>
+			</statistic>
+		
+		
+			<statistic>
+				<key>stats.pscan.10038.alerts</key>
+				<value>8</value>
+			</statistic>
+		
+		
+			<statistic>
+				<key>stats.ascan.90019.urls</key>
+				<value>24</value>
+			</statistic>
+		
+		
+			<statistic>
+				<key>stats.pscan.10041.time</key>
+				<value>0</value>
+			</statistic>
+		
+		
+			<statistic>
+				<key>stats.ascan.40020.time</key>
+				<value>63</value>
+			</statistic>
+		
+		
+			<statistic>
+				<key>stats.ascan.40045.time</key>
+				<value>39</value>
+			</statistic>
+		
+		
+			<statistic>
+				<key>stats.pscan.10116.time</key>
+				<value>1</value>
+			</statistic>
+		
+		
+			<statistic>
+				<key>stats.ascan.50000.started</key>
+				<value>1</value>
+			</statistic>
+		
+		
+			<statistic>
+				<key>stats.ascan.40026.time</key>
+				<value>85994</value>
+			</statistic>
+		
+		
+			<statistic>
+				<key>stats.ascan.90029.time</key>
+				<value>3</value>
+			</statistic>
+		
+		
+			<statistic>
+				<key>stats.ascan.20019.time</key>
+				<value>65</value>
+			</statistic>
+		
+		
+			<statistic>
+				<key>stats.ascan.40016.started</key>
+				<value>1</value>
+			</statistic>
+		
+	</statistics>
+	
+		<insights>
+			
+				<insight>
+					<level>Low</level>
+					<reason>Warning</reason>
+					<site></site>
+					<key>insight.log.warn</key>
+					<description>ZAP warnings logged - see the zap.log file for details</description>
+					<statistic>8</statistic>
+				</insight>
+			
+			
+				<insight>
+					<level>Low</level>
+					<reason>Exceeded Low</reason>
+					<site></site>
+					<key>insight.network.failure</key>
+					<description>Percentage of network failures</description>
+					<statistic>16</statistic>
+				</insight>
+			
+			
+				<insight>
+					<level>Info</level>
+					<reason>Informational</reason>
+					<site>http://demo-app:5000</site>
+					<key>insight.code.2xx</key>
+					<description>Percentage of responses with status code 2xx</description>
+					<statistic>73</statistic>
+				</insight>
+			
+			
+				<insight>
+					<level>Info</level>
+					<reason>Informational</reason>
+					<site>http://demo-app:5000</site>
+					<key>insight.code.4xx</key>
+					<description>Percentage of responses with status code 4xx</description>
+					<statistic>20</statistic>
+				</insight>
+			
+			
+				<insight>
+					<level>Info</level>
+					<reason>Informational</reason>
+					<site>http://demo-app:5000</site>
+					<key>insight.code.5xx</key>
+					<description>Percentage of responses with status code 5xx</description>
+					<statistic>6</statistic>
+				</insight>
+			
+			
+				<insight>
+					<level>Info</level>
+					<reason>Informational</reason>
+					<site>http://demo-app:5000</site>
+					<key>insight.endpoint.ctype.application/json</key>
+					<description>Percentage of endpoints with content type application/json</description>
+					<statistic>14</statistic>
+				</insight>
+			
+			
+				<insight>
+					<level>Info</level>
+					<reason>Informational</reason>
+					<site>http://demo-app:5000</site>
+					<key>insight.endpoint.ctype.text/html</key>
+					<description>Percentage of endpoints with content type text/html</description>
+					<statistic>85</statistic>
+				</insight>
+			
+			
+				<insight>
+					<level>Info</level>
+					<reason>Informational</reason>
+					<site>http://demo-app:5000</site>
+					<key>insight.endpoint.method.GET</key>
+					<description>Percentage of endpoints with method GET</description>
+					<statistic>100</statistic>
+				</insight>
+			
+			
+				<insight>
+					<level>Info</level>
+					<reason>Informational</reason>
+					<site>http://demo-app:5000</site>
+					<key>insight.endpoint.total</key>
+					<description>Count of total endpoints</description>
+					<statistic>7</statistic>
+				</insight>
+			
+			
+				<insight>
+					<level>Info</level>
+					<reason>Informational</reason>
+					<site>http://demo-app:5000</site>
+					<key>insight.response.slow</key>
+					<description>Percentage of slow responses</description>
+					<statistic>6</statistic>
+				</insight>
+			
+		</insights>
+	
+	
+	
+</OWASPZAPReport>

@@ -1,0 +1,674 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Semgrep and ZAP report formats</title>
+<style>
+@page { size: A4 landscape; margin: 0; }
+:root {
+  --red: #B22226; --red-dark: #8C1A1D; --red-tint: #FBEDEE; --red-line: #EBC3C5;
+  --ink: #1C2128; --muted: #5A6372; --line: #E2E5EA; --panel: #F5F6F8;
+  --yes: #1E7F3C; --yes-tint: #E3F3E8; --part: #A66A00; --part-tint: #FDF2DC; --no: #A9B0BA; --no-tint: #F1F2F4;
+  --sast: #34405A; --sast-tint: #E8EBF2; --dast: #8C1A1D; --dast-tint: #FBEDEE;
+}
+* { box-sizing: border-box; margin: 0; padding: 0; }
+html, body { background: #fff; color: var(--ink); -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+body { font-family: "Segoe UI", "Segoe UI Variable Text", Arial, sans-serif; font-size: 9.5pt; line-height: 1.35; }
+.page { width: 297mm; height: 210mm; padding: 10mm 13mm 8mm; position: relative; overflow: hidden;
+  display: flex; flex-direction: column; page-break-after: always; break-after: page; }
+.page:last-child { page-break-after: auto; break-after: auto; }
+.page::before { content: ""; position: absolute; left: 0; top: 0; width: 100%; height: 2.4mm; background: var(--red); }
+
+/* header / footer */
+.top { display: flex; align-items: center; justify-content: flex-end; margin-bottom: 3.5mm; }
+.top .tag { font-size: 8.5pt; color: var(--muted); letter-spacing: .04em; text-transform: uppercase; text-align: right; }
+.top .tag b { color: var(--red); font-weight: 600; }
+.foot { margin-top: auto; padding-top: 2.5mm; border-top: 0.3mm solid var(--line); display: flex; justify-content: space-between;
+  gap: 6mm; font-size: 7.5pt; color: var(--muted); }
+.foot b { color: var(--ink); font-weight: 600; }
+
+h1 { font-size: 23pt; line-height: 1.1; font-weight: 700; letter-spacing: -.01em; }
+h1 em { font-style: normal; color: var(--red); }
+.lead { font-size: 10.3pt; color: var(--muted); margin-top: 1.5mm; max-width: 245mm; }
+.lead b { color: var(--ink); font-weight: 600; }
+h2 { font-size: 13pt; font-weight: 700; margin-bottom: 2.5mm; display: flex; align-items: center; gap: 2.5mm; }
+
+/* icons */
+.ic { width: 4mm; height: 4mm; fill: none; stroke: currentColor; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; flex: none; }
+.bubble { display: inline-flex; align-items: center; justify-content: center; width: 7mm; height: 7mm; border-radius: 50%; background: var(--red); color: #fff; flex: none; }
+.bubble .ic { width: 4mm; height: 4mm; }
+.bubble.grey { background: #E3E6EB; color: var(--muted); }
+
+/* tool tags */
+.tool { display: inline-block; font-size: 6.6pt; font-weight: 700; letter-spacing: .06em; text-transform: uppercase;
+  padding: 0.2mm 1.5mm; border-radius: 1mm; white-space: nowrap; vertical-align: middle; }
+.tool.s { background: var(--sast); color: #fff; }
+.tool.z { background: #fff; color: var(--dast); border: 0.3mm solid var(--dast); }
+
+/* page 1: flow strip */
+.flow { display: grid; grid-template-columns: 1.05fr 8mm 1.25fr 8mm 1fr 8mm 1fr; margin: 3mm 0 3.5mm; align-items: stretch; }
+.flow .stack { display: flex; flex-direction: column; gap: 1.4mm; }
+.step { background: var(--panel); border: 0.3mm solid var(--line); border-radius: 2mm; padding: 1.4mm 3mm; display: flex; align-items: center; gap: 2.4mm; }
+.step > .ic { width: 5.5mm; height: 5.5mm; color: var(--red); }
+.step .k { font-size: 7.5pt; text-transform: uppercase; letter-spacing: .06em; color: var(--muted); }
+.step .v { font-size: 10pt; font-weight: 600; line-height: 1.2; }
+.step .v span { font-weight: 400; color: var(--muted); font-size: 8.5pt; }
+.step.key { background: var(--red); border-color: var(--red); color: #fff; }
+.step.key .k { color: #F6D6D7; }
+.step.key > .ic { color: #fff; }
+.step.key .v span { color: #F6D6D7; }
+.flow .tall { height: 100%; }
+.arrow { display: flex; align-items: center; justify-content: center; color: var(--red); font-size: 15pt; font-weight: 700; }
+
+/* page 1: families */
+.families { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 4.5mm; flex: 1; min-height: 0; }
+.fam h3 { font-size: 9.8pt; font-weight: 700; color: var(--red); text-transform: uppercase; letter-spacing: .03em;
+  display: flex; align-items: center; gap: 1.8mm; white-space: nowrap; }
+.fam .fd { font-size: 8.5pt; color: var(--muted); margin: 0.3mm 0 1.8mm; min-height: 7mm; }
+.card { border: 0.3mm solid var(--line); border-left: 1.2mm solid var(--line); border-radius: 1.5mm; padding: 1.3mm 2.5mm 1.5mm;
+  margin-bottom: 1.4mm; background: #fff; }
+.card.paste { border-color: var(--red-line); border-left-color: var(--red); background: var(--red-tint); }
+.card.mono { border-left-color: #D9A8AA; }
+.ct { display: flex; align-items: center; justify-content: space-between; gap: 2mm; }
+.name { font-size: 10pt; font-weight: 700; display: flex; align-items: center; gap: 1.4mm; }
+.card.paste .name .ic { width: 3.8mm; height: 3.8mm; color: var(--red); }
+.use { font-size: 8.2pt; margin: 0.3mm 0 0.9mm; }
+.badge { display: inline-block; background: var(--red); color: #fff; font-size: 6.8pt; font-weight: 700; letter-spacing: .05em;
+  text-transform: uppercase; padding: 0.4mm 1.8mm; border-radius: 3mm; white-space: nowrap; }
+.badge.soft { background: #fff; color: var(--red); border: 0.3mm solid var(--red); }
+.cov { display: flex; gap: 1.1mm; flex-wrap: wrap; }
+.cov i { font-style: normal; font-size: 7.2pt; padding: 0.2mm 1.5mm; border-radius: 2.5mm; white-space: nowrap; }
+.cov i.y { background: var(--yes-tint); color: var(--yes); font-weight: 600; }
+.cov i.y::before { content: "\2713 "; }
+.cov i.p { background: var(--part-tint); color: var(--part); font-weight: 600; }
+.cov i.p::before { content: "\25D0 "; }
+.cov i.n { background: var(--no-tint); color: var(--no); text-decoration: line-through; }
+.cov i.w { background: var(--red-tint); color: var(--red); font-weight: 600; }
+.cov i.w::before { content: "! "; }
+.note { border-radius: 2mm; padding: 2.4mm 3mm; font-size: 8.4pt; margin-bottom: 2mm; }
+.note.dark { background: var(--ink); color: #fff; }
+.note.dark b { color: #FFB9BB; }
+.note.light { background: var(--panel); border: 0.3mm solid var(--line); }
+.note h4 { font-size: 9.5pt; margin-bottom: 1mm; display: flex; align-items: center; gap: 1.5mm; }
+.note h4 .ic { color: var(--red); }
+.note.dark h4 .ic { color: #FFB9BB; }
+.legend div { display: flex; align-items: center; gap: 1.2mm; margin-top: 0.8mm; flex-wrap: nowrap; white-space: nowrap; font-size: 7.8pt; }
+.note.legend { padding: 1.8mm 2.5mm; }
+
+/* page 2 */
+.cols { display: grid; gap: 6mm; flex: 1; min-height: 0; margin-top: 3mm; }
+.cols.p2 { grid-template-columns: 1.12fr 1fr; }
+table { border-collapse: collapse; width: 100%; }
+.matrix th, .matrix td { padding: 0.55mm 1.3mm; border-bottom: 0.3mm solid var(--line); text-align: center; font-size: 8.6pt; }
+.matrix th { font-size: 7.2pt; text-transform: uppercase; letter-spacing: .03em; color: var(--muted); font-weight: 600;
+  border-bottom: 0.5mm solid var(--ink); vertical-align: bottom; line-height: 1.15; }
+.matrix td:first-child, .matrix th:first-child { text-align: left; }
+.matrix td:first-child b { font-weight: 600; } .matrix td:first-child { white-space: nowrap; }
+.matrix tr.paste td { background: var(--red-tint); }
+.matrix tr.grp td { background: none; font-size: 7.4pt; text-transform: uppercase; letter-spacing: .06em; color: var(--red);
+  font-weight: 700; padding-top: 1.2mm; border-bottom: 0.3mm solid var(--red-line); text-align: left; }
+.matrix tr.grp td .tool { margin-right: 1.5mm; }
+.d { display: inline-flex; width: 4.4mm; height: 4.4mm; border-radius: 50%; align-items: center; justify-content: center;
+  font-size: 7.3pt; font-weight: 700; }
+.d.y { background: var(--yes); color: #fff; } .d.y::before { content: "\2713"; }
+.d.p { background: var(--part); color: #fff; } .d.p::before { content: "\00BD"; font-size: 7pt; }
+.d.n { border: 0.35mm solid #C9CED6; color: #C9CED6; } .d.n::before { content: "\2013"; }
+.d.w { background: var(--red); color: #fff; } .d.w::before { content: "!"; }
+.na { color: #C9CED6; font-size: 7.5pt; }
+.pr { font-size: 7.1pt; font-weight: 700; text-transform: uppercase; letter-spacing: .04em; white-space: nowrap; }
+.pr.y { color: var(--red); } .pr.m { color: #B5676A; } .pr.n { color: var(--no); font-weight: 400; }
+.warn { margin-top: 2.2mm; border: 0.4mm solid var(--red); border-left: 2mm solid var(--red); border-radius: 1.5mm;
+  padding: 1.8mm 3mm; background: #fff; font-size: 8.3pt; display: flex; gap: 2.5mm; align-items: flex-start; }
+.warn b { color: var(--red); }
+.warn > .ic { width: 6mm; height: 6mm; color: var(--red); margin-top: 0.2mm; }
+.uses td { padding: 1.1mm 1.5mm; border-bottom: 0.3mm solid var(--line); font-size: 8.6pt; vertical-align: top; }
+.uses th { font-size: 7.6pt; text-transform: uppercase; letter-spacing: .04em; color: var(--muted); font-weight: 600;
+  border-bottom: 0.5mm solid var(--ink); padding: 1.2mm 1.5mm; text-align: left; }
+.uses td:nth-child(2) { font-weight: 700; color: var(--red-dark); }
+.uses td:nth-child(2) .tool { margin-bottom: 0.4mm; }
+.uses td:nth-child(3) { color: var(--muted); font-size: 8pt; }
+.uses tr.paste td:first-child { box-shadow: inset 1.2mm 0 0 var(--red); }
+.uses td:first-child .cell { display: flex; align-items: flex-start; gap: 2mm; }
+.uses td:first-child .ic { width: 4.2mm; height: 4.2mm; color: var(--red); margin-top: 0.3mm; }
+.duo { margin-top: 3mm; border-radius: 2mm; background: var(--panel); border: 0.3mm solid var(--line); padding: 2mm 3mm; }
+.duo h4 { font-size: 9pt; margin-bottom: 1.2mm; display: flex; align-items: center; gap: 1.5mm; }
+.duo h4 .ic { color: var(--red); }
+.duo table td { font-size: 8.2pt; padding: 0.5mm 1.2mm; border-bottom: 0.3mm solid var(--line); text-align: center; }
+.duo table td:first-child { text-align: left; }
+.duo table tr:last-child td { border-bottom: none; }
+.duo table th { font-size: 7pt; text-transform: uppercase; color: var(--muted); font-weight: 600; text-align: center; padding: 0 1.2mm 0.6mm; }
+.duo table th:first-child { text-align: left; }
+
+/* page 3 */
+.tiers { display: grid; grid-template-columns: 1.15fr 1fr 1fr; gap: 5mm; margin-top: 4mm; }
+.tier { border-radius: 2.5mm; padding: 3.2mm 4mm 3.2mm; border: 0.4mm solid var(--line); display: flex; flex-direction: column; }
+.tier.t1 { border: 0.6mm solid var(--red); background: var(--red-tint); }
+.tier.t2 { border: 0.6mm solid var(--red); }
+.tier.t3 { border: 0.4mm dashed #C9CED6; }
+.tier .rank { font-size: 7.5pt; text-transform: uppercase; letter-spacing: .07em; font-weight: 700; color: var(--red); display: flex; justify-content: space-between; align-items: center; }
+.tier.t3 .rank { color: var(--muted); }
+.tier .head { display: flex; align-items: center; gap: 2.8mm; margin-top: 0.8mm; }
+.tier .head .bubble { width: 9.5mm; height: 9.5mm; }
+.tier .head .bubble .ic { width: 5.2mm; height: 5.2mm; }
+.tier h3 { font-size: 15pt; line-height: 1.15; }
+.tier .file { font-family: Consolas, monospace; font-size: 8pt; color: var(--muted); margin-top: 0.4mm; }
+.tier h4 { font-size: 8pt; text-transform: uppercase; letter-spacing: .05em; color: var(--muted); margin: 1.4mm 0 0.9mm; }
+.steps { list-style: none; counter-reset: s; }
+.steps li { counter-increment: s; position: relative; padding-left: 6mm; margin-bottom: 1mm; font-size: 8.7pt; }
+.steps li::before { content: counter(s); position: absolute; left: 0; top: 0.2mm; width: 4.4mm; height: 4.4mm; border-radius: 50%;
+  background: var(--red); color: #fff; font-size: 7pt; font-weight: 700; display: flex; align-items: center; justify-content: center; }
+.facts { list-style: none; }
+.facts li { font-size: 8.5pt; padding-left: 4mm; position: relative; margin-bottom: 0.7mm; }
+.facts li::before { content: ""; position: absolute; left: 0.6mm; top: 1.7mm; width: 1.5mm; height: 1.5mm; border-radius: 50%; background: var(--muted); }
+.facts li.good::before { background: var(--yes); }
+.facts li.bad::before { background: var(--red); }
+.doc { height: 21mm; background: #fff; border: 0.3mm solid var(--line); border-radius: 1mm; padding: 2mm 2.5mm; margin: 1.2mm 0 1.2mm;
+  box-shadow: 0 0.6mm 1.5mm rgba(0,0,0,.08); overflow: hidden; }
+.doc .tl { height: 1.4mm; background: #D7DBE1; border-radius: 0.7mm; margin-bottom: 1.4mm; width: 45%; }
+.doc table td { border: 0.25mm solid #B9BFC8; height: 2.5mm; }
+.doc table tr:first-child td { background: #E8EAEE; }
+.doc table td.c { background: #F4C7C8; }
+.doc pre { font-family: Consolas, monospace; font-size: 4.6pt; line-height: 1.2; color: #3D4552; }
+.doc.pdf { display: flex; gap: 2mm; padding: 1.6mm 2.5mm; background: #EEF0F3; }
+.doc.pdf .pg { flex: 1; background: #fff; border: 0.25mm solid #C9CED6; border-radius: 0.6mm; padding: 1.2mm; }
+.doc.pdf .pg div { height: 0.9mm; background: #D7DBE1; border-radius: 0.5mm; margin-bottom: 0.9mm; }
+.doc.pdf .pg div.r { background: #F4C7C8; width: 60%; }
+.machine { margin-top: 3.5mm; display: grid; grid-template-columns: 62mm 1fr; gap: 4mm; align-items: center;
+  background: var(--panel); border: 0.3mm solid var(--line); border-radius: 2mm; padding: 2.2mm 4mm; }
+.machine + .machine { margin-top: 2mm; }
+.machine .lbl { font-weight: 700; font-size: 9.3pt; display: flex; align-items: center; gap: 2.5mm; }
+.machine .lbl span { display: block; font-size: 7.8pt; color: var(--muted); font-weight: 400; }
+.chips { display: flex; flex-wrap: wrap; gap: 1.3mm; }
+.chips span { background: #fff; border: 0.3mm solid var(--line); border-radius: 3mm; padding: 0.3mm 2.1mm; font-size: 8pt; color: var(--muted); }
+.chips span b { color: var(--ink); font-weight: 600; }
+.recipe { margin-top: 3.5mm; background: var(--ink); color: #fff; border-radius: 2mm; padding: 2.8mm 4.5mm; display: grid;
+  grid-template-columns: auto 1fr 1fr 1fr; gap: 5mm; align-items: center; }
+.recipe .t { font-size: 11pt; font-weight: 700; display: flex; align-items: center; gap: 3mm; }
+.recipe .t span { display: block; font-size: 8pt; color: #C5CBD3; font-weight: 400; }
+.recipe .t .bubble { width: 9mm; height: 9mm; }
+.recipe .t .bubble .ic { width: 5mm; height: 5mm; }
+.recipe .r { font-size: 8.4pt; color: #E4E7EB; border-left: 0.4mm solid #4A525E; padding-left: 4mm; }
+.recipe .r b { color: #FFB9BB; display: block; font-size: 9.6pt; }
+
+/* ---------- v2: one colour per tool ---------- */
+:root { --sem: #34405A; --sem-tint: #EEF1F6; --sem-line: #C3CAD8; --zap: #0B6B73; --zap-tint: #E5F2F3; --zap-line: #A9D2D5; }
+.tool.s { background: var(--sem); color: #fff; border: 0.3mm solid var(--sem); }
+.tool.z { background: var(--zap); color: #fff; border: 0.3mm solid var(--zap); }
+.tool.big { font-size: 10pt; padding: 0.6mm 2.6mm; border-radius: 1.4mm; letter-spacing: .05em; vertical-align: 0.8mm; margin-right: 2mm; }
+
+/* page 1: two panels */
+.split { display: grid; grid-template-columns: 2fr 3fr; gap: 5mm; flex: 1; min-height: 0; margin-top: 3.5mm; }
+.panel { border-radius: 2.5mm; border: 0.4mm solid; display: flex; flex-direction: column; overflow: hidden; background: #fff; }
+.panel.s { border-color: var(--sem-line); } .panel.z { border-color: var(--zap-line); }
+.ph { display: flex; align-items: center; gap: 3mm; padding: 2mm 3.5mm; color: #fff; }
+.panel.s .ph { background: var(--sem); } .panel.z .ph { background: var(--zap); }
+.ph .bubble { background: #fff; width: 8mm; height: 8mm; }
+.panel.s .ph .bubble { color: var(--sem); } .panel.z .ph .bubble { color: var(--zap); }
+.ph .bubble .ic { width: 4.6mm; height: 4.6mm; }
+.ph .t { font-size: 12.5pt; font-weight: 700; line-height: 1.15; }
+.ph .t span { display: block; font-size: 8pt; font-weight: 400; opacity: .88; }
+.ph .count { margin-left: auto; text-align: right; font-size: 21pt; font-weight: 700; line-height: 1; }
+.ph .count span { display: block; font-size: 7pt; font-weight: 600; letter-spacing: .06em; text-transform: uppercase; opacity: .88; margin-top: 0.6mm; }
+.pb { display: grid; gap: 3mm; padding: 2.2mm 3mm 1mm; flex: 1; min-height: 0; }
+.panel.s .pb { grid-template-columns: 1fr 1fr; background: var(--sem-tint); }
+.panel.z .pb { grid-template-columns: 1fr 1fr 1fr; background: var(--zap-tint); }
+.gh { font-size: 7.5pt; font-weight: 700; text-transform: uppercase; letter-spacing: .05em; margin: 0.4mm 0 1.1mm;
+  display: flex; align-items: center; gap: 1.4mm; white-space: nowrap; }
+.panel.s .gh { color: var(--sem); } .panel.z .gh { color: var(--zap); }
+.gh .ic { width: 3.6mm; height: 3.6mm; }
+.gh.next { margin-top: 2mm; }
+.panel .card { margin-bottom: 1.3mm; padding: 1.1mm 2.2mm 1.3mm; }
+.panel.s .card { border-left-color: var(--sem); }
+.panel.z .card { border-left-color: var(--zap); }
+.panel .card.paste { border-left-color: var(--red); }
+.panel .name { font-size: 9.6pt; }
+.panel .use { font-size: 7.9pt; margin: 0.2mm 0 0.8mm; line-height: 1.3; }
+.panel .cov i { font-size: 6.9pt; }
+.remember { margin-top: 3mm; background: var(--ink); color: #fff; border-radius: 2mm; padding: 2.4mm 4.5mm; display: grid;
+  grid-template-columns: auto 1fr 1fr 1fr; gap: 5mm; align-items: center; }
+.remember .t { font-size: 10.5pt; font-weight: 700; display: flex; align-items: center; gap: 2.5mm; white-space: nowrap; }
+.remember .t .ic { width: 5mm; height: 5mm; color: #FFB9BB; }
+.remember .r { font-size: 8.3pt; color: #E4E7EB; border-left: 0.4mm solid #4A525E; padding-left: 4mm; }
+.remember .r b { color: #FFB9BB; }
+.foot .lg { display: inline-flex; gap: 1mm; vertical-align: middle; margin-right: 2mm; }
+.foot .lg i { font-size: 6.6pt; }
+
+/* pages 2-3: one tool per page */
+.cols.p23 { grid-template-columns: 1.1fr 1fr; }
+.tooltag-s .matrix tr.grp td { color: var(--sem); border-bottom-color: var(--sem-line); }
+.tooltag-z .matrix tr.grp td { color: var(--zap); border-bottom-color: var(--zap-line); }
+.matrix td .ext { color: var(--muted); font-family: Consolas, monospace; font-size: 7.2pt; margin-left: 1.2mm; }
+.cmd { margin-top: 2.5mm; background: var(--ink); color: #E4E7EB; border-radius: 1.5mm; padding: 2mm 3mm; font-family: Consolas, monospace;
+  font-size: 7.4pt; line-height: 1.45; }
+.cmd .c { color: #8D96A0; }
+.cmd b { color: #FFB9BB; font-weight: 400; }
+.found { margin-top: 2.5mm; border-radius: 2mm; padding: 2mm 3mm; border: 0.3mm solid var(--line); background: var(--panel); }
+.found h4 { font-size: 9pt; margin-bottom: 1mm; display: flex; align-items: center; gap: 1.5mm; }
+.found h4 .ic { color: var(--red); }
+.found table td { font-size: 8.2pt; padding: 0.45mm 1.2mm; border-bottom: 0.3mm solid var(--line); }
+.found table tr:last-child td { border-bottom: none; }
+.found table td:nth-child(2) { text-align: center; width: 9mm; }
+.found table td:nth-child(3) { color: var(--muted); font-size: 7.8pt; }
+.uses.s td:nth-child(2) { color: var(--sem); }
+.uses.z td:nth-child(2) { color: var(--zap); }
+.uses td:first-child .ic { color: var(--red); }
+
+/* page 4 */
+.chips .tool { margin-right: 0.8mm; }
+.chips .sep { border: none; background: none; padding: 0 1mm; }
+
+</style>
+</head>
+<body>
+<svg width="0" height="0" style="position:absolute">
+ <symbol id="i-file" viewBox="0 0 24 24"><path d="M14 3H6a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V9z"/><path d="M14 3v6h6M8 13h8M8 17h5"/></symbol>
+ <symbol id="i-layers" viewBox="0 0 24 24"><path d="M12 3l9 4.5-9 4.5-9-4.5z"/><path d="M3 12l9 4.5 9-4.5M3 16.5L12 21l9-4.5"/></symbol>
+ <symbol id="i-user" viewBox="0 0 24 24"><circle cx="12" cy="8" r="4"/><path d="M4 21a8 8 0 0 1 16 0"/></symbol>
+ <symbol id="i-users" viewBox="0 0 24 24"><circle cx="9" cy="8" r="3.5"/><path d="M2.5 20a6.5 6.5 0 0 1 13 0"/><path d="M16 4.5a3.5 3.5 0 0 1 0 7M18 14a6.5 6.5 0 0 1 3.5 6"/></symbol>
+ <symbol id="i-server" viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="7" rx="2"/><rect x="3" y="13" width="18" height="7" rx="2"/><path d="M7 7.5h.01M7 16.5h.01M11 7.5h6M11 16.5h6"/></symbol>
+ <symbol id="i-shield" viewBox="0 0 24 24"><path d="M12 3l8 3v6c0 5-3.5 8-8 9-4.5-1-8-4-8-9V6z"/><path d="M9 12l2 2 4-4"/></symbol>
+ <symbol id="i-clipboard" viewBox="0 0 24 24"><rect x="8" y="3" width="8" height="4" rx="1"/><path d="M16 5h2a2 2 0 0 1 2 2v13a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V7a2 2 0 0 1 2-2h2M9 13l2 2 4-4"/></symbol>
+ <symbol id="i-alert" viewBox="0 0 24 24"><path d="M10.3 4.2L2.5 18a2 2 0 0 0 1.7 3h15.6a2 2 0 0 0 1.7-3L13.7 4.2a2 2 0 0 0-3.4 0z"/><path d="M12 9.5v4.5M12 17.5h.01"/></symbol>
+ <symbol id="i-bulb" viewBox="0 0 24 24"><path d="M9 18h6M10 21h4M12 3a6 6 0 0 0-4 10.5c.8.8 1 1.5 1 2.5h6c0-1 .2-1.7 1-2.5A6 6 0 0 0 12 3z"/></symbol>
+ <symbol id="i-grid" viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="16" rx="2"/><path d="M3 10h18M3 15h18M9 4v16M15 4v16"/></symbol>
+ <symbol id="i-chart" viewBox="0 0 24 24"><path d="M3 21h18M6 17v-6M11 17V5M16 17v-9M21 17v-3"/></symbol>
+ <symbol id="i-lines" viewBox="0 0 24 24"><path d="M4 6h16M4 10h16M4 14h10M4 18h13"/></symbol>
+ <symbol id="i-code" viewBox="0 0 24 24"><path d="M8 6l-6 6 6 6M16 6l6 6-6 6"/></symbol>
+ <symbol id="i-check" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M8 12l3 3 5-6"/></symbol>
+ <symbol id="i-merge" viewBox="0 0 24 24"><circle cx="6" cy="5" r="2"/><circle cx="6" cy="19" r="2"/><circle cx="18" cy="12" r="2"/><path d="M6 7v10M6 9c0 3 4 3 10 3"/></symbol>
+ <symbol id="i-lock" viewBox="0 0 24 24"><rect x="5" y="11" width="14" height="10" rx="2"/><path d="M8 11V7a4 4 0 0 1 8 0v4"/></symbol>
+ <symbol id="i-target" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><circle cx="12" cy="12" r="5"/><circle cx="12" cy="12" r="1"/></symbol>
+ <symbol id="i-cpu" viewBox="0 0 24 24"><rect x="6" y="6" width="12" height="12" rx="2"/><path d="M10 2v4M14 2v4M10 18v4M14 18v4M2 10h4M2 14h4M18 10h4M18 14h4"/></symbol>
+ <symbol id="i-star" viewBox="0 0 24 24"><path d="M12 3l2.7 5.6 6.1.9-4.4 4.3 1 6.1L12 17l-5.4 2.9 1-6.1-4.4-4.3 6.1-.9z"/></symbol>
+ <symbol id="i-globe" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M3 12h18M12 3c2.5 2.6 3.8 5.6 3.8 9s-1.3 6.4-3.8 9c-2.5-2.6-3.8-5.6-3.8-9S9.5 5.6 12 3z"/></symbol>
+ <symbol id="i-app" viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="16" rx="2"/><path d="M3 9h18M7 6.5h.01M10 6.5h.01M8 13l-2 2 2 2M16 13l2 2-2 2M13 12l-2 6"/></symbol>
+ <symbol id="i-send" viewBox="0 0 24 24"><path d="M21 3L10 14M21 3l-7 18-4-7-7-4z"/></symbol>
+ <symbol id="i-eye" viewBox="0 0 24 24"><path d="M2 12s3.5-7 10-7 10 7 10 7-3.5 7-10 7S2 12 2 12z"/><circle cx="12" cy="12" r="3"/></symbol>
+ <symbol id="i-book" viewBox="0 0 24 24"><path d="M4 5a2 2 0 0 1 2-2h14v16H6a2 2 0 0 0-2 2z"/><path d="M4 21V5M8 7h8M8 11h6"/></symbol>
+ <symbol id="i-wrench" viewBox="0 0 24 24"><path d="M14.7 6.3a4 4 0 0 0 5 5L21 13l-8 8-3-3 8-8-1.3-1.3a4 4 0 0 0-5-5l2.8 2.8-2 2-2.8-2.8"/><path d="M10 18l-4 4-3-3 4-4"/></symbol>
+</svg>
+
+<!-- ============================== PAGE 1: overview, one panel per tool ============================== -->
+<section class="page">
+  <div class="top"><div class="tag">Security tooling briefing &middot; <b>Semgrep &amp; ZAP report formats</b></div></div>
+  <h1>Two scanners, <em>two different sets of report formats</em></h1>
+  <p class="lead"><b>Semgrep</b> reads the <b>source code</b> (SAST); <b>OWASP ZAP</b> attacks the <b>running application</b> (DAST). Both are free.
+    Each scans once and writes all of <b>its own</b> formats from that scan: the formats are not shared between the two tools.</p>
+
+  <div class="split">
+    <!-- ---------------- SEMGREP ---------------- -->
+    <div class="panel s">
+      <div class="ph"><span class="bubble"><svg class="ic"><use href="#i-code"/></svg></span>
+        <div class="t">Semgrep Community Edition<span>SAST &middot; reads the source code &middot; one scan, about 15 s</span></div>
+        <div class="count">8<span>formats</span></div></div>
+      <div class="pb">
+        <div>
+          <div class="gh"><svg class="ic"><use href="#i-users"/></svg>For people</div>
+          <div class="card mono">
+            <div class="ct"><span class="name">Text</span><span class="badge soft">With effort</span></div>
+            <div class="use">The console output: rule, message, link and code line.</div>
+            <div class="cov"><i class="y">All findings</i><i class="y">Code</i><i class="n">CWE</i></div>
+          </div>
+          <div class="gh next"><svg class="ic"><use href="#i-wrench"/></svg>Editors</div>
+          <div class="card">
+            <div class="ct"><span class="name">Emacs</span><span class="fmt">.txt</span></div>
+            <div class="use">One line per finding; short rule names only.</div>
+            <div class="cov"><i class="p">Short IDs</i><i class="y">Code</i></div>
+          </div>
+          <div class="card">
+            <div class="ct"><span class="name">Vim</span><span class="fmt">.txt</span></div>
+            <div class="use">One line per finding, full rule IDs (quickfix list).</div>
+            <div class="cov"><i class="y">All findings</i><i class="n">Code</i></div>
+          </div>
+          <div class="gh next"><svg class="ic"><use href="#i-shield"/></svg>Automation &amp; evidence</div>
+          <div class="card">
+            <div class="ct"><span class="name">JSON</span><span class="fmt">.json</span></div>
+            <div class="use">Everything, with CWE and OWASP. Free version: code line reads &ldquo;requires login&rdquo;.</div>
+            <div class="cov"><i class="y">All findings</i><i class="y">CWE</i><i class="n">Code</i></div>
+          </div>
+        </div>
+        <div>
+          <div class="gh"><svg class="ic"><use href="#i-server"/></svg>Platforms &amp; CI</div>
+          <div class="card">
+            <div class="ct"><span class="name">SARIF</span><span class="fmt">.sarif</span></div>
+            <div class="use">GitHub code scanning, IDEs. 1 MB: all 560 rules inside.</div>
+            <div class="cov"><i class="y">All findings</i><i class="y">Code</i><i class="y">CWE</i></div>
+          </div>
+          <div class="card">
+            <div class="ct"><span class="name">GitLab SAST</span><span class="fmt">.json</span></div>
+            <div class="use">GitLab security dashboard and merge requests.</div>
+            <div class="cov"><i class="y">All findings</i><i class="n">Code</i><i class="n">CWE</i></div>
+          </div>
+          <div class="card">
+            <div class="ct"><span class="name">GitLab secrets</span><span class="fmt">.json</span></div>
+            <div class="use">GitLab secret detection. Labels <b>every</b> finding a secret.</div>
+            <div class="cov"><i class="w">Mislabelled</i><i class="n">Code</i></div>
+          </div>
+          <div class="card">
+            <div class="ct"><span class="name">JUnit XML</span><span class="fmt">.xml</span></div>
+            <div class="use">CI test results: each finding is a failed test.</div>
+            <div class="cov"><i class="y">All findings</i><i class="y">Code</i></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ---------------- ZAP ---------------- -->
+    <div class="panel z">
+      <div class="ph"><span class="bubble"><svg class="ic"><use href="#i-globe"/></svg></span>
+        <div class="t">OWASP ZAP<span>DAST &middot; attacks the running application &middot; one scan, about 2.5 min</span></div>
+        <div class="count">12<span>formats</span></div></div>
+      <div class="pb">
+        <div>
+          <div class="gh"><svg class="ic"><use href="#i-users"/></svg>For people</div>
+          <div class="card paste">
+            <div class="ct"><span class="name"><svg class="ic"><use href="#i-clipboard"/></svg>Traditional HTML</span></div>
+            <div class="use"><span class="badge">Paste-ready</span> Every alert as real tables; opens in Word.</div>
+            <div class="cov"><i class="y">All alerts</i><i class="y">Evidence</i><i class="y">Fix</i></div>
+          </div>
+          <div class="card paste">
+            <div class="ct"><span class="name"><svg class="ic"><use href="#i-send"/></svg>PDF</span></div>
+            <div class="use"><span class="badge">Send as is</span> The same report, printable, read-only.</div>
+            <div class="cov"><i class="y">All alerts</i><i class="y">Evidence</i><i class="y">Fix</i></div>
+          </div>
+          <div class="card">
+            <div class="ct"><span class="name">High-level report</span><span class="fmt">.html</span></div>
+            <div class="use">Management summary: counts and charts.</div>
+            <div class="cov"><i class="y">All alerts</i><i class="n">Evidence</i><i class="n">Fix</i></div>
+          </div>
+          <div class="card">
+            <div class="ct"><span class="name">Markdown</span><span class="fmt">.md</span></div>
+            <div class="use">Wikis, tickets and pull requests.</div>
+            <div class="cov"><i class="y">All alerts</i><i class="y">Evidence</i><i class="y">Fix</i></div>
+          </div>
+        </div>
+        <div>
+          <div class="gh"><svg class="ic"><use href="#i-wrench"/></svg>For developers</div>
+          <div class="card">
+            <div class="ct"><span class="name">Modern HTML</span><span class="fmt">.html</span></div>
+            <div class="use">Interactive, with charts and the HTTP traffic.</div>
+            <div class="cov"><i class="y">All alerts</i><i class="y">HTTP traffic</i></div>
+          </div>
+          <div class="card">
+            <div class="ct"><span class="name">HTML &ldquo;plus&rdquo;</span><span class="fmt">.html</span></div>
+            <div class="use">Traditional HTML plus every request and response.</div>
+            <div class="cov"><i class="y">All alerts</i><i class="y">HTTP traffic</i></div>
+          </div>
+          <div class="card">
+            <div class="ct"><span class="name">Risk &times; confidence</span><span class="fmt">.html</span></div>
+            <div class="use">Alerts on a risk / confidence grid, for triage.</div>
+            <div class="cov"><i class="y">All alerts</i><i class="p">Some traffic</i></div>
+          </div>
+          <div class="gh next"><svg class="ic"><use href="#i-server"/></svg>Platforms</div>
+          <div class="card">
+            <div class="ct"><span class="name">SARIF</span><span class="fmt">.json</span></div>
+            <div class="use">GitHub code scanning. Alerts point to URLs, not code.</div>
+            <div class="cov"><i class="y">All alerts</i><i class="y">CWE</i></div>
+          </div>
+        </div>
+        <div>
+          <div class="gh"><svg class="ic"><use href="#i-shield"/></svg>Automation &amp; evidence</div>
+          <div class="card">
+            <div class="ct"><span class="name">JSON</span><span class="fmt">.json</span></div>
+            <div class="use">Every alert and instance, with CWE and fix.</div>
+            <div class="cov"><i class="y">All alerts</i><i class="y">CWE</i><i class="y">Evidence</i></div>
+          </div>
+          <div class="card">
+            <div class="ct"><span class="name">JSON &ldquo;plus&rdquo;</span><span class="fmt">.json</span></div>
+            <div class="use">As JSON, plus the HTTP traffic.</div>
+            <div class="cov"><i class="y">All alerts</i><i class="y">HTTP traffic</i></div>
+          </div>
+          <div class="card">
+            <div class="ct"><span class="name">XML</span><span class="fmt">.xml</span></div>
+            <div class="use">Same as JSON, for older tools (e.g. DefectDojo).</div>
+            <div class="cov"><i class="y">All alerts</i><i class="y">CWE</i><i class="y">Evidence</i></div>
+          </div>
+          <div class="card">
+            <div class="ct"><span class="name">XML &ldquo;plus&rdquo;</span><span class="fmt">.xml</span></div>
+            <div class="use">As XML, plus the HTTP traffic.</div>
+            <div class="cov"><i class="y">All alerts</i><i class="y">HTTP traffic</i></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="remember">
+    <div class="t"><svg class="ic"><use href="#i-bulb"/></svg>Three things to remember</div>
+    <div class="r"><b>One scan per tool</b> gives all of that tool&rsquo;s formats: pick the format by reader.</div>
+    <div class="r">For a document use <b>ZAP&rsquo;s Traditional HTML</b>. Semgrep has <b>no document format</b>, only plain text.</div>
+    <div class="r">The tools <b>complement each other</b>: each finds flaws the other cannot see. Keep <b>both JSON</b> reports.</div>
+  </div>
+
+  <div class="foot"><span><span class="cov lg"><i class="y">Carried</i><i class="p">Partly</i><i class="n">Missing</i><i class="w">Misleading</i></span>
+    Formats as of <b>Semgrep CE 1.182.1</b> (free <b>OWASP Top Ten</b> ruleset) and <b>OWASP ZAP 2.17.0</b>, measured November 2026 on the lab&rsquo;s demo app. Samples in <b>samples</b>.</span><span>1 / 4</span></div>
+</section>
+
+<!-- ============================== PAGE 2: Semgrep ============================== -->
+<section class="page tooltag-s">
+  <div class="top"><div class="tag">Security tooling briefing &middot; <b>Semgrep &amp; ZAP report formats</b></div></div>
+  <h1><span class="tool s big">Semgrep</span>8 formats from <em>one code scan</em></h1>
+  <p class="lead">Semgrep Community Edition reads the source code with the free <b>OWASP Top Ten</b> ruleset. On the demo app it found
+    <b>13 findings from 10 rules</b> in about 15 seconds. One <code>semgrep scan</code> writes every format at once.</p>
+
+  <div class="cols p23">
+    <div>
+      <h2><span class="bubble" style="background:var(--sem)"><svg class="ic"><use href="#i-grid"/></svg></span>Content, measured</h2>
+      <table class="matrix">
+        <thead><tr><th>Format</th><th>All<br>findings</th><th>Code<br>line</th><th>CWE /<br>OWASP</th><th>Fix<br>advice</th><th>Into a<br>document</th></tr></thead>
+        <tbody>
+          <tr class="grp"><td colspan="6">For people</td></tr>
+          <tr><td><b>Text</b><span class="ext">.txt</span></td><td><span class="d y"></span></td><td><span class="d y"></span></td><td><span class="d n"></span></td><td><span class="d y"></span></td><td><span class="pr m">With effort</span></td></tr>
+          <tr class="grp"><td colspan="6">Platforms &amp; CI</td></tr>
+          <tr><td><b>SARIF</b><span class="ext">.sarif</span></td><td><span class="d y"></span></td><td><span class="d y"></span></td><td><span class="d y"></span></td><td><span class="d y"></span></td><td><span class="pr n">No</span></td></tr>
+          <tr><td><b>GitLab SAST</b><span class="ext">.json</span></td><td><span class="d y"></span></td><td><span class="d n"></span></td><td><span class="d n"></span></td><td><span class="d y"></span></td><td><span class="pr n">No</span></td></tr>
+          <tr><td><b>GitLab secrets</b><span class="ext">.json</span></td><td><span class="d w"></span></td><td><span class="d n"></span></td><td><span class="d n"></span></td><td><span class="d y"></span></td><td><span class="pr n">No</span></td></tr>
+          <tr><td><b>JUnit XML</b><span class="ext">.xml</span></td><td><span class="d y"></span></td><td><span class="d y"></span></td><td><span class="d n"></span></td><td><span class="d y"></span></td><td><span class="pr n">No</span></td></tr>
+          <tr class="grp"><td colspan="6">Editors</td></tr>
+          <tr><td><b>Emacs</b><span class="ext">.txt</span></td><td><span class="d p"></span></td><td><span class="d y"></span></td><td><span class="d n"></span></td><td><span class="d y"></span></td><td><span class="pr n">No</span></td></tr>
+          <tr><td><b>Vim</b><span class="ext">.txt</span></td><td><span class="d y"></span></td><td><span class="d n"></span></td><td><span class="d n"></span></td><td><span class="d y"></span></td><td><span class="pr n">No</span></td></tr>
+          <tr class="grp"><td colspan="6">Automation &amp; evidence</td></tr>
+          <tr><td><b>JSON</b><span class="ext">.json</span></td><td><span class="d y"></span></td><td><span class="d n"></span></td><td><span class="d y"></span></td><td><span class="d y"></span></td><td><span class="pr n">No</span></td></tr>
+        </tbody>
+      </table>
+      <div class="cmd"><span class="c"># one scan, several outputs (one option per format)</span><br>
+        semgrep scan --config p/owasp-top-ten <b>--text-output</b>=report.txt <b>--json-output</b>=report.json <b>--sarif-output</b>=report.sarif <b>--gitlab-sast-output</b>=&hellip; <b>--junit-xml-output</b>=&hellip; app/</div>
+      <div class="warn"><svg class="ic"><use href="#i-alert"/></svg><div><b>Watch out.</b> The free <b>JSON hides the code line</b> (&ldquo;requires login&rdquo;).
+        <b>GitLab secrets</b> labels SQL injection and XSS as secrets. <b>SARIF</b> carries all 560 rule descriptions (1 MB).
+        <b>Emacs</b> shortens rule names, so two rules can look the same.</div></div>
+    </div>
+
+    <div>
+      <h2><span class="bubble" style="background:var(--sem)"><svg class="ic"><use href="#i-target"/></svg></span>Pick by use case</h2>
+      <table class="uses s">
+        <thead><tr><th>You need to&hellip;</th><th>Use</th><th>Why</th></tr></thead>
+        <tbody>
+          <tr><td><div class="cell"><svg class="ic"><use href="#i-code"/></svg><span>Let developers fix findings in the IDE or GitHub</span></div></td><td>SARIF</td><td>File, line and code; CWE and OWASP</td></tr>
+          <tr><td><div class="cell"><svg class="ic"><use href="#i-merge"/></svg><span>Show findings in GitLab merge requests</span></div></td><td>GitLab SAST</td><td>Not GitLab secrets: it mislabels findings</td></tr>
+          <tr><td><div class="cell"><svg class="ic"><use href="#i-check"/></svg><span>Fail a CI pipeline and show it as test results</span></div></td><td>JUnit XML</td><td>Read by Jenkins, Azure DevOps, GitLab</td></tr>
+          <tr><td><div class="cell"><svg class="ic"><use href="#i-file"/></svg><span>Put code findings in a document</span></div></td><td>Text</td><td>The only readable format: paste in Consolas</td></tr>
+          <tr><td><div class="cell"><svg class="ic"><use href="#i-lines"/></svg><span>Jump to findings from an editor</span></div></td><td>Vim (or Emacs)</td><td>One line per finding; Vim keeps full rule IDs</td></tr>
+          <tr><td><div class="cell"><svg class="ic"><use href="#i-lock"/></svg><span>Keep audit evidence; feed a vulnerability manager</span></div></td><td>JSON</td><td>Complete metadata; add SARIF for the code</td></tr>
+        </tbody>
+      </table>
+      <div class="found">
+        <h4><svg class="ic"><use href="#i-target"/></svg>What Semgrep found in the demo app</h4>
+        <table>
+          <tr><td>SQL injection, XSS, command injection</td><td><span class="d y"></span></td><td>in the code, with the line</td></tr>
+          <tr><td>Hard-coded database password</td><td><span class="d y"></span></td><td>only Semgrep sees it</td></tr>
+          <tr><td>Debug mode on all interfaces</td><td><span class="d y"></span></td><td></td></tr>
+          <tr><td>Cookie without security flags</td><td><span class="d n"></span></td><td>no such rule in the ruleset</td></tr>
+          <tr><td>Missing security headers</td><td><span class="d n"></span></td><td>not visible in the code</td></tr>
+        </table>
+      </div>
+    </div>
+  </div>
+
+  <div class="foot"><span><span class="d y" style="width:3.4mm;height:3.4mm;font-size:6pt;vertical-align:middle"></span> carried &nbsp;
+    <span class="d p" style="width:3.4mm;height:3.4mm;font-size:5pt;vertical-align:middle"></span> partly (short rule names) &nbsp;
+    <span class="d n" style="width:3.4mm;height:3.4mm;font-size:6pt;vertical-align:middle"></span> missing &nbsp;
+    <span class="d w" style="width:3.4mm;height:3.4mm;font-size:6pt;vertical-align:middle"></span> misleading. Semgrep CE 1.182.1, ruleset p/owasp-top-ten (559 rules), November 2026.</span><span>2 / 4</span></div>
+</section>
+
+<!-- ============================== PAGE 3: ZAP ============================== -->
+<section class="page tooltag-z">
+  <div class="top"><div class="tag">Security tooling briefing &middot; <b>Semgrep &amp; ZAP report formats</b></div></div>
+  <h1><span class="tool z big">ZAP</span>12 formats from <em>one attack</em></h1>
+  <p class="lead">OWASP ZAP explores the running app and attacks it. On the demo app it raised <b>12 alert types (27 instances)</b> in about
+    2.5 minutes. One scan, then one <b>report job per template</b>: every template carries every alert.</p>
+
+  <div class="cols p23">
+    <div>
+      <h2><span class="bubble" style="background:var(--zap)"><svg class="ic"><use href="#i-grid"/></svg></span>Content, measured</h2>
+      <table class="matrix">
+        <thead><tr><th>Format</th><th>All<br>alerts</th><th>Evidence</th><th>CWE</th><th>Fix<br>advice</th><th>HTTP<br>traffic</th><th>Into a<br>document</th></tr></thead>
+        <tbody>
+          <tr class="grp"><td colspan="7">For people</td></tr>
+          <tr class="paste"><td><b>Traditional HTML</b><span class="ext">.html</span></td><td><span class="d y"></span></td><td><span class="d y"></span></td><td><span class="d y"></span></td><td><span class="d y"></span></td><td><span class="d n"></span></td><td><span class="pr y">Paste-ready</span></td></tr>
+          <tr class="paste"><td><b>PDF</b><span class="ext">.pdf</span></td><td><span class="d y"></span></td><td><span class="d y"></span></td><td><span class="d y"></span></td><td><span class="d y"></span></td><td><span class="d n"></span></td><td><span class="pr y">Send as is</span></td></tr>
+          <tr><td><b>High-level report</b><span class="ext">.html</span></td><td><span class="d y"></span></td><td><span class="d n"></span></td><td><span class="d p"></span></td><td><span class="d n"></span></td><td><span class="d n"></span></td><td><span class="pr m">Charts lost</span></td></tr>
+          <tr><td><b>Markdown</b><span class="ext">.md</span></td><td><span class="d y"></span></td><td><span class="d y"></span></td><td><span class="d y"></span></td><td><span class="d y"></span></td><td><span class="d n"></span></td><td><span class="pr m">Raw text</span></td></tr>
+          <tr class="grp"><td colspan="7">For developers</td></tr>
+          <tr><td><b>Modern HTML</b><span class="ext">.html</span></td><td><span class="d y"></span></td><td><span class="d y"></span></td><td><span class="d y"></span></td><td><span class="d y"></span></td><td><span class="d y"></span></td><td><span class="pr m">Too long</span></td></tr>
+          <tr><td><b>HTML &ldquo;plus&rdquo;</b><span class="ext">.html</span></td><td><span class="d y"></span></td><td><span class="d y"></span></td><td><span class="d y"></span></td><td><span class="d y"></span></td><td><span class="d y"></span></td><td><span class="pr m">Too long</span></td></tr>
+          <tr><td><b>Risk &times; confidence</b><span class="ext">.html</span></td><td><span class="d y"></span></td><td><span class="d y"></span></td><td><span class="d y"></span></td><td><span class="d y"></span></td><td><span class="d p"></span></td><td><span class="pr m">Too long</span></td></tr>
+          <tr class="grp"><td colspan="7">Platforms, automation &amp; evidence</td></tr>
+          <tr><td><b>SARIF</b><span class="ext">.json</span></td><td><span class="d y"></span></td><td><span class="d y"></span></td><td><span class="d y"></span></td><td><span class="d y"></span></td><td><span class="d n"></span></td><td><span class="pr n">No</span></td></tr>
+          <tr><td><b>JSON</b> &middot; <b>XML</b></td><td><span class="d y"></span></td><td><span class="d y"></span></td><td><span class="d y"></span></td><td><span class="d y"></span></td><td><span class="d n"></span></td><td><span class="pr n">No</span></td></tr>
+          <tr><td><b>JSON &ldquo;plus&rdquo;</b> &middot; <b>XML &ldquo;plus&rdquo;</b></td><td><span class="d y"></span></td><td><span class="d y"></span></td><td><span class="d y"></span></td><td><span class="d y"></span></td><td><span class="d y"></span></td><td><span class="pr n">No</span></td></tr>
+        </tbody>
+      </table>
+      <div class="cmd"><span class="c"># one scan (Automation Framework plan), then one report job per template</span><br>
+        jobs: spider &rarr; passiveScan &rarr; activeScan &rarr; <b>report</b> traditional-html &rarr; <b>report</b> traditional-pdf &rarr; <b>report</b> modern &rarr; &hellip;</div>
+      <div class="warn"><svg class="ic"><use href="#i-alert"/></svg><div><b>Watch out.</b> The <b>PDF job deletes an HTML report with the same name</b>: name them differently.
+        Modern, &ldquo;plus&rdquo;, Risk &times; confidence and High-level need the <b>folder next to the file</b>.
+        The active scan is a real attack: run it only on systems you may test.</div></div>
+    </div>
+
+    <div>
+      <h2><span class="bubble" style="background:var(--zap)"><svg class="ic"><use href="#i-target"/></svg></span>Pick by use case</h2>
+      <table class="uses z">
+        <thead><tr><th>You need to&hellip;</th><th>Use</th><th>Why</th></tr></thead>
+        <tbody>
+          <tr class="paste"><td><div class="cell"><svg class="ic"><use href="#i-file"/></svg><span>List the findings in a Word document</span></div></td><td>Traditional HTML</td><td>Real tables: 18 pages for 12 alerts</td></tr>
+          <tr class="paste"><td><div class="cell"><svg class="ic"><use href="#i-send"/></svg><span>Send a report that must not change</span></div></td><td>PDF</td><td>16 A4 pages, same content as the HTML</td></tr>
+          <tr><td><div class="cell"><svg class="ic"><use href="#i-chart"/></svg><span>Brief management</span></div></td><td>High-level report</td><td>Counts and charts; open it in a browser</td></tr>
+          <tr><td><div class="cell"><svg class="ic"><use href="#i-eye"/></svg><span>Let developers reproduce an attack</span></div></td><td>HTML &ldquo;plus&rdquo; or Modern</td><td>The exact HTTP request and response</td></tr>
+          <tr><td><div class="cell"><svg class="ic"><use href="#i-book"/></svg><span>Post findings in a wiki or ticket</span></div></td><td>Markdown</td><td>Renders in GitHub, GitLab, Confluence</td></tr>
+          <tr><td><div class="cell"><svg class="ic"><use href="#i-code"/></svg><span>Show alerts in GitHub code scanning</span></div></td><td>SARIF</td><td>Accepted, but alerts point to URLs</td></tr>
+          <tr><td><div class="cell"><svg class="ic"><use href="#i-lock"/></svg><span>Keep audit evidence; feed a vulnerability manager</span></div></td><td>JSON (XML for older tools)</td><td>Complete; &ldquo;plus&rdquo; adds the traffic</td></tr>
+        </tbody>
+      </table>
+      <div class="found">
+        <h4><svg class="ic"><use href="#i-target"/></svg>What ZAP found in the demo app</h4>
+        <table>
+          <tr><td>SQL injection, XSS, command injection</td><td><span class="d y"></span></td><td>by attacking the pages</td></tr>
+          <tr><td>Cookie without security flags</td><td><span class="d y"></span></td><td>only ZAP sees it</td></tr>
+          <tr><td>Missing security headers</td><td><span class="d y"></span></td><td>on every page</td></tr>
+          <tr><td>Debug mode on</td><td><span class="d p"></span></td><td>as a server version leak</td></tr>
+          <tr><td>Hard-coded database password</td><td><span class="d n"></span></td><td>not visible from outside</td></tr>
+        </table>
+      </div>
+    </div>
+  </div>
+
+  <div class="foot"><span><span class="d y" style="width:3.4mm;height:3.4mm;font-size:6pt;vertical-align:middle"></span> carried &nbsp;
+    <span class="d p" style="width:3.4mm;height:3.4mm;font-size:5pt;vertical-align:middle"></span> partly (High-level: CWE of top alerts only; Risk &times; confidence: part of the traffic) &nbsp;
+    <span class="d n" style="width:3.4mm;height:3.4mm;font-size:6pt;vertical-align:middle"></span> missing. OWASP ZAP 2.17.0, November 2026.</span><span>3 / 4</span></div>
+</section>
+
+<!-- ============================== PAGE 4: documents ============================== -->
+<section class="page">
+  <div class="top"><div class="tag">Security tooling briefing &middot; <b>Semgrep &amp; ZAP report formats</b></div></div>
+  <h1>Copy &amp; paste into <em>documents</em></h1>
+  <p class="lead">Of twenty formats, <b>one goes into a Word document as is</b> (ZAP&rsquo;s Traditional HTML), <b>one is ready to send</b>
+    (ZAP&rsquo;s PDF) and Semgrep&rsquo;s text works with some formatting. The rest are too long for a document, or data for tools.
+    All results below were tested in Microsoft Word.</p>
+
+  <div class="tiers">
+    <div class="tier t1">
+      <div class="rank"><span>Paste-ready &middot; real tables</span><span class="tool z">ZAP</span></div>
+      <div class="head"><span class="bubble"><svg class="ic"><use href="#i-grid"/></svg></span><h3>Traditional HTML</h3></div>
+      <div class="file">report.traditional.html &middot; traditional-html template</div>
+      <div class="doc"><div class="tl"></div>
+        <table style="width:100%"><tr><td></td><td></td><td></td><td></td></tr><tr><td class="c"></td><td></td><td></td><td></td></tr><tr><td class="c"></td><td></td><td></td><td></td></tr><tr><td></td><td></td><td></td><td></td></tr></table></div>
+      <h4>How</h4>
+      <ol class="steps">
+        <li>Open the <b>.html</b> file in Word (File &rarr; Open).</li>
+        <li>Optional: delete the <b>Insights</b> table (scan statistics).</li>
+        <li>Save as <b>.docx</b>.</li>
+      </ol>
+      <h4>Tested</h4>
+      <ul class="facts">
+        <li class="good">Fits the A4 page width; 15 editable tables.</li>
+        <li class="good">Every alert with description, URLs, evidence and fix.</li>
+        <li class="bad">18 pages for 12 alerts; no HTTP traffic (the &ldquo;plus&rdquo; version has it: 35 pages).</li>
+      </ul>
+    </div>
+
+    <div class="tier t2">
+      <div class="rank"><span>Send as is &middot; read-only</span><span class="tool z">ZAP</span></div>
+      <div class="head"><span class="bubble"><svg class="ic"><use href="#i-send"/></svg></span><h3>PDF</h3></div>
+      <div class="file">report.pdf &middot; traditional-pdf template</div>
+      <div class="doc pdf"><div class="pg"><div></div><div class="r"></div><div></div><div></div><div></div><div></div></div><div class="pg"><div class="r"></div><div></div><div></div><div></div><div class="r"></div><div></div></div><div class="pg"><div></div><div></div><div class="r"></div><div></div><div></div><div></div></div></div>
+      <h4>How</h4>
+      <ol class="steps">
+        <li>Attach <b>report.pdf</b> to the e-mail or document as it is.</li>
+        <li>Name it differently from the HTML report: ZAP deletes an HTML file with the same name.</li>
+      </ol>
+      <h4>Tested</h4>
+      <ul class="facts">
+        <li class="good">16 A4 pages, same content as the Traditional HTML.</li>
+        <li class="good">Nothing to install or format for the reader.</li>
+        <li class="bad">Not editable: to change it, use the HTML version.</li>
+      </ul>
+    </div>
+
+    <div class="tier t3">
+      <div class="rank"><span>With effort &middot; code findings</span><span class="tool s">Semgrep</span></div>
+      <div class="head"><span class="bubble grey"><svg class="ic"><use href="#i-lines"/></svg></span><h3>Text</h3></div>
+      <div class="file">report.txt &middot; --text-output</div>
+      <div class="doc"><pre>
+app/app.py
+ &#10095;&#10095;&#10095; python.flask.security.injection.tainted-sql-string
+      Detected user input used to manually construct
+      a SQL string. ... use a parameterized query.
+      Details: https://sg.run/JxZj
+
+       46&#9478; rows = db.execute("SELECT name, price FROM
+                products WHERE name = '" + q + "'")</pre></div>
+      <h4>How</h4>
+      <ol class="steps">
+        <li>Paste into a <b>landscape</b> page.</li>
+        <li>Set <b>Consolas, 8 pt</b>.</li>
+      </ol>
+      <h4>Tested</h4>
+      <ul class="facts">
+        <li class="good">Rule, message, link and the code line of each finding.</li>
+        <li class="bad">Plain text, not tables; no CWE or OWASP category.</li>
+        <li class="bad">13 findings took 4 pages.</li>
+      </ul>
+    </div>
+  </div>
+
+  <div class="machine">
+    <div class="lbl"><span class="bubble grey"><svg class="ic"><use href="#i-eye"/></svg></span><div>Read in a browser<span>Open in Word, but too long or lossy</span></div></div>
+    <div class="chips"><span class="sep"><span class="tool z">ZAP</span></span><span><b>Modern HTML</b> 54 pages</span><span><b>Risk &times; confidence</b> 36 pages</span><span><b>HTML &ldquo;plus&rdquo;</b> 35 pages</span><span><b>Markdown</b> raw symbols, 21 pages</span><span><b>High-level report</b> charts lost</span></div>
+  </div>
+  <div class="machine">
+    <div class="lbl"><span class="bubble grey"><svg class="ic"><use href="#i-cpu"/></svg></span><div>Not for documents<span>Machine data for tools; attach as files</span></div></div>
+    <div class="chips"><span class="sep"><span class="tool s">Semgrep</span></span><span>JSON</span><span>SARIF</span><span>GitLab SAST</span><span>GitLab secrets</span><span>JUnit XML</span><span>Emacs</span><span>Vim</span><span class="sep"></span><span class="sep"><span class="tool z">ZAP</span></span><span>JSON</span><span>XML</span><span>SARIF</span></div>
+  </div>
+
+  <div class="recipe">
+    <div class="t"><span class="bubble"><svg class="ic"><use href="#i-star"/></svg></span><div>Recommended for a document<span>covers both tools</span></div></div>
+    <div class="r"><b>ZAP Traditional HTML</b>The web findings, as tables in the body or an annex.</div>
+    <div class="r"><b>Semgrep Text</b>The code findings, as a Consolas annex.</div>
+    <div class="r"><b>Both JSON reports</b>Attached as evidence: the complete record of each scan.</div>
+  </div>
+
+  <div class="foot"><span>Word results from Microsoft Word 365 on A4 portrait, measured on the lab&rsquo;s demo app (Semgrep: 13 findings; ZAP: 12 alert types, 27 instances). All files are in <b>samples</b>.</span><span>4 / 4</span></div>
+</section>
+
+</body>
+</html>
